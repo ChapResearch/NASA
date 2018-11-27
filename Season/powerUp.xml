@@ -1,0 +1,277 @@
+<app>
+<!-- The following Document contains the major 3 sections labeled as the following:
+     <elements>
+         -Contains the information that tells the database what to call the inputs, what their values can be, and how to handel organizing them
+     <layout>
+         -Contains the information that tells the app how to layout the fields and what types they will be	 
+     <stats>
+         -Contains the information that tells the database how to do the statistical analysis on the stats gathered on the robots -->
+
+
+ <elements> <!-- comments are placed on the same line as the first time a new tag is introduced, or a tag is introduced in a new context -->
+  
+  <field><!--radio-->          <!-- <field> indicates a new field in which some sort of input will be entered, either
+				            <choice>, <int>, or <event>. Next to this I have placed a comment with
+				            the name of the type of choice field it will be in the <layout> portion below -->
+    <name>scCol</name>         <!-- <name> is the tag that the database and app will use to refer to this field -->
+    <label>Scale Color</label> <!-- <label> is the name that will appear as the heading for the field -->
+    <type>choice</type>        <!-- <type> defines to the database how it will recieve the value of the field:
+                                           -choice: array of int values
+                                           -int: a single int
+                                           -text: string of characters 
+					   -event: array of int values -->
+    <choice>                 <!-- <choice> containes a <label> and <value> that specifies how the app will send the data to
+				             the database and how the database will handel it -->
+      <label>Left</label>    <!-- <label> is the name that will appear as the heading for this choice -->
+      <value>1</value>       <!-- <value> is the int value sent to the database that indicates a cetain choice -->
+    </choice>
+    <choice>
+      <label>Right</label>
+      <value>2</value>
+    </choice>
+
+  </field>
+
+
+  <field><!--radio-->
+    <name>swCol</name>
+    <label>Switch Color</label>
+    <type>choice</type>
+    <choice>
+      <label>Left</label>
+      <value>1</value>
+    </choice>
+    <choice>
+      <label>Right</label>
+      <value>2</value>
+    </choice>
+  </field>
+
+
+  <field> <!--radio-->
+    <name>penalty</name>
+    <label>Penalty</label>
+    <type>choice</type>
+    <choice>
+      <label>Yes</label>
+      <value>1</value>
+    </choice>
+    <choice>
+      <label>No</label>
+      <value>2</value>
+    </choice>
+  </field>
+
+
+  <field><!--intChoice-->                   
+    <name>scScore</name>
+    <label>Scale Score</label>
+    <type>int</type>            <!-- The int <type> which returns an single int value to the database -->
+  </field>
+
+
+  <field> <!--intChoice-->
+    <name>swScore</name>
+    <label>Switch Score</label>
+    <type>int</type>
+  </field>
+
+
+
+  <field> <!--radio-->
+    <name>pos</name>
+    <label>Position</label>
+    
+    <!--The choices in a Choice <type>  will use the <value> as it's label if <label> is not present-->
+    <choice>
+      <value>1</value>
+    </choice>
+    <choice>
+      <value>2</value>
+    </choice>
+    <choice>
+      <value>3</value>
+    </choice>
+  </field>
+
+
+  <!-- The Following is the same data being gathered as the above <radio>, however this one is using a <dropdown> -->
+  <field> <!--dropdown-->
+    <name>posDD</name>
+    <label>Position</label>
+    <choice>
+      <value>1</value>
+    </choice>
+    <choice>
+      <value>2</value>
+    </choice>
+    <choice>
+      <value>3</value>
+    </choice>
+  </field>
+
+  <field>
+    <name>swBlocks</name>
+    <label>Switch Blocks</label>
+    <type>int</type>
+  </field>
+
+  <field>
+    <name>scBlocks</name>
+    <label>Scale Blocks</label>
+    <type>int</type>
+  </field>
+
+  <field>
+    <name>vBlocks</name>
+    <label>Vault Blocks</label>
+    <type>int</type>
+  </field>
+
+  <field> <!-- Events -->
+    <name>blocScor</name>
+    <label>Block Scoring</label>
+    <type>event</type>
+    <choices>
+      <choice>
+	<name>pickup</name>
+	<value></value>
+      </choice>
+    </choices>
+  </field>
+
+  <field>
+    <name>hangType</name>
+    <label>Hang Type</label>
+    <type>choice</type>
+    <choice>
+      <name>Self-Hang</name>
+      <value>1</value>
+    </choice>
+    <choice>
+      <name>Assisted Other</name>
+      <value>2</value>
+    </choice>
+    <choice>
+      <name>Assisted by Other</name>
+      <value>3</value>
+    </choice>
+  </field>
+  
+ </elements>
+
+
+
+
+<layout>                           <!-- <layout>
+                                        -Contains the information that tells the app how to layout the fields and what types they will be -->
+  <field> <!-- AUTO -->
+    <type>text</type>
+    <label>Auto</label>
+    <location>2,2</location>       <!-- The numbers in <location> are percentages of the size of the screen and are as follows: x,y -->
+  </field>
+  
+  <field> <!-- Scale Color -->
+    <type>radio</type>
+    <name>scCol</name>
+    <optional>true</optional>
+    <layout>B</layout>
+    <location>5,5</location>
+  </field>
+
+  <field> <!-- Switch Color -->
+    <type>radio</type>
+    <name>swCol</name>
+    <optional>true</optional>
+    <layout>B</layout>
+    <location>15,5</location>    
+  </field>
+
+  <field> <!-- Scale Score Auto -->
+    <type>intChoice</type>
+    <name>scScore</name>
+    <default>0</default>
+    <layout>R</layout>
+    <location>5,20</location>    
+  </field>
+  
+  <field> <!-- Switch Score Auto -->
+    <type>intChoice</type>
+    <name>swScore</name>
+    <default>0</default>
+    <layout>R</layout>
+    <location>25,20</location>    
+  </field>
+
+  <field> <!-- Penalty -->
+    <type>radio</type>
+    <name>penalty</name>
+    <default>2</default>
+    <optional>true</optional>
+    <layout>B</layout>
+    <location>25,5</location>    
+  </field>
+
+  <field> <!-- Position -->
+    <type>radio</type>
+    <name>pos</name>
+    <optional>true</optional>
+    <layout>B</layout>
+    <location>35,5</location>    
+  </field>
+
+  <field> <!-- Position (with dropdown) -->         <!-- this is for the same field as the top one, however this one is a dropdown -->
+    <type>dropdown</type>
+    <name>posDD</name>
+    <optional>true</optional>
+    <layout>B</layout>
+    <location>45,5</location>
+  </field>x
+
+  <field> <!-- TELE-OP -->
+    <type>text</type>
+    <label>Tele-op</label>
+    <location>2,35</location>
+  </field>
+
+  <field> <!-- Switch Blocks Scored -->
+    <type>intChoice</type>
+    <name>swBlocks</name>
+    <default>0</default>
+    <layout>R</layout>
+    <location>5,40</location>
+  </field>
+  
+  <field> <!-- Scale Blocks Scored -->
+    <type>intChoice</type>
+    <name>scBlocks</name>
+    <default>0</default>
+    <layout>R</layout>
+    <location>25,40</location>
+  </field>
+  
+  <field> <!-- Vault Blocks -->
+    <type>intChoice</type>
+    <name>vBlocks</name>
+    <default>0</default>
+    <layout>R</layout>
+    <location>45,40</location>
+  </field>
+
+  <field> <!-- END GAME -->
+    <type>text</type>
+    <label>End Game</label>
+    <location>2,60</location>
+  </field>
+
+  <field> <!-- Hang Type -->
+    <type>radio</type>
+    <name>hangType</name>
+    <layout>B</layout>
+    <location>5,65</location>
+  </field>
+  
+</layout>
+
+
+</app>
