@@ -1,0 +1,489 @@
+div.connect-indicator {
+    position: absolute;
+    bottom: 15px;
+    left: 230px;
+    height: 25px;
+    width: 25px;
+    border-radius: 15px;
+    border: 3px solid white;
+    background-color: red;
+    cursor: pointer;
+}
+
+div.connect-indicator.connected {
+    background-color: green;
+}
+
+div.top-bar {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 60px;
+    width: 100%;
+    background-color: #5555ff;
+    color: white;
+    font-family: 'Arial',sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+div.top-bar .controller-line,
+div.top-bar .match-line,
+div.top-bar .myname-line {
+    position: absolute;
+    bottom: 20px;
+    text-decoration: underline;
+    overflow-x: hidden;
+    font-size:28px;
+    white-space: nowrap;
+    text-align: center; 
+}    
+
+div.top-bar .controller-line:before,
+div.top-bar .match-line:before,
+div.top-bar .myname-line:before {
+    content: '\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0\a0'; 
+}
+
+div.top-bar .controller-name span,
+div.top-bar .match-name span,
+div.top-bar .myname-name span {
+    background-color: #5555ff;
+}
+
+div.top-bar .contributor-prompt span {
+    background-color: #5555ff;
+}
+
+div.top-bar .controller-name,
+div.top-bar .myname-name,
+div.top-bar .match-name {
+    position: absolute;
+    bottom: 20px;
+    text-decoration: underline;
+    overflow-x: hidden;
+    font-size:28px;
+    white-space: nowrap;
+    text-align: center;
+    z-index:1;
+}
+
+div.top-bar .myname-name,
+div.top-bar .myname-prompt {
+    cursor: pointer;
+}
+
+div.top-bar .contributor-prompt,
+div.top-bar .controller-prompt,
+div.top-bar .myname-prompt,
+div.top-bar .match-prompt { 
+    position: absolute;
+    bottom: 4px;
+    font-size: 14px;
+    font-style: italic;
+    color: #ddddff;
+    text-align: center;
+
+    background-color: #ffffff00;
+    z-index: 1;
+}
+
+div.top-bar .controller-line,
+div.top-bar .controller-prompt,
+div.top-bar .controller-name {
+    left: 10px;
+    width: 200px;
+}
+
+div.top-bar .contributor-prompt { 
+    left: 290px;
+    width: 200px;
+}
+
+div.top-bar .contributor-prompt span:before,
+div.top-bar .contributor-prompt span:after { 
+    content: '\a0\a0';
+}
+
+
+div.top-bar div.contributor-sideline {
+    position: absolute;
+    bottom: 10px;
+    left: 271px;
+    height: 5px;
+    width: 250px;
+    border-left: 2px solid white;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+    z-index: 0;
+}
+    
+div.top-bar div.contributor {
+    position: absolute;
+    bottom: 15px;
+    left: 270px;
+    z-index: 2;
+}
+
+div.top-bar div.contributor .letter {
+    font-size: 25px;
+    padding-top: 3px;
+    height: 32px;
+    width: 32px;
+    display: inline-block;
+    text-align: center;
+    border: 3px solid #ffffff00;
+    cursor: pointer;
+}
+
+div.top-bar div.contributor .letter:hover {
+    border: 3px solid #ffdddd;
+    border-radius: 19px;
+}
+div.top-bar div.contributor .letter.selected {
+    border: 3px solid #ff0000;
+    border-radius: 19px;
+}
+div.top-bar div.contributor .letter.selected:hover {
+    border: 3px solid #ff4444;
+    border-radius: 19px;
+}
+
+div.top-bar .myname-line,
+div.top-bar .myname-name,
+div.top-bar .myname-prompt {
+    left: 550px;
+    width: 130px;
+}
+
+div.top-bar .match-name,
+div.top-bar .match-line,
+div.top-bar .match-prompt {
+    left: 700px;
+    width: 70px;
+}
+
+div.top-bar .settings {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+}
+div.top-bar .settings img {
+    height: 30px;
+}
+
+/**** "about" is used during start-up, and like the overlay, uses the whole screen ****/
+
+div.about {
+/**** the overlay is used when setting options ***/
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    z-index: 99;
+}
+
+div.birdy {
+    position: absolute;
+    top: 200px;
+}
+
+div.overlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: black;
+    opacity: .5;
+    width: 100%;
+    height: 100%;
+    z-index: 99;
+}
+div.settings-form,
+div.connecting-dialog
+{
+    position: absolute;
+    top: 200px;
+    left: 200px;
+    width: 300px;
+    height: 390px;
+    border: 4px solid blue;
+    background-color: #dddddd;
+    opacity: 1;
+    z-index: 100;
+    font-family: "Arial",sans-serif;
+    font-size: 24px;
+    text-align: center;
+}
+
+div.settings-form div.password-input input,
+div.settings-form div.myname-input input {
+    font-size: 32px;
+    width: 250px;
+    border: 0px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+div.settings-form div.title {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+div.settings-form .logo {
+    text-align: center;
+}
+
+div.settings-form button,
+div.connecting-dialog button
+{
+    margin-top: 10px;
+    border-radius: 5px;
+    width: 200px;
+    height: 50px;
+    font-size: 18px;
+    color: white;
+    background-color: #0f599a;
+}
+
+div.settings-form button:hover,
+div.connecting-dialog button:hover {
+    background-color: #0f599add;
+}
+
+div.connecting-dialog .contacting-controller,
+div.connecting-dialog .getting-name,
+div.connecting-dialog .checking-password,
+div.connecting-dialog .checking-slot {
+    font-size: 18px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+div.connecting-dialog .connected,
+div.connecting-dialog .contacting-controller .fail,
+div.connecting-dialog .getting-name .fail,
+div.connecting-dialog .checking-password .fail,
+div.connecting-dialog .checking-slot .fail {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/******* buttons and timer on the bottom ********/
+
+div.bottom-bar {
+    font-family: 'Arial',sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    height: 70px;
+    width: 100%;
+    position: absolute;
+    top: 63px;
+    left: 0px;
+    background-color: #7777ff;
+    color: white;
+}
+
+div.bottom-bar .team-number {
+    font-family: 'Arial',sans-serif;
+    font-weight: bold;
+    font-size: 45px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    width: 150px;
+    height: 50px;
+    text-align: center;
+    background-color: #8888ff;
+    cursor: pointer;
+}
+
+div.bottom-bar .team-color {
+    position: absolute;
+    top: 10px;
+    height: 50px;
+    width: 50px;
+    left: 180px;
+    border-radius: 10px;
+    font-size: 9px;
+    cursor: pointer;
+}
+
+div.bottom-bar .team-color div {
+    margin-top: 15px;
+    width: 100%;
+    text-align: center;
+    color: white;
+}
+
+div.bottom-bar .team-color.blue {
+    background-color: blue;
+}
+
+div.bottom-bar .team-color.blue div {
+    color: blue;
+}
+
+div.bottom-bar .team-color.red {
+    background-color: red;
+}
+
+div.bottom-bar .team-color.red div {
+    color: red;
+}
+
+div.bottom-bar .team-color.none {
+    background-color: grey;
+    height: 40px;
+    width: 40px;
+    border: 5px solid black;
+    
+}
+
+div.bottom-bar canvas {
+    position: absolute;
+    bottom: 10px;
+    left: 240px;
+}
+
+div.bottom-bar button {
+    position: absolute;
+    bottom: 10px;
+    height: 50px;
+    width: 120px;
+    border-radius: 15px;
+    border: 4px solid white;
+    font-size: 30px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+}
+
+div.bottom-bar button.start {
+    left: 400px;
+    background-color: #00aa00;
+}
+
+div.bottom-bar button.stop {
+    left: 535px;
+    background-color: #ff3333;
+    disable: true;
+}
+
+div.bottom-bar button.stop:disabled,
+div.bottom-bar button.send:disabled,
+div.bottom-bar button.start:disabled {
+    background-color: #dddddd;
+    cursor: default;
+}
+
+div.bottom-bar button.send {
+    right: 10px;
+    background-color: #3333ff;
+}
+
+div.content {
+    position: absolute;
+    top: 133px;
+    left: 0px;
+    width: calc(100% - 16px);
+    height: calc(100% - 141px );
+    border-left: 8px solid #7777ff;
+    border-right: 8px solid #7777ff;
+    border-bottom: 8px solid #7777ff;
+    overflow: hidden;
+}
+    
+/****** numeric keypad ******/
+
+div.keypad {
+    position: absolute;
+    top: 100px;
+    left: 100px;
+    z-index: 1000;
+    background-color: white;
+    font-family: 'Arial',sans-serif;
+    font-weight: bold;
+    font-size: 28px;
+    width: 300px;
+    border: 4px solid blue;
+    background-color: #dddddd;
+    opacity: 1;
+    padding: 10px;
+}
+
+div.keypad div.display {
+    height: 40px;
+    border-radius: 5px;
+    border: 3px solid black;
+    margin-bottom: 10px;
+    background-color: white;
+    padding: 10px;
+}
+
+div.keypad div.display input {
+    width: 100%;
+    text-align: right;
+    font-size: 38px;
+    outline:none;
+    border: 0px;
+    font-weight: bold;
+}
+
+div.keypad div.number {
+    width: 50px;
+    height: 40px;
+    margin: 5px;
+    background-color: #2222ff;
+    color: white;
+    text-align: center;
+    padding-top: 10px;
+    border-radius: 10px;
+    float: left;
+    cursor: pointer;
+}
+div.keypad div.number:hover {
+    background-color: #3333ff;
+}
+
+div.keypad div.blank.number {
+    background-color: inherit;
+    cursor: default;
+}
+
+div.keypad div.control {
+    width: 105px;
+    height: 40px;
+    margin: 5px 0px 5px 15px;
+    background-color: #22aaff;
+    color: white;
+    text-align: center;
+    padding-top: 10px;
+    border-radius: 10px;
+    float: left;
+    cursor: pointer;
+}
+
+div.keypad div.control:hover {
+    background-color: #33bbff;
+}
+
+div.keypad div.blank.control {
+    background-color: inherit;
+    cursor: default;
+}    
+
+div.control {
+    width: 100px;
+    height: 40px;
+    margin-top: 10px;
+}
+
+div.newrow {
+    clear: both;
+}
