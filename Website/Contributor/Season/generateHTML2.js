@@ -4,37 +4,36 @@
 //
 //
 
-var script = document.createElement('script');
-script.src = 'http://code.jquery.com/jquery-1.11.0.min.js';
-script.type = 'text/javascript';
-document.getElementsByTageName('head')[0].appendChild(script);
-
-function seasonLoad_generateHTML(seasonXML,target)
+function seasonLoad_generateHTML(seasonXML)
 {
     var output = "";
 //    output += generateHeader();
     
-    var layoutFields = $("layout field", seasonXML);
-    var elementFields =  $("elements field", seasonXML);
+    var layoutFields = seasonXML.find("layout field");
+    var elementFields = seasonXML.find("elements field");
     
-	layoutFields.each(function()
-	{
-	    var type = $(this).find("type").text();
-	    var name = $(this).find("name").text();
-	    var targetElementField = fieldElementByName(elementFields,name);
-	    
-	    switch(type)
-	    {
-		case "text":        output += generateTextField($(this),targetElementField); break;
-		case "radio":       output += generateRadioField($(this),targetElementField); break;
-		case "intChoice":   output += generateIntChoiceField(field,targetElementField); break;
-		case "dropdown":    output += generateDropField(field,targetElementField); break;
-		case "checkbox":    output += generateCheckboxField(field,targetElementField); break;
-		case "slider":      output += generateSliderField(field,targetElementField); break;
-		case "event":       output += generateEventButton(field,targetElementField); break;
-		case "eventWindow": output += generateEventWindow(field,targetElementField); break; 
-	    }
-	});
+    layoutFields.each(function()
+		      {
+			  var type = $(this).find("type").text();
+			  var nameObj = $(this).find("name");
+			  if(nameObj.length != 0) {
+			      console.log("Processing: " + nameObj.text());
+			      var targetElementField = findElementByName(elementFields,nameObj.text());
+			      console.log(targetElementField);
+			  }
+			  
+			  switch(type)
+			  {
+			      case "text":        output += generateTextField($(this)); break;
+			      case "radio":       output += generateRadioField($(this),targetElementField); break;
+			      case "intChoice":   output += generateIntChoiceField($(this),targetElementField); break;
+			      case "dropdown":    output += generateDropField($(this),targetElementField); break;
+			      case "checkbox":    output += generateCheckboxField($(this),targetElementField); break;
+			      case "slider":      output += generateSliderField($(this),targetElementField); break;
+			      case "event":       output += generateEventButton($(this),targetElementField); break;
+			      case "eventWindow": output += generateEventWindow($(this)); break; 
+			  }
+		      });
     
 //    output += generateFooter();
 
@@ -45,14 +44,19 @@ function seasonLoad_generateHTML(seasonXML,target)
 
 function findElementByName(elementFields, targetName)
 {
+    console.log("looking for " + targetName);
+
+    var retElement = null;
+    
     elementFields.each(function()
 		       {
 			   var name = $(this).find("name").text();
 			   if(name == targetName){
-			       return $(this);
+			       console.log("found " + name);
+			       retElement = $(this);
 			   }
 		       });
-    return null;
+    return(retElement);
 }
 
 
@@ -61,7 +65,7 @@ function findElementByName(elementFields, targetName)
 function fieldPosition(layoutField)
 {
     var output = ""
-    var location = layoutField('location');
+    var location = layoutField.find('location').text();
     var pos = location.split(",");
     if (pos.length != 2){
 	pos = [50, 50];
@@ -82,10 +86,11 @@ function getChoices(name, targetElementField, type)
 		 {
 		     var name = this.find("name");
 		     var value = this.find("value");
-		     if (name == null)
+		     if (name == null) {
 			 name = value;
+		     }
 		     output += '<input type="' + type + '" name="' + name + '" value="' + value + '">' + name + '<br>';
-		 }
+		 });
 
     return output;
 }
@@ -93,11 +98,11 @@ function getChoices(name, targetElementField, type)
 
 
 
-function eventWindowStyle(field)
+function eventWindowStyle(layoutField)
 {
     var output = ""
-    var location = layoutField('location');
-    var size = layoutField('size');
+    var location = layoutField.find('location').text();
+    var size = layoutField.find('size').text();
     var dim = size.split(",");
     if (dim.length != 2){
 	dim = [15, 50];
@@ -118,11 +123,11 @@ function eventWindowStyle(field)
 function generateEventButton(layoutField,elementField)
 {
     var output = "";
-    var name = layoutField.find('name');
-    var ewid = layoutField.find('ewid');
-    var label = elementField.find('name');
+    var name = layoutField.find('name').text();
+    var ewid = layoutField.find('ewid').text();
+    var label = elementField.find('name').text();
 
-    output += '<div class="NASA-event-button" ' + fieldPosition(field) + '>';    
+    output += '<div class="NASA-event-button" ' + fieldPosition(layoutField) + '>';    
     output += '<button onclick="eventTagTime(&quot;' + ewid + '&quot;' + ', &quot;' + label + '&quot;)">' + label + '</button>';
     output += '</div>';
 
@@ -132,13 +137,12 @@ function generateEventButton(layoutField,elementField)
 
 
 
-function generateEventWindow(layoutField,elementField)
+function generateEventWindow(layoutField)
 {
     var output = "";
     var ewid = layoutField.find('ewid');
-    var label = elementField.find('name');    
     
-    output += '<div class="NASA-event-window" id="' + ewid + '" ' + eventWindowStyle(field) + '>';
+    output += '<div class="NASA-event-window" id="' + ewid + '" ' + eventWindowStyle(layoutField) + '>';
 
     output += '</div>';
 
@@ -147,12 +151,12 @@ function generateEventWindow(layoutField,elementField)
 
 
 
-function generateTextField(layoutField, elementField)
+function generateTextField(layoutField)
 {
     
     var output = "";
 
-    output += '<div class="NASA-field-text" ' + fieldPosition(field) + '>';
+    output += '<div class="NASA-field-text" ' + fieldPosition(layoutField) + '>';
     var text = layoutField.find("label").text();
     output += text;
     output += '</div>';
@@ -168,7 +172,7 @@ function generateRadioField(layoutField, elementField)
     var output = "";
     var label = elementField.find("label").text();
     
-    output += '<div class="NASA-field-radio" ' + fieldPosition(field) + '>';
+    output += '<div class="NASA-field-radio" ' + fieldPosition(layoutField) + '>';
     output += label + "<br>";
     output += getChoices(name, elementField, "radio");
     output += '</div>';
@@ -183,10 +187,10 @@ function generateIntChoiceField(layoutField, elementField)
 {
     
     var output = "";
-    var name = layoutfield.find('name');
-    var label = elementField.find('label');;
+    var name = layoutField.find('name').text();
+    var label = elementField.find('label').text();
     
-    output += '<div class="NASA-field-intChoice" ' + fieldPosition(field) + '>';
+    output += '<div class="NASA-field-intChoice" ' + fieldPosition(layoutField) + '>';
     output += label;
     output += '<input type="number" name="' + name + '" step="1">';
     output += '</div>';
@@ -200,10 +204,10 @@ function generateIntChoiceField(layoutField, elementField)
 function generateCheckboxField(layoutField, elementField)
 {
     var output = "";
-    var name = layoutField.find('name')
-    var label = elementField.find('label');
+    var name = layoutField.find('name').text();
+    var label = elementField.find('label').text();
     
-    output += '<div class="NASA-field-checkbox" ' + fieldPosition(field) + '>';
+    output += '<div class="NASA-field-checkbox" ' + fieldPosition(layoutField) + '>';
     output += label + "<br>";
     output += getChoices(name, elementField, "checkbox");
     output += '</div>';
@@ -217,12 +221,12 @@ function generateCheckboxField(layoutField, elementField)
 function generateSliderField(layoutField, elementField)
 {
     var output = "";
-    var name = layoutField.find('name');
-    var label = elementField.find('name');
-    var max = layoutField.find('max');
-    var min = layoutField.find('min');
+    var name = layoutField.find('name').text();
+    var label = elementField.find('name').text();
+    var max = layoutField.find('max').text();
+    var min = layoutField.find('min').text();
     
-    output += '<div class="NASA-field-intChoice" ' + fieldPosition(field) + '>';
+    output += '<div class="NASA-field-intChoice" ' + fieldPosition(layoutField) + '>';
     output += label;
     output += '<input type="range" name="' + name + '" max="' + max + '" min="' + min + '" id="' + label + '" value="5">';
     output += '<p>Value: <span id="' + name + '"></span></p>';
@@ -241,10 +245,10 @@ function generateSliderField(layoutField, elementField)
 function generateLine(layoutField,elementField)
 {
     var output = "";
-    var name = elementField.find('name');
-    var size = elementField.find('size');
+    var name = elementField.find('name').text();
+    var size = elementField.find('size').text();
 	
-    output += '<div class="NASA-line" ' + fieldPosition(field) + '>';
+    output += '<div class="NASA-line" ' + fieldPosition(layoutField) + '>';
     output += '<hr size="' + size + '" width="' + width + '">';
     output += '</div>';
 
@@ -252,7 +256,10 @@ function generateLine(layoutField,elementField)
     return output;
 }
 
-
+function generateDropField(layoutField,targetElementField)
+{
+    return("");
+}
 
 
     
