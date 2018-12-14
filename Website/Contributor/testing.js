@@ -235,6 +235,22 @@ function keypadControl(control)
     keypadNumberObj.val(newNumber);
 }
 
+// must run the XML code after resources have been loaded to get the seasonXML object loaded
+
+$( window ).on( "load", function() { 
+
+    var xmldata = document.getElementById("seasonXML").contentDocument;
+
+    var jObject = $("app",xmldata);      // the jQuery'able xml data
+    var target = $("div.content");       // the place where all new fields should be written
+
+    // uncomment this code for a little test of the load
+    //    console.log(xmldata);
+    //    jObject.find("layout field").each(function() { console.log($(this).find('name').text()); });
+
+//    doSomething(jObject,target);
+});
+
 $( document ).ready(function() {
 
     myNASA.slot = $('div.contributor .letter.selected').data('contributor');
@@ -243,7 +259,7 @@ $( document ).ready(function() {
 
     // set-up for the about page, that terminates in bringing up the settingsForm
     about();
-
+    
     // clear the timer
     timerClear();
 

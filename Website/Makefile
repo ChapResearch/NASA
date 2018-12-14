@@ -53,7 +53,7 @@ fb-logout:
 fb-init: .firebaserc firebase.json
 
 fb-deploy:
-	firebase deploy
+	firebase deploy --only hosting
 
 clean: 
 	rm -fr node_modules
@@ -69,6 +69,6 @@ deploy:	.firebaserc firebase.json deployment
 	cp -R Main/* deployment
 	cp -R Contributor deployment
 	cp -R ../Season deployment
-	firebase deploy
+	firebase deploy --only hosting
 
 refresh:
