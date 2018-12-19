@@ -55,6 +55,9 @@ fb-init: .firebaserc firebase.json
 fb-deploy:
 	firebase deploy --only hosting
 
+favicon.ico: nasa-birdy-logo.ico
+	cp nasa-birdy-logo.ico favicon.ico
+
 clean: 
 	rm -fr node_modules
 	rm -fr firebase.json .firebaserc
@@ -65,10 +68,12 @@ clean:
 deployment:
 	mkdir deployment
 
-deploy:	.firebaserc firebase.json deployment
+deploy:	.firebaserc firebase.json deployment favicon.ico
 	cp -R Main/* deployment
 	cp -R Contributor deployment
 	cp -R ../Season deployment
+	cp -R Contributor/Season deployment/Contributor
+	cp favicon.ico deployment
 	firebase deploy --only hosting
 
 refresh:

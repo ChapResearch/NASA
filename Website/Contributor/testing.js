@@ -248,7 +248,9 @@ $( window ).on( "load", function() {
     //    console.log(xmldata);
     //    jObject.find("layout field").each(function() { console.log($(this).find('name').text()); });
 
-//    doSomething(jObject,target);
+    var output = seasonLoad_generateHTML(jObject)
+
+    target.append(output);
 });
 
 $( document ).ready(function() {
