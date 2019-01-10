@@ -1,0 +1,612 @@
+<app>
+
+  
+  <elements>
+    
+    <field><!--radio-->
+      <name>PreloadAreaLeft</name>
+      <label>Area Left</label>
+      <type>choice</type>
+      <choice>
+	<label>Cargo</label>
+	<value>1</value>
+      </choice>
+      <choice>
+	<label>Panel</label>
+	<value>2</value>
+      </choice>
+      <choice>
+	<label>Unknown</label>   <!--I am aware this is out of order. This was done so this choice shows up last, however I would still like it to have a value of 0 -->
+	<value>0</value>
+      </choice>
+    </field>
+
+    <field><!--radio-->
+      <name>PreloadAreaRight</name>
+      <label>Area Right</label>
+      <type>choice</type>
+      <choice>
+	<label>Cargo</label>
+	<value>1</value>
+      </choice>
+      <choice>
+	<label>Panel</label>
+	<value>2</value>
+      </choice>
+      <choice>
+	<label>Unknown</label>   <!--I know this is out of order, Read comment above -->
+	<value>0</value>
+      </choice>
+    </field>
+
+    <field><!--radio-->
+      <name>StartPos</name>
+      <label>Starting Position</label>
+      <type>choice</type>
+      <choice>
+	<label>Level 1</label>
+	<value>1</value>
+      </choice>
+      <choice>
+	<label>Level 2</label>
+	<value>2</value>
+      </choice>
+      <choice>
+	<label>Unknown</label>
+	<value>0</value>
+      </choice>
+    </field>
+
+    <field>
+      <name>StartSide</name>
+      <label> Starting Side</label>
+      <type>choice</type>
+      <choice>
+	<label>Left</label>
+	<value>1</value>
+      </choice>
+      <choice>
+	<label>Middle</label>
+	<value>2</value>
+      </choice>
+      <choice>
+	<label>Right</label>
+	<value>3</value>
+      </choice>
+      <choice>
+	<label>Unknown</label>
+	<value>0</value>
+      </choice>
+    </field>
+
+    <field>
+      <name>robotPreload</name>
+      <label>Robot Preload</label>
+      <type>choice</type>
+      <choice>
+	<label>Cargo</label>
+	<value>1</value>
+      </choice>
+      <choice>
+	<label>Panel</label>
+	<value>2</value>
+      </choice>
+      <choice>
+	<label>None</label>
+	<value>3</value>
+      </choice>
+      <choice>
+	<label>Unknown</label>
+	<value>0</value>
+      </choice>
+    </field>
+
+    <field>
+      <name>crossHAB</name>
+      <label>Cross HAB</label>
+      <type>choice</type>
+      <choice>
+	<label>Yes</label>
+	<value>1</value>
+      </choice>
+      <choice>
+	<label>No</label>
+	<value>2</value>
+      </choice>
+      <choice>
+	<label>Unknown</label>
+	<value>0</value>
+      </choice>
+    </field>
+
+    <field>
+      <name>HABEndPos</name>
+      <label>HAB End Position</label>
+      <type>choice</type>
+      <choice>
+	<label>Level 1</label>
+	<value>1</value>
+      </choice>
+      <choice>
+	<label>Level 2</label>
+	<value>2</value>
+      </choice>
+      <choice>
+	<label>Level 3</label>
+	<value>3</value>
+      </choice>
+      <choice>
+	<label>Field</label>
+	<value>4</value>
+      </choice>
+      <choice>
+	<label>Unknown</label>
+	<value>0</value>
+      </choice>
+    </field>
+
+    <field><!--intChoice-->                   
+      <name>HABAssist1</name>
+      <label>HAB Assist Level 1</label>
+      <type>int</type>            <!-- The int <type> which returns an single int value to the database -->
+    </field>
+
+    <field><!--intChoice-->                   
+      <name>HABAssist2</name>
+      <label>HAB Assist Level 2</label>
+      <type>int</type>
+    </field>n
+
+    <field><!--intChoice-->       
+      <name>HABAssist3</name>
+      <label>HAB Assist Level 3</label>
+      <type>int</type>
+    </field>
+
+    <field><!--intChoice-->    
+      <name>gamePieceOffRocket</name>
+      <label>Game Piece Off Rocket</label>
+      <type>int</type>
+    </field>
+
+    <field><!--intChoice-->          
+      <name>gamePieceOffCargo</name>
+      <label>Game Piece Off Cargo</label>
+      <type>int</type>
+    </field>
+
+    <field><!--intChoice-->                   
+      <name>defensivePenalty</name>
+      <label>Defensive Penalty</label>
+      <type>int</type>
+    </field>
+    
+
+<!-- ############## EVENTS for PANEL ############### -->    
+    
+    <field> <!-- Event -->
+      <name>panelPickupHuman</name>
+      <label>Pickup Human</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>panelPickupGround</name>
+      <label>Pickup Ground</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>panelDropped</name>
+      <label>Dropped</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>panelScoredRocketLvl1</name>
+      <label>Rocket Lvl 1</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>panelScoredRocketLvl2</name>
+      <label>Rocket Lvl 2</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>panelScoredRocketLvl3</name>
+      <label>Rocket Lvl 3</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>panelScoredCargoLeft</name>
+      <label>Cargo Left</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>panelScoredCargoRight</name>
+      <label>Cargo Right</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>panelScoredCargoMiddle</name>
+      <label>Cargo Middle</label>
+      <type>event</type>
+    </field>
+
+
+<!-- ############## EVENTS for CARGO ############### -->    
+    
+    <field> <!-- Event -->
+      <name>cargoPickupHuman</name>
+      <label>Pickup Human</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>cargoPickupGround</name>
+      <label>Pickup Ground</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>cargoDropped</name>
+      <label>Dropped</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>cargoScoredRocketLvl1</name>
+      <label>Rocket Lvl 1</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>cargoScoredRocketLvl2</name>
+      <label>Rocket Lvl 2</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>cargoScoredRocketLvl3</name>
+      <label>Rocket Lvl 3</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>cargoScoredCargoLeft</name>
+      <label>Cargo Left</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>cargoScoredCargoRight</name>
+      <label>Cargo Right</label>
+      <type>event</type>
+    </field>
+
+    <field> <!-- Event -->
+      <name>cargoScoredCargoMiddle</name>
+      <label>Cargo Middle</label>
+      <type>event</type>
+    </field>    
+
+    
+  </elements>
+
+
+  <!-- =======================================================================================  -->
+  
+  <layout>
+
+    <field>
+      <type>eventWindow</type>
+      <ewid>panel</ewid>
+      <label>Panel Window</label>
+      <location>70,40</location>
+      <size>15,15</size>
+    </field>
+
+    <field>
+      <type>eventWindow</type>
+      <ewid>cargo</ewid>
+      <label>Cargo Window</label>
+      <location>70,40</location>
+      <size>15,15</size>
+    </field>
+
+
+<!-- ############## PREMATCH #################### -->
+    
+    <field>
+      <type>text</type>
+      <label>Prematch</label>
+      <location>2,2</location>
+    </field>
+
+    <field> <!-- Area Left -->
+      <type>radio</type>
+      <name>preloadAreaLeft</name>
+      <optional>false</optional>
+      <layout>B</layout>
+      <location>3,5</location>    
+    </field>
+      
+    <field> <!-- Area Right -->
+      <type>radio</type>
+      <name>preloadAreaRight</name>
+      <optional>false</optional>
+      <layout>B</layout>
+      <location>28,5</location>    
+    </field>
+      
+    <field> <!-- Start Position -->
+      <type>radio</type>
+      <name>startPos</name>
+      <optional>false</optional>
+      <layout>B</layout>
+      <location>53,5</location>    
+    </field>
+      
+    <field> <!-- Start Side -->
+      <type>radio</type>
+      <name>startSide</name>
+      <optional>false</optional>
+      <layout>B</layout>
+      <location>78,5</location>    
+    </field>
+      
+    <field> <!-- Robot Preload -->
+      <type>radio</type>
+      <name>robotPreload</name>
+      <optional>false</optional>
+      <layout>R</layout>
+      <location>3,25</location>    
+    </field>
+
+
+<!-- SANDSTORM AND TELEOP ####################### -->
+
+    <field>
+      <type>text</type>
+      <label>Sandstorm and Teleop</label>
+      <location>3,30</location>
+    </field>
+
+    <field> <!-- Cross HAB Line -->
+      <type>radio</type>
+      <name>crossHABLine</name>
+      <optional>false</optional>
+      <layout>R</layout>
+      <location>3,35</location>    
+    </field>
+
+    <!-- ############### PANEL EVENTS ################ -->    
+
+    <field>
+      <type>text</type>
+      <label>Panel</label>
+      <location>2,2</location>
+    </field>
+      
+    <field>
+      <type>event</type>
+      <name>panelPickupHuman</name>
+      <ewid>panel</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>panelPickupGround</name>
+      <ewid>panel</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>panelDropped</name>
+      <ewid>panel</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>panelScoredRocketLvl1</name>
+      <ewid>panel</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>panelScoredRocketLvl2</name>
+      <ewid>panel</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>panelScoredRocketLvl3</name>
+      <ewid>panel</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>panelScoredCargoLeft</name>
+      <ewid>panel</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>panelScoredCargoRight</name>
+      <ewid>panel</ewid>
+      <location>50,50</location>
+    </field>    
+
+    <field>
+      <type>event</type>
+      <name>panelScoredRocketMiddle</name>
+      <ewid>panel</ewid>
+      <location>50,50</location>
+    </field>
+
+
+    <!-- ############### CARGO EVENTS ################ -->    
+
+    <field>
+      <type>event</type>
+      <name>cargoPickupHuman</name>
+      <ewid>cargo</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>cargoPickupGround</name>
+      <ewid>cargo</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>cargoDropped</name>
+      <ewid>cargo</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>cargoScoredRocketLvl1</name>
+      <ewid>cargo</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>cargoScoredRocketLvl2</name>
+      <ewid>cargo</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>cargoScoredRocketLvl3</name>
+      <ewid>cargo</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>cargoScoredCargoLeft</name>
+      <ewid>cargo</ewid>
+      <location>50,50</location>
+    </field>
+
+    <field>
+      <type>event</type>
+      <name>cargoScoredCargoRight</name>
+      <ewid>cargo</ewid>
+      <location>50,50</location>
+    </field>    
+
+    <field>
+      <type>event</type>
+      <name>cargoScoredRocketMiddle</name>
+      <ewid>cargo</ewid>
+      <location>50,50</location>
+    </field>
+
+
+<!-- ################ END GAME ################## -->
+    
+    <field>
+      <type>text</type>
+      <label>End Game</label>
+      <location>3,55</location>
+    </field>
+
+    <field> <!-- HAB End Position -->
+      <type>radio</type>
+      <name>HABEndPos</name>
+      <optional>false</optional>
+      <layout>R</layout>
+      <location>3,40</location>    
+    </field>
+
+
+    <!-- ################### HAB ASSIST ################### -->
+    
+    <field>
+      <type>text</type>
+      <label>HAB Assist</label>
+      <location>3,65</location>
+    </field>
+    
+    <field> <!-- HAB Assist Lvl 1 -->
+      <type>intChoice</type>
+      <name>HABAssist1</name>
+      <default>0</default>
+      <layout>B</layout>
+      <location>5,70</location>    
+    </field>
+
+    <field> <!-- HAB Assist Lvl 2 -->
+      <type>intChoice</type>
+      <name>HABAssist2</name>
+      <default>0</default>
+      <layout>B</layout>
+      <location>40,70</location>    
+    </field>
+
+    <field> <!-- HAB Assist Lvl 3 -->
+      <type>intChoice</type>
+      <name>HABAssist3</name>
+      <default>0</default>
+      <layout>B</layout>
+      <location>70,70</location>    
+    </field>
+
+    
+    <!-- ################### PENALTIES ################### -->
+    
+    <field>
+      <type>text</type>
+      <label>Penalties</label>
+      <location>3,80</location>
+    </field>
+    
+    <field> <!-- Game Piece Off Rocket -->
+      <type>intChoice</type>
+      <name>gamePieceOffRocket</name>
+      <default>0</default>
+      <layout>B</layout>
+      <location>5,85</location>    
+    </field>
+
+    <field> <!-- Game Piece Off Cargo -->
+      <type>intChoice</type>
+      <name>gamePieceOffRocket</name>
+      <default>0</default>
+      <layout>B</layout>
+      <location>40,85</location>    
+    </field>
+
+    <field> <!-- Defensive Penalty -->
+      <type>intChoice</type>
+      <name>Defensive Penalty</name>
+      <default>0</default>
+      <layout>B</layout>
+      <location>70,85</location>    
+    </field>
+    
+
+  </layout>
+
+  
+</app>
