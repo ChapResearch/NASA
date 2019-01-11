@@ -112,7 +112,7 @@ function eventWindowStyle(layoutField)
 	pos = [50, 50];
     }
 
-    output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:' + dim[0] + '%;height:' + dim[1] + '%;"';
+    output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:' + dim[0] + '%;height:' + dim[1] + '%;border:3px solid black;"';
     return output;
 }
     
@@ -125,7 +125,7 @@ function generateEventButton(layoutField,elementField)
     var output = "";
     var name = layoutField.find('name').text();
     var ewid = layoutField.find('ewid').text();
-    var label = elementField.find('name').text();
+    var label = elementField.find('label').text();
 
     output += '<div class="NASA-event-button" ' + fieldPosition(layoutField) + '>';    
     output += '<button onclick="eventTagTime(&quot;' + ewid + '&quot;' + ', &quot;' + label + '&quot;)">' + label + '</button>';
@@ -140,7 +140,7 @@ function generateEventButton(layoutField,elementField)
 function generateEventWindow(layoutField)
 {
     var output = "";
-    var ewid = layoutField.find('ewid');
+    var ewid = layoutField.find('ewid').text();
     
     output += '<div class="NASA-event-window" id="' + ewid + '" ' + eventWindowStyle(layoutField) + '>';
 
