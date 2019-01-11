@@ -62,10 +62,21 @@ clean:
 deployment:
 	mkdir deployment
 
-deploy:	.firebaserc firebase.json deployment
-	cp -R Main/* deployment
-	cp -R Contributor deployment
-	cp -R ../Season deployment
-	firebase deploy
+deploy:
+	firebase deploy --only functions:catcher
+
+test:
+	curl -d "password=floopy" -X POST https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+
+badtest:
+	curl -d "password=floopyx" -X POST https://us-central1-nasa-7a363.cloudfunctions.net/catcher
 
 refresh:
+
+newtest:
+	curl --header "Content-Type: application/json" -d '{"password":"floopy","moredata":{"hello":"there"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+
+
+newtest2:
+	curl --header "Content-Type: application/json" -d '{"password":"floopy","moredata2":{"hello":"there"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+

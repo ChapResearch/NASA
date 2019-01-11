@@ -27,13 +27,17 @@ var firebase = require("firebase");
 	 //firebase.initializeApp(config);
 	 var database = firebase.database();
 	 var ref = database.ref("Anna");
+	 var ref2 = database.ref("Anna/test");
+	 var myData = {		     "Anna" : "hello" };
+
 
 	 ref.on('value', function(snapshot) {
 		 console.log(snapshot.val());
 	     });
 
+	 ref2.set(data);
 
-	 ref.set(data.data);
+	 //	 ref.set(data.data);
 	 if (data.password == "floopy") {
 	     response.send("Yes\n");
 	 } else {
