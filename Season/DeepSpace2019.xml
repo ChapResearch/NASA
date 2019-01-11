@@ -4,7 +4,7 @@
   <elements>
     
     <field><!--radio-->
-      <name>PreloadAreaLeft</name>
+      <name>preloadAreaLeft</name>
       <label>Area Left</label>
       <type>choice</type>
       <choice>
@@ -22,7 +22,7 @@
     </field>
 
     <field><!--radio-->
-      <name>PreloadAreaRight</name>
+      <name>preloadAreaRight</name>
       <label>Area Right</label>
       <type>choice</type>
       <choice>
@@ -40,7 +40,7 @@
     </field>
 
     <field><!--radio-->
-      <name>StartPos</name>
+      <name>startPos</name>
       <label>Starting Position</label>
       <type>choice</type>
       <choice>
@@ -58,7 +58,7 @@
     </field>
 
     <field>
-      <name>StartSide</name>
+      <name>startSide</name>
       <label> Starting Side</label>
       <type>choice</type>
       <choice>
@@ -102,7 +102,7 @@
     </field>
 
     <field>
-      <name>crossHAB</name>
+      <name>crossHABLine</name>
       <label>Cross HAB</label>
       <type>choice</type>
       <choice>
@@ -341,7 +341,7 @@
       <name>preloadAreaRight</name>
       <optional>false</optional>
       <layout>B</layout>
-      <location>28,5</location>    
+      <location>23,5</location>    
     </field>
       
     <field> <!-- Start Position -->
@@ -349,7 +349,7 @@
       <name>startPos</name>
       <optional>false</optional>
       <layout>B</layout>
-      <location>53,5</location>    
+      <location>43,5</location>    
     </field>
       
     <field> <!-- Start Side -->
@@ -357,7 +357,7 @@
       <name>startSide</name>
       <optional>false</optional>
       <layout>B</layout>
-      <location>78,5</location>    
+      <location>63,5</location>    
     </field>
       
     <field> <!-- Robot Preload -->
@@ -365,7 +365,7 @@
       <name>robotPreload</name>
       <optional>false</optional>
       <layout>R</layout>
-      <location>3,25</location>    
+      <location>83,5</location>    
     </field>
 
 
@@ -374,7 +374,7 @@
     <field>
       <type>text</type>
       <label>Sandstorm and Teleop</label>
-      <location>3,30</location>
+      <location>2,20</location>
     </field>
 
     <field> <!-- Cross HAB Line -->
@@ -382,7 +382,7 @@
       <name>crossHABLine</name>
       <optional>false</optional>
       <layout>R</layout>
-      <location>3,35</location>    
+      <location>3,23</location>    
     </field>
 
     <!-- ############### PANEL EVENTS ################ -->    
@@ -390,7 +390,7 @@
     <field>
       <type>text</type>
       <label>Panel</label>
-      <location>2,2</location>
+      <location>35,35</location>
     </field>
       
     <field>
@@ -451,7 +451,7 @@
 
     <field>
       <type>event</type>
-      <name>panelScoredRocketMiddle</name>
+      <name>panelScoredCargoMiddle</name>
       <ewid>panel</ewid>
       <location>50,50</location>
     </field>
@@ -517,7 +517,7 @@
 
     <field>
       <type>event</type>
-      <name>cargoScoredRocketMiddle</name>
+      <name>cargoScoredCargoMiddle</name>
       <ewid>cargo</ewid>
       <location>50,50</location>
     </field>
@@ -528,7 +528,7 @@
     <field>
       <type>text</type>
       <label>End Game</label>
-      <location>3,55</location>
+      <location>2,40</location>
     </field>
 
     <field> <!-- HAB End Position -->
@@ -536,7 +536,7 @@
       <name>HABEndPos</name>
       <optional>false</optional>
       <layout>R</layout>
-      <location>3,40</location>    
+      <location>3,43</location>
     </field>
 
 
@@ -599,7 +599,7 @@
 
     <field> <!-- Defensive Penalty -->
       <type>intChoice</type>
-      <name>Defensive Penalty</name>
+      <name>defensivePenalty</name>
       <default>0</default>
       <layout>B</layout>
       <location>70,85</location>    

@@ -71,7 +71,7 @@ function fieldPosition(layoutField)
 	pos = [50, 50];
     }
 
-    output += 'style="position:absolute;left:' + pos[0] + 'vw;top:' + pos[1] + 'vh;width:200px"';
+    output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:200px"';
     return output;
 }
 
@@ -80,18 +80,18 @@ function fieldPosition(layoutField)
 
 function getChoices(name, targetElementField, type)
 {
-    var choices = targetElementField.find("choices");
+    var choices = targetElementField.find("choice");
     var output = "";
     choices.each(function()
 		 {
-		     var name = this.find("name");
-		     var value = this.find("value");
-		     if (name == null) {
-			 name = value;
+		     var label = $(this).find("label").text();
+		     var value = $(this).find("value").text();
+		     if (label == null) {
+			 label = value;
 		     }
-		     output += '<input type="' + type + '" name="' + name + '" value="' + value + '">' + name + '<br>';
+		     output += '<input type="' + type + '" name="' + name + '" value="' + value + '">' + label + '<br>';
 		 });
-
+    console.log(output);
     return output;
 }
 
@@ -112,7 +112,7 @@ function eventWindowStyle(layoutField)
 	pos = [50, 50];
     }
 
-    output += 'style="position:absolute;left:' + pos[0] + 'vw;top:' + pos[1] + 'vh;width:' + dim[0] + 'vw;height:' + dim[1] + 'vh;"';
+    output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:' + dim[0] + '%;height:' + dim[1] + '%;"';
     return output;
 }
     
@@ -170,7 +170,8 @@ function generateRadioField(layoutField, elementField)
 {
     
     var output = "";
-    var label = elementField.find("label").text();
+    var label = elementField.children("label").text();
+    var name = elementField.children("name").text();    
     
     output += '<div class="NASA-field-radio" ' + fieldPosition(layoutField) + '>';
     output += label + "<br>";
