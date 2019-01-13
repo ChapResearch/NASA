@@ -239,6 +239,19 @@ function keypadControl(control)
     keypadNumberObj.val(newNumber);
 }
 
+//
+// dataSend() - gathers the data from the season form, and sends it off to the controller.
+//
+function dataSend()
+{
+    var xmldata = document.getElementById("seasonXML").contentDocument;
+    var jObject = $("app",xmldata);      // the jQuery'able xml data
+
+    var data = seasonDataGather(jObject);
+
+    console.log(data);
+}
+
 // must run the XML code after resources have been loaded to get the seasonXML object loaded
 
 $( window ).on( "load", function() { 
@@ -328,6 +341,10 @@ $( document ).ready(function() {
 	$(this).prop('disabled',true);
 	$('button.send').prop('disabled',false);
 	$('button.start').prop('disabled',false);
+    });
+
+    $('button.send').click(function() {
+	dataSend();
     });
 
     $('div.team-color').click(function() {
