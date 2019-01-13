@@ -176,7 +176,7 @@ function generateEventButton(layoutField,elementField)
     var label = elementField.find('label').text();
 
     output += '<div class="NASA-event-button" ' + fieldPosition(layoutField) + '>';    
-    output += '<button onclick="eventTagTime(&quot;' + ewid + '&quot;' + ', &quot;' + label + '&quot;)">' + label + '</button>';
+    output += '<button onclick="eventTagTime(&quot;' + ewid + '&quot;' + ', &quot;' + label + '&quot;, &quot;' + name + '&quot;)">' + label + '</button>';
     output += '</div>';
 
     return output;

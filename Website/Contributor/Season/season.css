@@ -18,9 +18,13 @@ div.NASA-field-radio label {
 .NASA-event-window div.time > span{
     margin-left: 7px;
 }
+
+div.NASA-event-window {
+    overflow-y: auto;
+}
 	
 
-.NASA-event-window span.close{
+div.NASA-event-window span.close{
     cursor: pointer;
     position: absolute;
     right: 7px;
@@ -28,26 +32,28 @@ div.NASA-field-radio label {
 
 }
 
-.NASA-event-window span.close:hover{
+div.NASA-event-window span.close:hover{
     color: blue;   
 
 }
 
 
-.NASA-event-window div:hover{
+div.NASA-event-window div:hover{
     background-color: lightblue;
 }
     
 
-.NASA-line {
+div.NASA-line {
     border: 3px solid;
+    z-index: -5;
 }
 
-.NASA-box {
+div.NASA-box {
     border: 3px solid;
+    z-index: -5;
 }
 
-.NASA-field-text {
+div.NASA-field-text {
     font-weight: bold;
     font-size: 120%;
 }
