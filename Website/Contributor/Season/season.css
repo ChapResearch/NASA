@@ -1,0 +1,24 @@
+/********************************************************************/
+/* season.css - "normal" classes for a season                       */
+/********************************************************************/
+
+div.NASA-field-text {
+    font-family: sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+}
+    
+div.NASA-field-radio {
+    font-family: sans-serif;
+    font-size: 18px;
+}
+div.NASA-field-radio input[type=radio] {
+    margin: 5px 0px 5px 0px;
+}
+
+div.NASA-field-radio label {
+    font-size: 16px;
+}
+
+
+type
