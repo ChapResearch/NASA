@@ -1,5 +1,9 @@
 //
-// This is code that is LIKE the code that should be in the contributor support .js
+// Main code for driving the contributor screens.
+//  - Allocates the NASA object (see NASA.js)
+//  - Paints the general purpose background
+//  - calls the construction of the season-specific HTML from the XML
+//
 
 var myNASA = new NASA();
 
