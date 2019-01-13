@@ -68,12 +68,17 @@ clean:
 deployment:
 	mkdir deployment
 
-deploy:	.firebaserc firebase.json deployment favicon.ico
+deploycopy: deployment favicon.ico 
 	cp -R Main/* deployment
 	cp -R Contributor deployment
 	cp -R ../Season deployment
-	cp -R Contributor/Season deployment/Contributor
+	cp -R Contributor/Season/* deployment/Season
 	cp favicon.ico deployment
+
+deploy:	.firebaserc firebase.json deploycopy
 	firebase deploy --only hosting
+
+testdeploy: deploycopy
+	cd deployment; python -m SimpleHTTPServer
 
 refresh:
