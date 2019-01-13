@@ -71,6 +71,7 @@ deployment:
 deploycopy: deployment favicon.ico 
 	cp -R Main/* deployment
 	cp -R Contributor deployment
+	[ -d deployment/Season ] || mkdir deployment/Season
 	cp -R ../Season/*.xml deployment
 	cp -R Contributor/Season/* deployment/Season
 	cp favicon.ico deployment
