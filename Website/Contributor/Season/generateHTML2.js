@@ -31,7 +31,9 @@ function seasonLoad_generateHTML(seasonXML)
 			      case "checkbox":    output += generateCheckboxField($(this),targetElementField); break;
 			      case "slider":      output += generateSliderField($(this),targetElementField); break;
 			      case "event":       output += generateEventButton($(this),targetElementField); break;
-			      case "eventWindow": output += generateEventWindow($(this)); break; 
+			      case "eventWindow": output += generateEventWindow($(this)); break;
+			      case "line":        output += generateLine($(this)); break;
+			      case "box":         output += generateBox($(this)); break;			      
 			  }
 		      });
     
@@ -77,6 +79,52 @@ function fieldPosition(layoutField)
 
 
 
+function fieldStyleLine(layoutField)
+{
+    var output = ""
+    var location = layoutField.find('location').text();
+    var pos = location.split(",");
+    var direction = layoutField.find('direction').text();
+    var length = layoutField.find('length').text();
+    var color = layoutField.find('color').text();
+    if (pos.length != 2){
+	pos = [50, 50];
+    }
+    
+    if(direction=="vertical")
+    {
+	output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;height:' + length + '%;width:0;border-color:' + color + '"';
+    }
+    else
+    {
+	output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:' + length + '%;height:0;border-color:' + color + '"';
+    }
+	    
+    return output;
+}
+
+function fieldStyleBox(layoutField)
+{
+    var output = ""
+    var location = layoutField.find('location').text();
+    var pos = location.split(",");
+    var size  = layoutField.find('size').text();
+    size = size.split(",");
+    var color = layoutField.find('color').text();
+    if (pos.length != 2){
+	pos = [50, 50];
+    }
+    if (pos.length != 2){
+	pos = [50, 50];
+    }
+    
+    output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:' + size[0] + '%;height:' + size[1] + '%;border-color:' + color + '"';
+    
+    return output;
+}
+
+
+
 
 function getChoices(name, targetElementField, type)
 {
@@ -89,7 +137,7 @@ function getChoices(name, targetElementField, type)
 		     if (label == null) {
 			 label = value;
 		     }
-		     output += '<input type="' + type + '" name="' + name + '" value="' + value + '">' + label + '<br>';
+		     output += '<label><input type="' + type + '" name="' + name + '" value="' + value + '">' + label + '<br></label>';
 		 });
     console.log(output);
     return output;
@@ -174,7 +222,7 @@ function generateRadioField(layoutField, elementField)
     var name = elementField.children("name").text();    
     
     output += '<div class="NASA-field-radio" ' + fieldPosition(layoutField) + '>';
-    output += label + "<br>";
+    output += '<Strong>' + label + "</Strong><br>";
     output += getChoices(name, elementField, "radio");
     output += '</div>';
     
@@ -243,14 +291,26 @@ function generateSliderField(layoutField, elementField)
 
 
 
-function generateLine(layoutField,elementField)
+function generateLine(layoutField)
 {
     var output = "";
-    var name = elementField.find('name').text();
-    var size = elementField.find('size').text();
-	
-    output += '<div class="NASA-line" ' + fieldPosition(layoutField) + '>';
-    output += '<hr size="' + size + '" width="' + width + '">';
+    
+    output += '<div class="NASA-line" ';
+    output += fieldStyleLine(layoutField);
+    output += '>';
+    output += '</div>';
+
+    console.log(output);
+    return output;
+}
+
+function generateBox(layoutField)
+{
+    var output = "";
+    
+    output += '<div class="NASA-box" ';
+    output += fieldStyleBox(layoutField);
+    output += '>';
     output += '</div>';
 
     console.log(output);
@@ -262,5 +322,3 @@ function generateDropField(layoutField,targetElementField)
     return("");
 }
 
-
-    

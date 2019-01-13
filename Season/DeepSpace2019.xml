@@ -515,7 +515,7 @@
       <type>eventWindow</type>
       <ewid>panel</ewid>
       <label>Panel Window</label>
-      <location>71,28</location>
+      <location>71,26</location>
       <size>25,15</size>
     </field>
 
@@ -523,7 +523,7 @@
       <type>eventWindow</type>
       <ewid>cargo</ewid>
       <label>Panel Window</label>
-      <location>71,50</location>
+      <location>71,48</location>
       <size>25,15</size>
     </field>
 
@@ -609,7 +609,44 @@
       <layout>B</layout>
       <location>70,85</location>    
     </field>
+
+    <field>
+      <type>line</type>
+      <direction>vertical</direction>
+      <length>29</length>
+      <location>20,38</location>
+      <color>red</color>
+    </field>
+
+    <field>
+      <type>line</type>
+      <direction>horizontal</direction>
+      <length>19</length>
+      <location>1,38</location>
+      <color>red</color>
+    </field>
     
+    <field>
+      <type>line</type>
+      <direction>horizontal</direction>
+      <length>79</length>
+      <location>20,68</location>
+      <color>red</color>
+    </field>    
+
+    <field>
+      <type>box</type>
+      <size>74,22</size>
+      <location>24,22</location>
+      <color>blue</color>
+    </field>
+
+    <field>
+      <type>box</type>
+      <size>74,22</size>
+      <location>24,44</location>
+      <color>blue</color>
+    </field>
 
   </layout>
 
