@@ -282,7 +282,9 @@ $( document ).ready(function() {
     // clear the timer
     timerClear();
 
-    // set up monitoring of connection changes
+    // set up monitoring of connection/name changes - note that the name change probably
+    //   only gets called once upon the connection
+    
     myNASA.connectionMonitor(connectionChange);
     myNASA.nameMonitor(nameChange);
     
@@ -310,7 +312,11 @@ $( document ).ready(function() {
     });
 
     $('div.myname-name, div.myname-prompt').click(function() {
-	settingsForm(true);
+	if(myNASA.connected) {
+	    alert("You can't change name or password while connected!");
+	} else {
+	    settingsForm(true);
+	}
     });
 
     $('div.connecting-dialog button').click(function() {
@@ -318,10 +324,10 @@ $( document ).ready(function() {
     });
 
     $('div.settings-form button').click(function() {
-	myNASA.setName($('div.settings-form .myname-input input').val());
+	myNASA.setUserName($('div.settings-form .myname-input input').val());
 	myNASA.setPassword($('div.settings-form .password-input input').val());
 
-	$('div.myname-name span').text(myNASA.getName());
+	$('div.myname-name span').text(myNASA.getUserName());
 	settingsForm(false);
     });
 
