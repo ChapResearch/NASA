@@ -44,19 +44,23 @@ const NASA_Controller_Reset = '5eda1292-e156-11e8-9f32-f2801f1b9fd1';
 
 function NASA()
 {
-    this.name = null;
+    this.userName = null;
     this.password = null;
     this.connectedStatus = false;       // get/set through this.connected - defined below
     
     //    this.service = 'battery_service';
     this.service = NASA_Service;;
 
+    //    this.pinger pings the server to "keep alive"
+    this.pinger = null;
+    this.pingerInterval = 5000;
+
     // the filters object used when connecting to bluetooth
     //    this.filters = [{ services: [this.service], name: this.name }];
     this.filters = [{ services: [this.service]}];
-    if(name) {
-	this.filters[0].name = name;
-    }
+//    if(name) {
+//	this.filters[0].name = name;
+//    }
 
     // the device we're connecting to
     this.device = null;
@@ -79,8 +83,18 @@ function NASA()
 Object.defineProperties(NASA.prototype, {
     connected: { set: function(a) {
 	                 if(a) {
+			     if(!this.connectedStatus) {
+				 console.log("setting up pinger for " + this.pinterInterval);
+				 this.pinger = setInterval(this.pingerFN.bind(this),this.pingerInterval);
+			     }
 			     this.connectedStatus = true;
 			 } else {
+			     if(this.connectedStatus) {
+				 if(this.pinger) {
+				     clearInterval(this.pinger);
+				     this.pinger = null;
+				 }
+			     }
 			     this.connectedStatus = false;
 			 }
 	                 if(this.connectionMonitorFN) {
@@ -88,16 +102,39 @@ Object.defineProperties(NASA.prototype, {
 			 }},
 		 get: function() { return(this.connectedStatus); }},
 });
-					 
 
-NASA.prototype.setName = function(name)
+NASA.prototype.pingerFN = function()
 {
-    this.name = name;
+    console.log("pinger called");
+    if(this.connected) {
+	console.log("attempting ping");
+	var uuid = NASA_UUIDs[NASAObj.slot].transmit;
+
+	var buffer = new ArrayBuffer(1);
+	var bufferView = new Uint8Array(buffer);
+
+	bufferView[0] = 1;    // ping
+	
+	NASAObj.serviceObj.getCharacteristic(uuid)
+	    .then(characteristic => {
+		characteristic.writeValue(buffer)
+	            .catch(error => { NASAObj.connected = false; });
+	    });
+    }
+}    
+
+//
+// setUserName() - sets the HUMAN name of this contributor, for
+//                 transmission later.
+//
+NASA.prototype.setUserName = function(name)
+{
+    this.userName = name;
 }
 
-NASA.prototype.getName = function()
+NASA.prototype.getUserName = function()
 {
-    return(this.name);
+    return(this.userName);
 }
 
 NASA.prototype.setPassword = function(password)
@@ -105,6 +142,37 @@ NASA.prototype.setPassword = function(password)
     this.password = password;
 }
 
+//
+// sendUserName() - called to tell the Controller the human name of this contributor.
+//                 Normally, this is called only during the connection process. The
+//                 UI prevents the name change while connected.
+//
+NASA.prototype.sendUserName = function()
+{
+    if(this.connected) {
+	console.log("attempting to send user name");
+	var uuid = NASA_UUIDs[NASAObj.slot].transmit;
+
+	var encoder = new TextEncoder('utf-8');
+	var userName = encoder.encode(this.userName);
+
+	var message = new Uint8Array(userName.length + 1);
+	message[0] = 4;    // user name
+	message.set(userName,1);
+
+	NASAObj.serviceObj.getCharacteristic(uuid)
+	    .then(characteristic => {
+		characteristic.writeValue(message)
+	            .catch(error => { NASAObj.connected = false; });
+	    });
+    }
+}
+
+//
+// setTeam() - called when the team number is entered/changed in the UI. This
+//             causes a write to the characteristic. If it fails, then the
+//             connection is deemed as dropped.
+//
 NASA.prototype.setTeam = function(team)
 {
     if(this.connected) {
@@ -152,15 +220,10 @@ NASA.prototype.setColor = function(color)
     }
 }
 
-
-
-// 
-// Attach the following to a button:
 //
-//    $('button.connect').click(myNASA.connect());
+// _disconnect() - this routine is attached to the bluetooth interface to be called
+//                 when the connection drops.
 //
-// 
-
 NASA.prototype._disconnect = function()
 {
     this.connected = false;
@@ -182,6 +245,12 @@ NASA.prototype.connect = function(reportFN)
 
     reportFN("contact");
 
+    console.log(this.filters);
+
+    // kick-off the connection process by getting the BLE device and connecting to the device
+    //  that the user specified in the pop-up. The disconnect listener is attached upon
+    //  the filters, imply specify the service UUID - no names - it doesn't work right in the API yet
+    
     navigator.bluetooth.requestDevice({ filters: this.filters })
 	.then(device => {
 	    if(device.name) {
@@ -193,6 +262,9 @@ NASA.prototype.connect = function(reportFN)
 	    NASAObj.device = device;
 	    return(device.gatt.connect());
 	})
+
+    // if we get this far, then we have a connection, so get the primary service for it
+    
 	.then(server => {
 	    NASAObj.server = server;
 	    console.log("connected - getting primary service");
@@ -209,6 +281,9 @@ NASA.prototype.connect = function(reportFN)
 	    console.log("getting name of controller - characteristic");
 	    return(NASAObj.serviceObj.getCharacteristic(NASA_Controller_Name));
 	})
+
+    // get the name of the controller and tell the UI about it.
+    
 	.then(characteristic => {
 	    console.log("get name of controller - value");
 	    return(characteristic.readValue());
@@ -256,23 +331,35 @@ NASA.prototype.connect = function(reportFN)
 	    var uuid = NASA_UUIDs[NASAObj.slot].transmit;
 	    return(NASAObj.serviceObj.getCharacteristic(uuid));
 	})
-
 	.then(characteristic => {
-	    let encoder = new TextEncoder('utf-8');
-	    // TODO - write name to characteristic using the write value protocol
-	    let value = "floopy";
-	    console.log("writing to characteristic");
-	    characteristic.writeValue(encoder.encode(value))
-		.then(() => { reportFN("slot-done");} )
-	        .catch(error => { reportFN("slot-fail"); NASAObj.connected = false; });
+	    console.log("claiming slot");
+
+	    var buffer = new ArrayBuffer(1);
+	    var bufferView = new Uint8Array(buffer);
+	    bufferView[0] = 0;    // slot claim
+
+	    // this write will fail if we can't have the slot we wanted
+	    return(characteristic.writeValue(buffer));
+	})
+    
+
+    // if we get here, then everything went well, and we're connected
+    //   we do kick-off the sending of the user name, but it isn't
+    //   part of this promise chain.
+
+        .then(() => {
+	    reportFN("slot-done");
+	    NASAObj.sendUserName();
 	})
 
 	.catch(error => {
 
 	    console.log('"' + error +'"');
 	    switch(error.toString()) {
+	    case 'NotSupportedError: GATT operation not permitted.':
 	    case 'DOMException: GATT operation not permitted.':
 		error = 'slot-fail';
+		reportFN("slot-fail");
 		break;
 	    case 'DOMException: User cancelled the requestDevice() chooser.':
 	    case 'NotFoundError: User cancelled the requestDevice() chooser.':
@@ -288,10 +375,15 @@ NASA.prototype.connect = function(reportFN)
 	});
 };
 
+//
+// disconnect() - can be called internally/externally to disconnect
+//
 NASA.prototype.disconnect = function()
 {
+    console.log("disconnect called when " + (this.connected?"connected":"not connected"));
     if(this.connected) {
 	this.device.gatt.disconnect();
+	this.connected = false;
     }
 }
 
@@ -304,6 +396,10 @@ NASA.prototype.connectionMonitor = function(fn)
     this.connectionMonitorFN = fn;
 }
 
+//
+// nameMonitor() - use to specify a callback that is called whenever the
+//                 name of the controller has changed.
+//
 NASA.prototype.nameMonitor = function(fn)
 {
     this.nameFN = fn;

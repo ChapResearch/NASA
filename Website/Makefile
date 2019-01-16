@@ -34,6 +34,8 @@
 
 ROOT = ..
 FBCONFIG = $(ROOT)/FirebaseConfig
+DEPLOYDIR = deployment
+#DEPLOYDIR = /media/sf_Virtual_Machine_Shares/deployment
 
 .firebaserc: $(FBCONFIG)/firebaserc-template
 	cp $(FBCONFIG)/firebaserc-template $@
@@ -65,15 +67,21 @@ clean:
 	rm -fr deployment
 	rm *~
 
-deployment:
-	mkdir deployment
+$(DEPLOYDIR):
+	mkdir $(DEPLOYDIR)
 
-deploy:	.firebaserc firebase.json deployment favicon.ico
-	cp -R Main/* deployment
-	cp -R Contributor deployment
-	cp -R ../Season deployment
-	cp -R Contributor/Season deployment/Contributor
-	cp favicon.ico deployment
+deploycopy: $(DEPLOYDIR) favicon.ico 
+	cp -R Main/* $(DEPLOYDIR)
+	cp -R Contributor $(DEPLOYDIR)
+	[ -d $(DEPLOYDIR)/Season ] || mkdir $(DEPLOYDIR)/Season
+	cp -R ../Season/*.xml $(DEPLOYDIR)
+	cp -R Contributor/Season/* $(DEPLOYDIR)/Season
+	cp favicon.ico $(DEPLOYDIR)
+
+deploy:	.firebaserc firebase.json deploycopy
 	firebase deploy --only hosting
+
+testdeploy: deploycopy
+	cd $(DEPLOYDIR); python -m SimpleHTTPServer
 
 refresh:

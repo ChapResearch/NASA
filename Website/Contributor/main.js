@@ -1,5 +1,9 @@
 //
-// This is code that is LIKE the code that should be in the contributor support .js
+// Main code for driving the contributor screens.
+//  - Allocates the NASA object (see NASA.js)
+//  - Paints the general purpose background
+//  - calls the construction of the season-specific HTML from the XML
+//
 
 var myNASA = new NASA();
 
@@ -235,6 +239,19 @@ function keypadControl(control)
     keypadNumberObj.val(newNumber);
 }
 
+//
+// dataSend() - gathers the data from the season form, and sends it off to the controller.
+//
+function dataSend()
+{
+    var xmldata = document.getElementById("seasonXML").contentDocument;
+    var jObject = $("app",xmldata);      // the jQuery'able xml data
+
+    var data = seasonDataGather(jObject);
+
+    console.log(data);
+}
+
 // must run the XML code after resources have been loaded to get the seasonXML object loaded
 
 $( window ).on( "load", function() { 
@@ -265,7 +282,9 @@ $( document ).ready(function() {
     // clear the timer
     timerClear();
 
-    // set up monitoring of connection changes
+    // set up monitoring of connection/name changes - note that the name change probably
+    //   only gets called once upon the connection
+    
     myNASA.connectionMonitor(connectionChange);
     myNASA.nameMonitor(nameChange);
     
@@ -293,7 +312,11 @@ $( document ).ready(function() {
     });
 
     $('div.myname-name, div.myname-prompt').click(function() {
-	settingsForm(true);
+	if(myNASA.connected) {
+	    alert("You can't change name or password while connected!");
+	} else {
+	    settingsForm(true);
+	}
     });
 
     $('div.connecting-dialog button').click(function() {
@@ -301,10 +324,10 @@ $( document ).ready(function() {
     });
 
     $('div.settings-form button').click(function() {
-	myNASA.setName($('div.settings-form .myname-input input').val());
+	myNASA.setUserName($('div.settings-form .myname-input input').val());
 	myNASA.setPassword($('div.settings-form .password-input input').val());
 
-	$('div.myname-name span').text(myNASA.getName());
+	$('div.myname-name span').text(myNASA.getUserName());
 	settingsForm(false);
     });
 
@@ -324,6 +347,10 @@ $( document ).ready(function() {
 	$(this).prop('disabled',true);
 	$('button.send').prop('disabled',false);
 	$('button.start').prop('disabled',false);
+    });
+
+    $('button.send').click(function() {
+	dataSend();
     });
 
     $('div.team-color').click(function() {

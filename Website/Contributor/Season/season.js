@@ -1,6 +1,6 @@
 var countDownDate = new Date().getTime();
 
-function eventTagTime(id, event)
+function eventTagTime(id, event, eventName)
 {
     if(event=="Start")
 	countDownDate = new Date().getTime();
@@ -15,6 +15,8 @@ function eventTagTime(id, event)
     var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 //    seconds += minutes;
     console.log(seconds);
+
+    var totalSeconds = seconds + minutes*60
 
     var minString = "";
     var secString = "";
@@ -32,10 +34,12 @@ function eventTagTime(id, event)
    
     var element = document.createElement('div');
     var time = document.createElement('span');
-    var divToAdd = "" + minString + ":" + secString + "   " + event;
+    var divToAdd = "" + minString + ":" + secString + "            " + event;
     divToAdd = document.createTextNode(divToAdd);
     time.appendChild(divToAdd);
     element.className = "time";
+    element.dataset.event = eventName;
+    element.dataset.time = totalSeconds;
     element.appendChild(time);
     
     var close = document.createElement('span');
@@ -46,6 +50,8 @@ function eventTagTime(id, event)
     element.appendChild(close);
     
     var scoring = document.getElementById(id);
+    console.log(id);
+    console.log(scoring);
     scoring.scrollTop = scoring.scrollHeight;    
     
     scoring.appendChild(element);    

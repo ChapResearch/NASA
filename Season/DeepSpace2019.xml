@@ -303,23 +303,6 @@
   
   <layout>
 
-    <field>
-      <type>eventWindow</type>
-      <ewid>panel</ewid>
-      <label>Panel Window</label>
-      <location>70,40</location>
-      <size>15,15</size>
-    </field>
-
-    <field>
-      <type>eventWindow</type>
-      <ewid>cargo</ewid>
-      <label>Cargo Window</label>
-      <location>70,40</location>
-      <size>15,15</size>
-    </field>
-
-
 <!-- ############## PREMATCH #################### -->
     
     <field>
@@ -390,136 +373,158 @@
     <field>
       <type>text</type>
       <label>Panel</label>
-      <location>35,35</location>
+      <location>25,23</location>
     </field>
       
     <field>
       <type>event</type>
       <name>panelPickupHuman</name>
       <ewid>panel</ewid>
-      <location>50,50</location>
+      <location>27,28</location>
     </field>
 
     <field>
       <type>event</type>
       <name>panelPickupGround</name>
       <ewid>panel</ewid>
-      <location>50,50</location>
+      <location>27,33</location>
     </field>
 
     <field>
       <type>event</type>
       <name>panelDropped</name>
       <ewid>panel</ewid>
-      <location>50,50</location>
+      <location>27,38</location>
     </field>
 
     <field>
       <type>event</type>
       <name>panelScoredRocketLvl1</name>
       <ewid>panel</ewid>
-      <location>50,50</location>
+      <location>43,28</location>
     </field>
 
     <field>
       <type>event</type>
       <name>panelScoredRocketLvl2</name>
       <ewid>panel</ewid>
-      <location>50,50</location>
+      <location>43,33</location>
     </field>
 
     <field>
       <type>event</type>
       <name>panelScoredRocketLvl3</name>
       <ewid>panel</ewid>
-      <location>50,50</location>
+      <location>43,38</location>
     </field>
 
     <field>
       <type>event</type>
       <name>panelScoredCargoLeft</name>
       <ewid>panel</ewid>
-      <location>50,50</location>
+      <location>58,28</location>
     </field>
 
     <field>
       <type>event</type>
       <name>panelScoredCargoRight</name>
       <ewid>panel</ewid>
-      <location>50,50</location>
+      <location>58,33</location>
     </field>    
 
     <field>
       <type>event</type>
       <name>panelScoredCargoMiddle</name>
       <ewid>panel</ewid>
-      <location>50,50</location>
+      <location>58,38</location>
     </field>
 
 
-    <!-- ############### CARGO EVENTS ################ -->    
+    <!-- ############### CARGO EVENTS ################ -->        
+    
+    <field>
+      <type>text</type>
+      <label>Cargo</label>
+      <location>25,45</location>
+    </field>
 
     <field>
       <type>event</type>
       <name>cargoPickupHuman</name>
       <ewid>cargo</ewid>
-      <location>50,50</location>
+      <location>27,50</location>
     </field>
 
     <field>
       <type>event</type>
       <name>cargoPickupGround</name>
       <ewid>cargo</ewid>
-      <location>50,50</location>
+      <location>27,55</location>
     </field>
 
     <field>
       <type>event</type>
       <name>cargoDropped</name>
       <ewid>cargo</ewid>
-      <location>50,50</location>
+      <location>27,60</location>
     </field>
 
     <field>
       <type>event</type>
       <name>cargoScoredRocketLvl1</name>
       <ewid>cargo</ewid>
-      <location>50,50</location>
+      <location>43,50</location>
     </field>
 
     <field>
       <type>event</type>
       <name>cargoScoredRocketLvl2</name>
       <ewid>cargo</ewid>
-      <location>50,50</location>
+      <location>43,55</location>
     </field>
 
     <field>
       <type>event</type>
       <name>cargoScoredRocketLvl3</name>
       <ewid>cargo</ewid>
-      <location>50,50</location>
+      <location>43,60</location>
     </field>
 
     <field>
       <type>event</type>
       <name>cargoScoredCargoLeft</name>
       <ewid>cargo</ewid>
-      <location>50,50</location>
+      <location>58,50</location>
     </field>
 
     <field>
       <type>event</type>
       <name>cargoScoredCargoRight</name>
       <ewid>cargo</ewid>
-      <location>50,50</location>
+      <location>58,55</location>
     </field>    
 
     <field>
       <type>event</type>
       <name>cargoScoredCargoMiddle</name>
       <ewid>cargo</ewid>
-      <location>50,50</location>
+      <location>58,55</location>
+    </field>
+
+    <field>
+      <type>eventWindow</type>
+      <ewid>panel</ewid>
+      <label>Panel Window</label>
+      <location>71,26</location>
+      <size>25,15</size>
+    </field>
+
+    <field>
+      <type>eventWindow</type>
+      <ewid>cargo</ewid>
+      <label>Panel Window</label>
+      <location>71,48</location>
+      <size>25,15</size>
     </field>
 
 
@@ -604,7 +609,44 @@
       <layout>B</layout>
       <location>70,85</location>    
     </field>
+
+    <field>
+      <type>line</type>
+      <direction>vertical</direction>
+      <length>29</length>
+      <location>20,38</location>
+      <color>red</color>
+    </field>
+
+    <field>
+      <type>line</type>
+      <direction>horizontal</direction>
+      <length>19</length>
+      <location>1,38</location>
+      <color>red</color>
+    </field>
     
+    <field>
+      <type>line</type>
+      <direction>horizontal</direction>
+      <length>79</length>
+      <location>20,68</location>
+      <color>red</color>
+    </field>    
+
+    <field>
+      <type>box</type>
+      <size>74,22</size>
+      <location>24,22</location>
+      <color>blue</color>
+    </field>
+
+    <field>
+      <type>box</type>
+      <size>74,22</size>
+      <location>24,44</location>
+      <color>blue</color>
+    </field>
 
   </layout>
 
