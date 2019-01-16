@@ -1,3 +1,4 @@
+
 const functions = require('firebase-functions');
 var firebase = require("firebase");
 
@@ -12,37 +13,67 @@ var firebase = require("firebase");
 
 	 let data = request.body;
 	 console.log(data);
-
-	 console.log(data.data);
-	 // Initialize Firebase
-	 var config = {
-	     apiKey: "AIzaSyAJtiy-xB69zjg7VRdBiEDmtupBeoGgS9A",
-	     authDomain: "nasa-7a363.firebaseapp.com",
-	     databaseURL: "https://nasa-7a363.firebaseio.com",
-	     projectId: "nasa-7a363",
-	     storageBucket: "nasa-7a363.appspot.com",
-	     messagingSenderId: "885889218553"
-	 };
-	 (!firebase.apps.length) ? firebase.initializeApp(config) : firebase.app();
-	 //firebase.initializeApp(config);
-	 var database = firebase.database();
-	 var ref = database.ref("Anna");
-	 var ref2 = database.ref("Anna/test");
-	 var myData = {		     "Anna" : "hello" };
-
-
-	 ref.on('value', function(snapshot) {
-		 console.log(snapshot.val());
-	     });
-
-	 ref2.set(data);
-
-	 //	 ref.set(data.data);
-	 if (data.password == "floopy") {
-	     response.send("Yes\n");
+	 console.log(data.moredata2);
+	 var year = data.year;
+	 var team_number = data.team_number;
+	 var competition = data.competition;
+	 var match = data.match;
+	 var record = data.record;
+	 
+	 if (!year || !team_number || !competition || !match || !record) {
+	     response.send("0");
 	 } else {
-	     response.send("No\n");
+
+	     var refpath = year + "/" + team_number + "/" + competition + "/" + match;
+	     
+	
+	     // Initialize Firebase
+	     var config = {
+		 apiKey: "AIzaSyAJtiy-xB69zjg7VRdBiEDmtupBeoGgS9A",
+		 authDomain: "nasa-7a363.firebaseapp.com",
+		 databaseURL: "https://nasa-7a363.firebaseio.com",
+		 projectId: "nasa-7a363",
+		 storageBucket: "nasa-7a363.appspot.com",
+		 messagingSenderId: "885889218553"
+	     };
+	     (!firebase.apps.length) ? firebase.initializeApp(config) : firebase.app();
+	     //firebase.initializeApp(config);
+	     var database = firebase.database();
+	     var ref = database.ref(refpath);
+	     
+
+	     //	 ref.on('value', function(snapshot) {
+	     // console.log(snapshot.val());
+	     //  });
+	     
+	     ref.set(record);
+
+	     response.send("1");
+	     
 	 }
 
-
  });
+
+
+//sum test function
+//listens for a new number in records and creates a sum to enter back into database
+
+exports.sum = functions.database.ref('/{year}/{team_number}/{competition}/{match}')
+
+.onCreate((snapshot, context) => {
+	
+	const original = snapshot.val();
+	console.log('sum function');
+	console.log(original);
+	
+	var one = parseInt(original.one);
+	var two = parseInt(original.two);
+	var three = parseInt(original.three);
+	var sum = one + two + three;
+
+
+	original.sum = sum;
+	return snapshot.ref.update(original);
+
+
+    });

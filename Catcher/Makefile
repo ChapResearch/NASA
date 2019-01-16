@@ -65,6 +65,9 @@ deployment:
 deploy:
 	firebase deploy --only functions:catcher
 
+deploy2:
+	firebase deploy --only functions:sum
+
 test:
 	curl -d "password=floopy" -X POST https://us-central1-nasa-7a363.cloudfunctions.net/catcher
 
@@ -74,9 +77,15 @@ badtest:
 refresh:
 
 newtest:
-	curl --header "Content-Type: application/json" -d '{"password":"floopy","moredata":{"hello":"there"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"2468","competition":"ElPaso","match":"1","record":{"one":"1","two":"2","three":"3"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
 
 
 newtest2:
 	curl --header "Content-Type: application/json" -d '{"password":"floopy","moredata2":{"hello":"there"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+
+sumtest:
+	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"2468","competition":"ElPaso","match":"1","record":{"one":"1","two":"2","three":"3"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+
+sumtest2:
+	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"5628","competition":"ElPaso","match":"1","record":{"one":"47","two":"2","three":"3"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
 
