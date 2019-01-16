@@ -106,12 +106,20 @@
       <label>Cross HAB</label>
       <type>choice</type>
       <choice>
-	<label>Yes</label>
+	<label>Start Level 1</label>
 	<value>1</value>
       </choice>
       <choice>
-	<label>No</label>
+	<label>Start Level 2</label>
 	<value>2</value>
+      </choice>
+      <choice>
+	<label>Yes</label>
+	<value>3</value>
+      </choice>
+      <choice>
+	<label>No</label>
+	<value>4</value>
       </choice>
       <choice>
 	<label>Unknown</label>
@@ -149,30 +157,35 @@
       <name>HABAssist1</name>
       <label>HAB Assist Level 1</label>
       <type>int</type>            <!-- The int <type> which returns an single int value to the database -->
+      <default>0</default>
     </field>
 
     <field><!--intChoice-->                   
       <name>HABAssist2</name>
       <label>HAB Assist Level 2</label>
       <type>int</type>
-    </field>n
+      <default>0</default>
+    </field>
 
     <field><!--intChoice-->       
       <name>HABAssist3</name>
       <label>HAB Assist Level 3</label>
       <type>int</type>
+      <default>0</default>
     </field>
 
     <field><!--intChoice-->    
       <name>gamePieceOffRocket</name>
       <label>Game Piece Off Rocket</label>
       <type>int</type>
+      <default>0</default>
     </field>
 
     <field><!--intChoice-->          
       <name>gamePieceOffCargo</name>
       <label>Game Piece Off Cargo</label>
       <type>int</type>
+      <default>0</default>
     </field>
 
     <field><!--intChoice-->                   
@@ -361,7 +374,7 @@
     </field>
 
     <field> <!-- Cross HAB Line -->
-      <type>radio</type>
+      <type>checkbox</type>
       <name>crossHABLine</name>
       <optional>false</optional>
       <layout>R</layout>

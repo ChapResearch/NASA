@@ -238,10 +238,15 @@ function generateIntChoiceField(layoutField, elementField)
     var output = "";
     var name = layoutField.find('name').text();
     var label = elementField.find('label').text();
+    var defaultValue = elementField.find('default').text();
+    console.log(defaultValue);
+    if(defaultValue=="")
+	defaultValue = 0;
+	
     
     output += '<div class="NASA-field-intChoice" ' + fieldPosition(layoutField) + '>';
     output += label;
-    output += '<input type="number" name="' + name + '" step="1">';
+    output += '<input type="number" name="' + name + '" step="1" value = "' + defaultValue + '">';
     output += '</div>';
     
     return output;
@@ -253,11 +258,11 @@ function generateIntChoiceField(layoutField, elementField)
 function generateCheckboxField(layoutField, elementField)
 {
     var output = "";
-    var name = layoutField.find('name').text();
-    var label = elementField.find('label').text();
+    var name = layoutField.children('name').text();
+    var label = elementField.children('label').text();
     
     output += '<div class="NASA-field-checkbox" ' + fieldPosition(layoutField) + '>';
-    output += label + "<br>";
+    output += '<Strong>' + label + "<Strong><br>";
     output += getChoices(name, elementField, "checkbox");
     output += '</div>';
 

@@ -4,19 +4,20 @@
 //                              This object will be sent to the Controller phone where it will be sent to the database.
 //
 //
-var data = new Object();
-
 function seasonDataGather(seasonXML)
 {
-    gatherRadioData()
+    var seasonData = {};
+    gatherRadioData(seasonData);
+    gatherIntChoiceData(seasonData);
+    gatherCheckboxData(seasonData);
+    gatherEventData(seasonData);
 
-    console.log(data);
-    return data;
+    console.log(seasonData);
+    return seasonData;
 }
 
 function gatherRadioData(data)
 {
-    data.test = "true";
     $('div.content').find("input[type=radio]:checked").each(function()
 							    {
 								var name = $(this).attr("name");
@@ -24,3 +25,64 @@ function gatherRadioData(data)
 								data[name] = $(this).val();
 							    });
 }
+
+function gatherIntChoiceData(data)
+{
+    $('div.content').find("input[type=number]").each(function()
+							    {
+								var name = $(this).attr("name");
+								console.log(data);
+								data[name] = $(this).val();
+							    });
+}
+
+function gatherCheckboxData(data)
+{
+    $('div.content').find("input[type=checkbox]:checked").each(function()
+							       {
+								   var name = $(this).attr("name");
+								   if(data[name] == undefined)
+								       data[name] = [];
+								   data[name].push($(this).val());
+							       });
+}
+
+
+function gatherSliderData(data) //NEED TO FINISH
+{
+//    $('div.content').find("input[type=checkbox]:checked").each(function()
+//							       {
+//								   var name = $(this).attr("name");
+//								   if(data[name] == undefined)
+//								       data[name] = [];
+//								   data[name].push($(this).val());
+//							       });
+}
+
+
+function gatherDropdownData(data) //NEED TO FINISH
+{
+//    $('div.content').find("input[type=checkbox]:checked").each(function()
+//							       {
+//								   var name = $(this).attr("name");
+//								   if(data[name] == undefined)
+//								       data[name] = [];
+//								   data[name].push($(this).val());
+//							       });
+}
+
+function gatherEventData(data)
+{
+    $('div.content').find(".NASA-event-window").each(function()
+						     {
+							 $(this).find("div").each(function()
+										  {
+										      var name = $(this).attr("data-event");
+										      var time = $(this).attr("data-time");
+										      if(data[name] == undefined)
+											  data[name] = [];
+										      data[name].push(time);
+										  });
+						     });
+}
+
