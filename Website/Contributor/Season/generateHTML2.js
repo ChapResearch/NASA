@@ -137,7 +137,7 @@ function getChoices(name, targetElementField, type)
 		     if (label == null) {
 			 label = value;
 		     }
-		     output += '<label><span class="checkmark">&nbsp; &nbsp;</span>&nbsp;' + label + '<input type="' + type + '" name="' + name + '" value="' + value + '"><br></label>';
+		     output += '<label><input type="' + type + '" name="' + name + '" value="' + value + '">' + label + '<br></label>';
 		 });
     console.log(output);
     return output;

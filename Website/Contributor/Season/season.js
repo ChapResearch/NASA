@@ -65,8 +65,17 @@ function remove()
 
 function reset(seasonXML)
 {
+    var elementFields = seasonXML.find("elements field");
+    
     $('div.content').find(":input").each( function()
 					  {
-					      $(this).   
-					  }
+					      var name = $(this).attr('name');
+					      var field = $("[name='" + name + "']");
+					      var defaultVal = field.find('default').text();
+					      if(!defaultVal)
+						  defaultVal = 0;
+					      $(this).val(defaultVal);
+					  });
+    
+    $('div.content').find(".NASA-event-window").empty();
 }
