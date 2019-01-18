@@ -8,6 +8,7 @@ function seasonDataGather(seasonXML)
 {
     var seasonData = {};
     gatherRadioData(seasonData);
+    gatherSliderData(seasonData);
     gatherIntChoiceData(seasonData);
     gatherCheckboxData(seasonData);
     gatherEventData(seasonData);
@@ -48,15 +49,14 @@ function gatherCheckboxData(data)
 }
 
 
-function gatherSliderData(data) //NEED TO FINISH
+function gatherSliderData(data)
 {
-//    $('div.content').find("input[type=checkbox]:checked").each(function()
-//							       {
-//								   var name = $(this).attr("name");
-//								   if(data[name] == undefined)
-//								       data[name] = [];
-//								   data[name].push($(this).val());
-//							       });
+    $('div.content').find("input[type=range]").each(function()
+							       {
+								   var name = $(this).attr("name");
+								   console.log(data);
+								   data[name] = $(this).val();    
+							       });
 }
 
 

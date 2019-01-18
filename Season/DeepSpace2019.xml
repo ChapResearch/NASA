@@ -2,6 +2,14 @@
 
   
   <elements>
+
+    <field> <!-- Slider -->
+      <name>rate</name>
+      <label>Rate this examples from 1-10</label>
+      <max>10</max>
+      <min>1</min>
+      <default>5</default>
+    </field>
     
     <field><!--radio-->
       <name>preloadAreaLeft</name>
@@ -35,24 +43,6 @@
       </choice>
       <choice>
 	<label>Unknown</label>   <!--I know this is out of order, Read comment above -->
-	<value>0</value>
-      </choice>
-    </field>
-
-    <field><!--radio-->
-      <name>startPos</name>
-      <label>Starting Position</label>
-      <type>choice</type>
-      <choice>
-	<label>Level 1</label>
-	<value>1</value>
-      </choice>
-      <choice>
-	<label>Level 2</label>
-	<value>2</value>
-      </choice>
-      <choice>
-	<label>Unknown</label>
 	<value>0</value>
       </choice>
     </field>
@@ -316,6 +306,15 @@
   
   <layout>
 
+    <field>
+      <type>slider</type>
+      <name>rate</name>
+      <default>0</default>
+      <max>10</max>
+      <min>1</min>
+      <location>43,5</location>
+    </field>
+
 <!-- ############## PREMATCH #################### -->
     
     <field>
@@ -338,14 +337,6 @@
       <optional>false</optional>
       <layout>B</layout>
       <location>23,5</location>    
-    </field>
-      
-    <field> <!-- Start Position -->
-      <type>radio</type>
-      <name>startPos</name>
-      <optional>false</optional>
-      <layout>B</layout>
-      <location>43,5</location>    
     </field>
       
     <field> <!-- Start Side -->

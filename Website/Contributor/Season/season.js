@@ -61,4 +61,12 @@ function remove()
 {
     this.parentNode.remove();
 }
-    
+
+
+function reset(seasonXML)
+{
+    $('div.content').find(":input").each( function()
+					  {
+					      $(this).   
+					  }
+}

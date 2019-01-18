@@ -58,3 +58,23 @@ div.NASA-field-text {
     font-size: 120%;
 }
 
+
+.NASA-field-radio label:hover {
+  background: #9faab7;
+}
+.NASA-field-radio label:checked {
+  background: #005BA6;
+}
+
+body {
+  background: #e8ebee;
+  color: #9faab7;
+  font-family: "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
+}
+
+.NASA-field-radio span.checkmark{
+    width: 20px;
+    height: 20px;
+    background-color: #005BA6;
+}
+

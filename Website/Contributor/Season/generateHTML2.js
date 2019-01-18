@@ -6,7 +6,7 @@
 
 function seasonLoad_generateHTML(seasonXML)
 {
-    var output = "";
+    var output = '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>';
 //    output += generateHeader();
     
     var layoutFields = seasonXML.find("layout field");
@@ -137,7 +137,7 @@ function getChoices(name, targetElementField, type)
 		     if (label == null) {
 			 label = value;
 		     }
-		     output += '<label><input type="' + type + '" name="' + name + '" value="' + value + '">' + label + '<br></label>';
+		     output += '<label><span class="checkmark">&nbsp; &nbsp;</span>&nbsp;' + label + '<input type="' + type + '" name="' + name + '" value="' + value + '"><br></label>';
 		 });
     console.log(output);
     return output;
@@ -276,20 +276,25 @@ function generateSliderField(layoutField, elementField)
 {
     var output = "";
     var name = layoutField.find('name').text();
-    var label = elementField.find('name').text();
+    var textName = name + "DisplayValue";
+    var label = elementField.find('label').text();
     var max = layoutField.find('max').text();
     var min = layoutField.find('min').text();
+    var defaultVal = elementField.find('default').text();
     
-    output += '<div class="NASA-field-intChoice" ' + fieldPosition(layoutField) + '>';
+    output += '<div class="NASA-slider-field" ' + fieldPosition(layoutField) + '>';
     output += label;
-    output += '<input type="range" name="' + name + '" max="' + max + '" min="' + min + '" id="' + label + '" value="5">';
-    output += '<p>Value: <span id="' + name + '"></span></p>';
-    output += '</div>';    
-    output += '<script>	var slider = document.getElementById("' + label + '");';
-    output += 'var output = document.getElementById("' + name + '");';
-    output += 'output.innerHTML = slider.value;';
-    output += 'slider.oninput = function() { output.innerHTML = this.value; }';
+    output += '<input type="range" max="' + max + '" min="' + min + '" id="' + name + '" value="' + defaultVal + '">';
+    output += '<span>Value: </span>';
+    output += '<span id="' + textName + '">' + defaultVal + '</span>';
+    output += '<script>'
+    output += 'var slider = $("#' + name + '");';
+    output += 'var output = $("#' + textName + '");';    
+    output += 'slider.oninput = function() {';    
+    output += 'output.innerHTML = this.value; }';
     output += '</script>';
+    output += '</div>';
+    
     
     return output;
 }
