@@ -137,7 +137,7 @@ function getChoices(name, targetElementField, type)
 		     if (label == null) {
 			 label = value;
 		     }
-		     output += '<label><input type="' + type + '" name="' + name + '" value="' + value + '">' + label + '<br></label>';
+		     output += '<label><input type="' + type + '" name="' + name + '" value="' + value + '"><span>' + label + '</span><br></label>';
 		 });
     console.log(output);
     return output;
