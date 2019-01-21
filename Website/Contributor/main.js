@@ -12,7 +12,16 @@ function nameChange(name)
     console.log("name boink");
     $('div.top-bar .controller-name span').text(name);
 }
-	
+
+function matchChange(match)
+{
+    $('div.top-bar .match-name span').text(match);
+}
+
+function resetChange()
+{
+    console.log("reset requested");
+}
 
 function connectionChange(conn)
 {
@@ -250,6 +259,7 @@ function dataSend()
     var data = seasonDataGather(jObject);
 
     console.log(data);
+    myNASA.sendData(data,function(disable) { jQuery('button.send').prop('disabled',disable);});
 }
 
 // must run the XML code after resources have been loaded to get the seasonXML object loaded
@@ -287,6 +297,8 @@ $( document ).ready(function() {
     
     myNASA.connectionMonitor(connectionChange);
     myNASA.nameMonitor(nameChange);
+    myNASA.matchMonitor(matchChange);
+    myNASA.resetMonitor(resetChange);
     
     $('div.connect-indicator').click(function() {
 	console.log("clicky clicky");
@@ -354,18 +366,24 @@ $( document ).ready(function() {
     });
 
     $('div.team-color').click(function() {
-	if($(this).hasClass('blue')){
-	    $(this).removeClass('blue');
-	    $(this).addClass('none');
-	    myNASA.setColor(null);
-	} else if($(this).hasClass('none')) {
-	    $(this).removeClass('none');
-	    $(this).addClass('red');
-	    myNASA.setColor('red');
-	} else {
-	    $(this).removeClass('red');
-	    $(this).addClass('blue');
-	    myNASA.setColor('blue');
+
+	var target = $(this);
+	var control = function(disabled) { if(disabled) {target.addClass('disabled');} else {target.removeClass('disabled');}};
+
+	if(!target.hasClass('disabled')) {
+	    if(target.hasClass('blue')){
+		target.removeClass('blue');
+		target.addClass('none');
+		myNASA.setColor(null,control);
+	    } else if(target.hasClass('none')) {
+		target.removeClass('none');
+		target.addClass('red');
+		myNASA.setColor('red',control);
+	    } else {
+		target.removeClass('red');
+		target.addClass('blue');
+		myNASA.setColor('blue',control);
+	    }
 	}
     });
 

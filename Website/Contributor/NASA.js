@@ -40,7 +40,7 @@ const NASA_UUIDs = {
 
 const NASA_Controller_Name = 'd9867b1d-15dd-4f18-a134-3d8e4408fcff';
 const NASA_Controller_PW = 'b1de1e91-6d8a-4b5c-8b06-2e64688d3fc9';
-const NASA_Controller_Reset = '5eda1292-e156-11e8-9f32-f2801f1b9fd1';
+const NASA_Controller_MATCH = '5eda1292-e156-11e8-9f32-f2801f1b9fd1';
 
 function NASA()
 {
@@ -53,7 +53,8 @@ function NASA()
 
     //    this.pinger pings the server to "keep alive"
     this.pinger = null;
-    this.pingerInterval = 5000;
+    //    this.pingerInterval = 120000;
+    this.pingerInterval = 0;          // turns off the pinger completely
 
     // the filters object used when connecting to bluetooth
     //    this.filters = [{ services: [this.service], name: this.name }];
@@ -78,14 +79,18 @@ function NASA()
     
     this.connectionMonitorFN = null;
     this.nameFN = null;
+    this.matchFN = null;
+    this.resetFN = null;
 }
 
 Object.defineProperties(NASA.prototype, {
     connected: { set: function(a) {
 	                 if(a) {
 			     if(!this.connectedStatus) {
-				 console.log("setting up pinger for " + this.pinterInterval);
-				 this.pinger = setInterval(this.pingerFN.bind(this),this.pingerInterval);
+				 if(this.pingerInterval) {
+				     console.log("setting up pinger for " + this.pinterInterval);
+				     this.pinger = setInterval(this.pingerFN.bind(this),this.pingerInterval);
+				 }
 			     }
 			     this.connectedStatus = true;
 			 } else {
@@ -194,7 +199,7 @@ NASA.prototype.setTeam = function(team)
     }
 }
     
-NASA.prototype.setColor = function(color)
+NASA.prototype.setColor = function(color,uiControl)
 {
     switch(color) {
     case 'blue':   color = 1; break;
@@ -203,6 +208,7 @@ NASA.prototype.setColor = function(color)
     }
 
     if(this.connected) {
+	uiControl(true);         // disable the associated uiControl
 	console.log("attempting to send color report");
 	var uuid = NASA_UUIDs[NASAObj.slot].transmit;
 
@@ -215,9 +221,101 @@ NASA.prototype.setColor = function(color)
 	NASAObj.serviceObj.getCharacteristic(uuid)
 	    .then(characteristic => {
 		characteristic.writeValue(buffer)
+		    .then(() => { uiControl(false); })
 	            .catch(error => { NASAObj.connected = false; });
 	    });
     }
+}
+
+//
+// sendData() - sends the given object (data) to the controller.
+//              The uiControl is a function that is called to enable/disable the
+//              ui element that is used to send data.  It is called with:
+//              uiControl(disabled) where disabled is true or false.  If true,
+//              then the ui element should be disabled.
+//
+NASA.prototype.sendData = function(obj,uiControl)
+{
+    var MAXBLE = 512;
+    var CHUNKSIZE = MAXBLE - 2;      // need 2 bytes to transmit each chunk
+
+    if(this.connected) {
+	uiControl(true);         // disable the associated uiControl
+    
+	console.log("attempting to send data");
+	var uuid = NASA_UUIDs[NASAObj.slot].transmit;
+
+	var jsonData = JSON.stringify(obj);
+	var encoder = new TextEncoder('utf-8');
+	var jsonDataEncoded = encoder.encode(jsonData);          // Uint8Array returned
+
+	console.log("encoded data is length of " + (jsonDataEncoded.length + 2));
+
+	// at this point we have the data that needs to be transmitted
+	// but it may be too big for a characteristic - so it may need
+	// to be broken into chunks.  We use the array in any case to
+	// make it easier.
+
+	var chunks = [];
+	var chunkCount = Math.floor(jsonDataEncoded.length / CHUNKSIZE);    // count of full chunks
+	if(jsonDataEncoded.length % CHUNKSIZE != 0) {
+	    chunkCount++;                                                   // have a final non-full chunk
+	}
+
+	for(var i=0; i < chunkCount; i++) {
+	    chunks.push(jsonDataEncoded.slice(i*CHUNKSIZE,(i+1)*CHUNKSIZE));
+	}
+
+	console.log("using " + chunks.length + " chunks");
+
+	// now we have an array of chunks to be transmitted WITHOUT the need to check
+	//  the size of the chunk any more.
+	
+	NASAObj.serviceObj.getCharacteristic(uuid)
+	    .then(characteristic => { this._sendChunks(characteristic,uiControl,chunks); })
+	    .catch(error => { NASAObj.connected = false; });
+    }
+}
+
+//
+// _sendChunks() - sends the given chunks to the Controller. This routine
+//                 will resursively call itself after each chunk is transmitted.
+//                 Note that each chunk is json encoded data (not that it matters
+//                 for this routine).
+//
+NASA.prototype._sendChunks = function(characteristic,uiControl,chunks)
+{
+    if(chunks.length) {
+
+	var chunk = chunks.shift();
+	var message = new Uint8Array(chunk.length + 2);
+
+	message[0] = 5;                        // data report transmission
+	message[1] = (chunks.length==0)?1:0;    // zero is non-final, otherwise is final
+	
+	message.set(chunk,2);
+
+	// TODO - need to trow error upon the catch here
+	
+	characteristic.writeValue(message)
+	    .then(() => { this._sendChunks(characteristic,uiControl,chunks); })
+	    .catch(error => { NASAObj.connected = false; });
+    } else {
+	uiControl(false);         // enable the associated uiControl
+    }
+}    
+
+//
+// _notifySetup() - called to set-up notifications for changes to the match number.
+//
+NASA.prototype._notifySetup = function(matchCharacteristic)
+{
+    return matchCharacteristic.startNotifications()
+	        .then(() => {
+		    matchCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+			console.log("event");
+		    })
+		});
 }
 
 //
@@ -319,8 +417,48 @@ NASA.prototype.connect = function(reportFN)
 		NASAObj.disconnect();
 		throw new Error("password-fail");
 	    }
-	    NASAObj.connected = true;
 	    reportFN("password-done");
+	})
+
+    // since things have gone OK up to this point, we'll just grab the match
+    //  number without providing any status for it...
+
+    	.then(() => {
+	    console.log("getting match number of controller - characteristic");
+	    return(NASAObj.serviceObj.getCharacteristic(NASA_Controller_MATCH));
+	})
+	.then(characteristic => {
+	    return(characteristic.readValue());
+	})
+	.then(value => {
+	    var decoder = new TextDecoder('utf-8');
+	    var match = decoder.decode(value);
+	    if(NASAObj.matchFN) {
+		NASAObj.matchFN(match);
+	    }
+	})
+
+    // then set-up the notifications on the match number
+
+    	.then(() => {
+	    console.log("setting up notifications");
+	    return(NASAObj.serviceObj.getCharacteristic(NASA_Controller_MATCH));
+	})
+	.then((matchCharacteristic) => {
+	    console.log("here we go");
+	    return(matchCharacteristic.startNotifications());
+	})
+    	.then((matchCharacteristic) => {
+	    matchCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+		var decoder = new TextDecoder('utf-8');
+		var match = decoder.decode(event.target.value);
+		if(NASAObj.matchFN){
+		    NASAObj.matchFN(match);
+		}
+		if(NASAObj.resetFN) {
+		    NASAObj.resetFN();
+		}
+	    })
 	})
 
     // check to see if we can have the slot we're asking for
@@ -342,7 +480,6 @@ NASA.prototype.connect = function(reportFN)
 	    return(characteristic.writeValue(buffer));
 	})
     
-
     // if we get here, then everything went well, and we're connected
     //   we do kick-off the sending of the user name, but it isn't
     //   part of this promise chain.
@@ -350,6 +487,7 @@ NASA.prototype.connect = function(reportFN)
         .then(() => {
 	    reportFN("slot-done");
 	    NASAObj.sendUserName();
+	    NASAObj.connected = true;
 	})
 
 	.catch(error => {
@@ -403,4 +541,22 @@ NASA.prototype.connectionMonitor = function(fn)
 NASA.prototype.nameMonitor = function(fn)
 {
     this.nameFN = fn;
+}
+
+//
+// matchMonitor() - use to specifuy the callback that is called whenever the
+//                  match number from the Controller changes.
+//
+NASA.prototype.matchMonitor = function(fn)
+{
+    this.matchFN = fn;
+}
+
+//
+// resetMontitor()- use to specify the callback that is called when the Controller
+//                  requests a reset of the Contributors.
+//
+NASA.prototype.resetMonitor = function(fn)
+{
+    this.resetFN = fn;
 }
