@@ -278,6 +278,8 @@ $( window ).on( "load", function() {
     var output = seasonLoad_generateHTML(jObject)
 
     target.append(output);
+
+    numSpinner_initAll();
 });
 
 $( document ).ready(function() {

@@ -1,0 +1,41 @@
+
+div.numSpinner_field {
+    border: 2px solid black;
+    display: inline-block;
+    height: 25px;
+    margin: 0px;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: sans-serif;
+    padding-top: 5px;
+    text-align: center;
+    -webkit-user-select: none;
+}
+
+/* note that the widths DON'T add up to 100% - that's because the
+   border isn't figured into the width. So it must be lower. */
+
+div.numSpinner_minus {
+    color: white;
+    background-color: red;
+    width: 40px;
+    cursor: pointer;
+}
+
+div.numSpinner_value {
+    color: black;
+    background-color: white;
+    width: calc(100% - 88px);
+    border-right: 0px;
+    border-left: 0px;
+}
+div.numSpinner_plus {
+    color: white;
+    background-color: green;
+    width: 40px;
+    cursor: pointer;
+}
+
+div.numSpinner_minus:active, div.numSpinner_plus:active {
+    opacity: 0.5;
+}
