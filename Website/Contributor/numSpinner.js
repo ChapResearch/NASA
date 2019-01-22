@@ -65,7 +65,6 @@ function numSpinner_initAll()
 	spinnerPlus.click(function() {
 	    var value = parseInt(spinnerValue.html());
 	    var max = target.attr("max");
-	    console.log("max " + max);
 	    value += 1;
 	    if(max === undefined || value <= parseInt(max)) {
 		spinnerValue.html(value);
