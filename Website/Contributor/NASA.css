@@ -312,6 +312,7 @@ div.bottom-bar .team-color {
     border-radius: 10px;
     font-size: 9px;
     cursor: pointer;
+    -webkit-user-select: none;    
 }
 
 div.bottom-bar .team-color div {
