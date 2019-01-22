@@ -18,9 +18,23 @@ function matchChange(match)
     $('div.top-bar .match-name span').text(match);
 }
 
+//
+// resetChange() - this is occuring during a BLE conversation - so it shouldn't
+//                 cause a transmit!
+//
 function resetChange()
 {
     console.log("reset requested");
+
+    keypadReset();       // clear robot number
+    teamColorReset();    // clear the color
+
+    var xmldata = document.getElementById("seasonXML").contentDocument;
+    var jObject = $("app",xmldata);      // the jQuery'able xml data
+
+    reset(jObject);
+
+    timerClear();
 }
 
 function connectionChange(conn)
@@ -51,23 +65,23 @@ function settingsForm(onoff)
     }(jQuery));
 }
 
-var timerCurrent = 0;
-var timerStart = 0;
+var timerCurrentTime = 0;
+var timerStartTime = 0;
 var timerInterval = null;
 
 function timerGetMins()
 {
-    return(Math.floor((timerCurrent-timerStart) / 60));
+    return(Math.floor((timerCurrentTime-timerStartTime) / 60));
 }
 
 function timerGetSecs()
 {
-    return(Math.floor((timerCurrent - (timerGetMins() * 60)) - timerStart));
+    return(Math.floor((timerCurrentTime - (timerGetMins() * 60)) - timerStartTime));
 }
     
 function timerDisplay()
 {
-    timerCurrent = Math.floor(Date.now()/1000);
+    timerCurrentTime = Math.floor(Date.now()/1000);
     
     var minutes = timerGetMins();
     var seconds = timerGetSecs();
@@ -81,6 +95,29 @@ function timerDisplay()
 
     display.setValue(minString + ":" + secString);
 }
+
+function timerStart()
+{
+    timerStartTime = Math.floor(Date.now()/1000);
+    timerCurrentTime = timerStartTime;
+    timerDisplay();
+
+    $('button.start').prop('disabled',true);
+    $('button.send').prop('disabled',true);
+    $('button.stop').prop('disabled',false);
+    
+    timerInterval = setInterval(timerDisplay,1000);
+}
+
+function timerStop()
+{
+    clearInterval(timerInterval);
+    timerDisplay();
+    $('button.start').prop('disabled',false);
+    $('button.send').prop('disabled',false);
+    $('button.stop').prop('disabled',true);
+}
+
 
 //
 // connectBox() - turn the connetion dialogbox on/off (true/false)
@@ -192,7 +229,7 @@ function about()
 
 function timerClear()
 {
-    timerStart = Math.floor(Date.now()/1000);
+    timerStartTime = Math.floor(Date.now()/1000);
     timerDisplay();
 }
 
@@ -249,6 +286,27 @@ function keypadControl(control)
 }
 
 //
+// keypadReset() - reset the number on the keypad
+//
+function keypadReset()
+{
+    $('div.team-number').text("");
+    $('div.keypad div.display input').val("");
+}
+
+//
+// teamColorReset() - sets the team color to "no color"
+//
+function teamColorReset()
+{
+    var target = $('div.team-color');
+
+    target.removeClass('red');
+    target.removeClass('blue');
+    target.addClass('none');
+}
+
+//
 // dataSend() - gathers the data from the season form, and sends it off to the controller.
 //
 function dataSend()
@@ -301,6 +359,7 @@ $( document ).ready(function() {
     myNASA.nameMonitor(nameChange);
     myNASA.matchMonitor(matchChange);
     myNASA.resetMonitor(resetChange);
+    myNASA.startMonitor(function() { timerClear(); timerStart(); });
     
     $('div.connect-indicator').click(function() {
 	console.log("clicky clicky");
@@ -346,21 +405,11 @@ $( document ).ready(function() {
     });
 
     $('button.start').click(function() {
-	timerStart = Math.floor(Date.now()/1000);
-	timerCurrent = timerStart;
-	timerDisplay();
-	$(this).prop('disabled',true);
-	$('button.send').prop('disabled',true);
-	$('button.stop').prop('disabled',false);
-	timerInterval = setInterval(timerDisplay,1000);
+	timerStart();
     });
 
     $('button.stop').click(function() {
-	clearInterval(timerInterval);
-	timerDisplay();
-	$(this).prop('disabled',true);
-	$('button.send').prop('disabled',false);
-	$('button.start').prop('disabled',false);
+	timerStop();
     });
 
     $('button.send').click(function() {

@@ -41,6 +41,7 @@ const NASA_UUIDs = {
 const NASA_Controller_Name = 'd9867b1d-15dd-4f18-a134-3d8e4408fcff';
 const NASA_Controller_PW = 'b1de1e91-6d8a-4b5c-8b06-2e64688d3fc9';
 const NASA_Controller_MATCH = '5eda1292-e156-11e8-9f32-f2801f1b9fd1';
+const NASA_Controller_START = 'baa7db04-1e87-11e9-ab14-d663bd873d93';
 
 function NASA()
 {
@@ -81,6 +82,7 @@ function NASA()
     this.nameFN = null;
     this.matchFN = null;
     this.resetFN = null;
+    this.startFN = null;
 }
 
 Object.defineProperties(NASA.prototype, {
@@ -461,6 +463,23 @@ NASA.prototype.connect = function(reportFN)
 	    })
 	})
 
+    // then set-up the notifications on the start
+
+    	.then(() => {
+	    console.log("setting up notifications on start");
+	    return(NASAObj.serviceObj.getCharacteristic(NASA_Controller_START));
+	})
+	.then((startCharacteristic) => {
+	    return(startCharacteristic.startNotifications());
+	})
+    	.then((startCharacteristic) => {
+	    startCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+		if(NASAObj.startFN) {
+		    NASAObj.startFN();
+		}
+	    })
+	})
+
     // check to see if we can have the slot we're asking for
     
 	.then( () => {
@@ -486,8 +505,8 @@ NASA.prototype.connect = function(reportFN)
 
         .then(() => {
 	    reportFN("slot-done");
-	    NASAObj.sendUserName();
 	    NASAObj.connected = true;
+	    NASAObj.sendUserName();
 	})
 
 	.catch(error => {
@@ -559,4 +578,12 @@ NASA.prototype.matchMonitor = function(fn)
 NASA.prototype.resetMonitor = function(fn)
 {
     this.resetFN = fn;
+}
+
+//
+// startMonitor() - used to specify the callback when the Controller says "START!"
+//
+NASA.prototype.startMonitor = function(fn)
+{
+    this.startFN = fn;
 }
