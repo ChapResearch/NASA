@@ -63,19 +63,62 @@ function remove()
 }
 
 
+
 function reset(seasonXML)
 {
     var elementFields = seasonXML.find("elements field");
     
-    $('div.content').find(":input").each( function()
-					  {
-					      var name = $(this).attr('name');
-					      var field = $("[name='" + name + "']");
-					      var defaultVal = field.find('default').text();
-					      if(!defaultVal)
-						  defaultVal = 0;
-					      $(this).val(defaultVal);
-					  });
+//    $('div.content').find(":input").each( function()
+//					  {
+//					      var name = $(this).attr('name');
+//					      var field = $("[name='" + name + "']");
+//					      var defaultVal = field.find('default').text();
+//					      if(!defaultVal)
+//						  defaultVal = 0;
+//					      $(this).val(defaultVal);
+    //					  });
+
+    $('div.content').find('input[type="radio"]').each( function()
+						      {
+							  var name = $(this).attr('name');
+							  var HTMLval = $(this).attr('value');
+							  var field = findElementByName(elementFields,name);
+							  var defaultVal = field.find('default').text();
+							  if(!defaultVal)
+							      defaultVal = 0;
+							  $(this).prop('checked',false);
+							  if(HTMLval==defaultVal)
+							      $(this).prop('checked',true);
+						      });
+
+    $('div.content').find('input[type="checkbox"]').each( function()
+						      {
+							  var name = $(this).attr('name');
+							  var HTMLval = $(this).attr('value');
+							  var field = findElementByName(elementFields,name);
+							  var defaultVal = field.find('default').text();
+							  if(!defaultVal)
+							      defaultVal = 0;
+							  $(this).prop('checked',false);
+							  if(HTMLval==defaultVal)
+							      $(this).prop('checked',true);
+						      });
+    
+    $('div.content').find('input[type="number"]').each( function()
+						      {
+							  var name = $(this).attr('name');
+							  console.log(name);
+							  var field = findElementByName(elementFields,name);
+							  var defaultVal = field.find('default').text();
+							  console.log(field);
+							  if(!defaultVal)
+							      defaultVal = 0;
+							  $(this).val(defaultVal);
+							  $(this).trigger('change');
+
+						      });
+
+
     
     $('div.content').find(".NASA-event-window").empty();
 }

@@ -416,6 +416,10 @@ $( document ).ready(function() {
 	dataSend();
     });
 
+    $('button.reset').click(function() {
+	resetChange();
+    });
+    
     $('div.team-color').click(function() {
 
 	var target = $(this);

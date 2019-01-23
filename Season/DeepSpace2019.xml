@@ -15,6 +15,7 @@
       <name>preloadAreaLeft</name>
       <label>Area Left</label>
       <type>choice</type>
+      <default>0</default>
       <choice>
 	<label>Cargo</label>
 	<value>1</value>
@@ -600,7 +601,7 @@
 
     <field> <!-- Game Piece Off Cargo -->
       <type>intChoice</type>
-      <name>gamePieceOffRocket</name>
+      <name>gamePieceOffCargo</name>
       <default>0</default>
       <layout>B</layout>
       <location>40,85</location>    
