@@ -1,20 +1,8 @@
-var countDownDate = new Date().getTime();
 
 function eventTagTime(id, event, eventName)
 {
-    if(event=="Start")
-	countDownDate = new Date().getTime();
-
-    var now = new Date().getTime();
-    var distance = now - countDownDate;
-    var subId = id + "sub";
-
-    // Time calculations for days, hours, minutes and seconds
-    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-//    minutes = minutes*60;
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-//    seconds += minutes;
-    console.log(seconds);
+    var minutes = timerGetMins();
+    var seconds = timerGetSecs();
 
     var totalSeconds = seconds + minutes*60
 
