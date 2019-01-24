@@ -192,6 +192,8 @@
       <name>panelPickupHuman</name>
       <label>Pickup Human</label>
       <type>event</type>
+      <eventType>start</eventType>
+      <eventTie>panel</eventTie>
     </field>
 
     <field> <!-- Event -->
@@ -618,7 +620,7 @@
     <field>
       <type>line</type>
       <direction>vertical</direction>
-      <length>29</length>
+      <length>30p</length>
       <location>20,38</location>
       <color>red</color>
     </field>
@@ -643,14 +645,14 @@
       <type>box</type>
       <size>74,22</size>
       <location>24,22</location>
-      <color>blue</color>
+      <color>green</color>
     </field>
 
     <field>
       <type>box</type>
       <size>74,22</size>
-      <location>24,44</location>
-      <color>blue</color>
+      <location>24,43.9</location>
+      <color>green</color>
     </field>
 
   </layout>

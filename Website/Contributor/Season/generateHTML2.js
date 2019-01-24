@@ -73,7 +73,7 @@ function fieldPosition(layoutField)
 	pos = [50, 50];
     }
 
-    output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:200px"';
+    output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:230px"';
     return output;
 }
 
@@ -262,7 +262,7 @@ function generateCheckboxField(layoutField, elementField)
     var label = elementField.children('label').text();
     
     output += '<div class="NASA-field-checkbox" ' + fieldPosition(layoutField) + '>';
-    output += '<Strong>' + label + "<Strong><br>";
+    output += '<Strong>' + label + "</Strong><br>";
     output += getChoices(name, elementField, "checkbox");
     output += '</div>';
 

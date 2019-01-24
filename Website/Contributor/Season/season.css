@@ -58,10 +58,11 @@ div.NASA-field-text {
     font-size: 120%;
 }
 
-
-.NASA-field-radio label:hover {
-  background: #9faab7;
+div.NASA-field-checkbox {
+    font-family: sans-serif;    
+    font-size: 16px;
 }
+
 .NASA-field-radio label:checked {
   background: #005BA6;
 }
@@ -79,8 +80,49 @@ button {
     border-radius: 10%;
 }
 
-button:focus {
-    background: #106BB6;
+button:active {
+    background: red;
+}
+
+
+div.NASA-field-checkbox [type="checkbox"] {
+  border: 0; 
+  clip: rect(0 0 0 0); 
+  height: 1px; margin: -1px; 
+  overflow: hidden; 
+  padding: 0; 
+  position: absolute; 
+  width: 1px;
+}
+
+div.NASA-field-checkbox [type="checkbox"] + span {
+  display: block;
+}
+
+/* the basic, unchecked style */
+div.NASA-field-checkbox [type="checkbox"] + span:before {
+  content: '';
+  display: inline-block;
+  width: 1em;
+  height: .75em;
+  vertical-align: -0.25em;
+  border: 0.125em solid #fff;
+  box-shadow: 0 0 0 0.1em #000;
+  margin-right: 0.75em;
+  transition: 0.1s ease all;
+}
+
+/* the checked style using the :checked pseudo class */
+div.NASA-field-checkbox [type="checkbox"]:checked + span:before {
+  background: #005BA6;
+  box-shadow: 0 0 0 0.25em #000;
+}
+
+/* never forget focus styling */
+div.NASA-field-checkbox [type="checkbox"]:focus + span:after {
+  font-size: 1.5em;
+  line-height: .5;
+  vertical-align: -0.125em;
 }
 
 
@@ -100,7 +142,6 @@ label {
   display: block;
   cursor: pointer;
   line-height: .5;
-  font-size: 1.5em;
   color: #005BA6;
 }
 
