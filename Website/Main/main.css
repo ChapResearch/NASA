@@ -1,0 +1,58 @@
+div.content {
+    font-size: 24px;
+    color: white;
+    font-family: sans-serif;
+    text-align: center;
+    width: 900px;
+}
+
+div.buttons {
+    float: left;
+    width: 150px;
+}
+
+div.buttons > div {
+    margin-top: 65px;
+    margin-left: 50px;
+    border: 8px solid white;
+    width: 160px;
+    height: 75px;
+    color: white;
+    font-family: sans-serif;
+    font-size: 25px;
+    text-align: center;
+    cursor: pointer;
+}
+
+div.buttons > div:active {
+    opacity: 0.5;
+}
+    
+div.buttons div.webpage {
+    padding-top: 8px;
+    background-color: blue;
+    height: 67px;
+}
+
+div.buttons div.statistics {
+    padding-top: 25px;
+    background-color: red;
+    height: 50px;
+}
+
+div.buttons div.app {
+    padding-top: 25px;
+    background-color: white;
+    color: black;
+    border: 8px solid blue;
+    height: 50px;
+}
+
+div.buttons div.about {
+    padding-top: 25px;
+    background-color: white;
+    color: blue;
+    border: 8px solid red;
+    height: 50px;
+}
+
