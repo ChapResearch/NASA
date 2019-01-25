@@ -238,20 +238,27 @@ NASA.prototype.setColor = function(color,uiControl)
 //
 NASA.prototype.sendData = function(obj,uiControl)
 {
-    var MAXBLE = 512;
+    // the windows implementation of web ble apparently can transmit up to 512
+    //   bytes by sending multiple messages. However, the andriod implementation
+    //   doesn't appear to be able to do that, having a maximum of 20 bytes.
+    //   So we go with the lower.
+    //
+    //    var MAXBLE = 512;
+    
+    var MAXBLE = 20;
+
     var CHUNKSIZE = MAXBLE - 2;      // need 2 bytes to transmit each chunk
 
     if(this.connected) {
 	uiControl(true);         // disable the associated uiControl
     
-	console.log("attempting to send data");
 	var uuid = NASA_UUIDs[NASAObj.slot].transmit;
 
 	var jsonData = JSON.stringify(obj);
 	var encoder = new TextEncoder('utf-8');
 	var jsonDataEncoded = encoder.encode(jsonData);          // Uint8Array returned
 
-	console.log("encoded data is length of " + (jsonDataEncoded.length + 2));
+	console.log(jsonData);
 
 	// at this point we have the data that needs to be transmitted
 	// but it may be too big for a characteristic - so it may need
@@ -268,14 +275,14 @@ NASA.prototype.sendData = function(obj,uiControl)
 	    chunks.push(jsonDataEncoded.slice(i*CHUNKSIZE,(i+1)*CHUNKSIZE));
 	}
 
-	console.log("using " + chunks.length + " chunks");
-
 	// now we have an array of chunks to be transmitted WITHOUT the need to check
 	//  the size of the chunk any more.
 	
 	NASAObj.serviceObj.getCharacteristic(uuid)
-	    .then(characteristic => { this._sendChunks(characteristic,uiControl,chunks); })
-	    .catch(error => { NASAObj.connected = false; });
+	    .then( this._sendChunks.bind(this,uiControl,chunks) )
+	    .catch(error => {
+		console.log("catch in sendData");
+		NASAObj.connected = false; });
     }
 }
 
@@ -285,7 +292,7 @@ NASA.prototype.sendData = function(obj,uiControl)
 //                 Note that each chunk is json encoded data (not that it matters
 //                 for this routine).
 //
-NASA.prototype._sendChunks = function(characteristic,uiControl,chunks)
+NASA.prototype._sendChunks = function(uiControl,chunks,characteristic)
 {
     if(chunks.length) {
 
@@ -300,8 +307,12 @@ NASA.prototype._sendChunks = function(characteristic,uiControl,chunks)
 	// TODO - need to trow error upon the catch here
 	
 	characteristic.writeValue(message)
-	    .then(() => { this._sendChunks(characteristic,uiControl,chunks); })
-	    .catch(error => { NASAObj.connected = false; });
+	    .then( this._sendChunks.bind(this,uiControl,chunks,characteristic) )
+	    .catch(error => {
+		console.log("catch in _sendChunks with chunks=" + chunks.length);
+		console.log(error);
+		NASAObj.connected = false;
+	    });
     } else {
 	uiControl(false);         // enable the associated uiControl
     }
