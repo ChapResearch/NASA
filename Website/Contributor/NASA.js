@@ -42,6 +42,7 @@ const NASA_Controller_Name = 'd9867b1d-15dd-4f18-a134-3d8e4408fcff';
 const NASA_Controller_PW = 'b1de1e91-6d8a-4b5c-8b06-2e64688d3fc9';
 const NASA_Controller_MATCH = '5eda1292-e156-11e8-9f32-f2801f1b9fd1';
 const NASA_Controller_START = 'baa7db04-1e87-11e9-ab14-d663bd873d93';
+const NASA_Controller_RESET = '50c0ee7a-231d-11e9-ab14-d663bd873d93';
 
 function NASA()
 {
@@ -468,7 +469,22 @@ NASA.prototype.connect = function(reportFN)
 		if(NASAObj.matchFN){
 		    NASAObj.matchFN(match);
 		}
-		if(NASAObj.resetFN) {
+	    })
+	})
+
+    // then set-up the notifications on reset
+
+    	.then(() => {
+	    console.log("setting up reset");
+	    return(NASAObj.serviceObj.getCharacteristic(NASA_Controller_RESET));
+	})
+	.then((resetCharacteristic) => {
+	    console.log("here we go");
+	    return(resetCharacteristic.startNotifications());
+	})
+    	.then((resetCharacteristic) => {
+	    resetCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+		if(NASAObj.resetFN){
 		    NASAObj.resetFN();
 		}
 	    })
@@ -485,8 +501,10 @@ NASA.prototype.connect = function(reportFN)
 	})
     	.then((startCharacteristic) => {
 	    startCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+		var decoder = new TextDecoder('utf-8');
+		var start = parseInt(decoder.decode(event.target.value));
 		if(NASAObj.startFN) {
-		    NASAObj.startFN();
+		    NASAObj.startFN(start);      // a "1" indicated to start, a "0" to stop
 		}
 	    })
 	})

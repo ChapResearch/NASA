@@ -34,6 +34,7 @@ function resetChange()
 
     reset(jObject);
 
+    timerStop();
     timerClear();
 }
 
@@ -359,7 +360,7 @@ $( document ).ready(function() {
     myNASA.nameMonitor(nameChange);
     myNASA.matchMonitor(matchChange);
     myNASA.resetMonitor(resetChange);
-    myNASA.startMonitor(function() { timerClear(); timerStart(); });
+    myNASA.startMonitor(function(start) { if(start) {timerStart();} else { timerStop(); } });
     
     $('div.connect-indicator').click(function() {
 	console.log("clicky clicky");
