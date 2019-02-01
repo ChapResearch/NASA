@@ -657,5 +657,79 @@
 
   </layout>
 
-  
+  <views>
+
+    <view>
+      <name>testView</name>
+      <type>table</type>
+      <perspective>robot</perspective>
+      <field>robot</field>
+      <field>panelScoredCargoTimeAverage</field>
+    </view>
+    
+  </views>
+      
+
+    
+  <metaData>
+    <field>
+      <name>panelPickup</name>
+      <type>event</type>
+      <label>Combined pickup events</label>
+      <perspective>match</perspective>
+      <op>combine</op>
+      <target>panelPickupGround</target>
+      <target>panelPickupHuman</target>
+    </field>
+    <field>
+      <name>panelScoredRocket</name>
+      <type>event</type>
+      <label>Combined panel rocket scoring events</label>
+      <perspective>match</perspective>
+      <op>combine</op>
+      <target>panelScoredRocketLvl1</target>
+      <target>panelScoredRocketLvl2</target>
+      <target>panelScoredRocketLvl3</target>
+    </field>
+    <field>
+      <name>panelScoredCargo</name>
+      <type>event</type>
+      <label>Combined panel cargo scoring events</label>
+      <perspective>match</perspective>
+      <op>combine</op>
+      <target>panelScoredCargoMiddle</target>
+      <target>panelScoredCargoRight</target>
+      <target>panelScoredCargoLeft</target>
+    </field>
+    <field>
+      <name>panelScoredCargoTime</name>
+      <type>event</type>
+      <label>Cargo scoring times</label>
+      <perspective>match</perspective>
+      <op>delta</op>
+      <start>panelPickup</start>
+      <end>panelScoredCargo</end>
+    </field>
+    <field>
+      <name>panelScoredCargoCount</name>
+      <type>int</type>
+      <label>Cargo scoring counts</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>count</op>
+      <target>panelScoredCargoTime</target>
+    </field>
+    <field>
+      <name>panelScoredCargoTimeAverage</name>
+      <type>int</type>
+      <label>Cargo scoring times average</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>average</op>
+      <target>panelScoredCargoTime</target>
+    </field>
+  </metaData>
+    
 </app>
