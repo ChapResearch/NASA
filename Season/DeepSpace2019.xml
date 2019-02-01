@@ -3,14 +3,6 @@
   
   <elements>
 
-    <field> <!-- Slider -->
-      <name>rate</name>
-      <label>Rate this examples from 1-10</label>
-      <max>10</max>
-      <min>1</min>
-      <default>5</default>
-    </field>
-    
     <field><!--radio-->
       <name>preloadAreaLeft</name>
       <label>Area Left</label>
@@ -672,6 +664,7 @@
 
     
   <metaData>
+
     <field>
       <name>panelPickup</name>
       <type>event</type>
@@ -681,6 +674,10 @@
       <target>panelPickupGround</target>
       <target>panelPickupHuman</target>
     </field>
+
+
+
+
     <field>
       <name>panelScoredRocket</name>
       <type>event</type>
@@ -691,6 +688,7 @@
       <target>panelScoredRocketLvl2</target>
       <target>panelScoredRocketLvl3</target>
     </field>
+
     <field>
       <name>panelScoredCargo</name>
       <type>event</type>
@@ -701,6 +699,7 @@
       <target>panelScoredCargoRight</target>
       <target>panelScoredCargoLeft</target>
     </field>
+
     <field>
       <name>panelScoredCargoTime</name>
       <type>event</type>
@@ -710,6 +709,7 @@
       <start>panelPickup</start>
       <end>panelScoredCargo</end>
     </field>
+
     <field>
       <name>panelScoredCargoCount</name>
       <type>int</type>
@@ -720,6 +720,7 @@
       <op>count</op>
       <target>panelScoredCargoTime</target>
     </field>
+
     <field>
       <name>panelScoredCargoTimeAverage</name>
       <type>int</type>
