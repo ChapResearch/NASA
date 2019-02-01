@@ -2,9 +2,9 @@ div.connect-indicator {
     position: absolute;
     bottom: 15px;
     left: 230px;
-    height: 25px;
-    width: 25px;
-    border-radius: 15px;
+    height: 50px;
+    width: 50px;
+    border-radius: 100%;
     border: 3px solid white;
     background-color: red;
     cursor: pointer;
@@ -18,7 +18,7 @@ div.top-bar {
     position: absolute;
     top: 0px;
     left: 0px;
-    height: 60px;
+    height: 80px;
     width: 100%;
     background-color: #5555ff;
     color: white;
@@ -34,7 +34,7 @@ div.top-bar .myname-line {
     bottom: 20px;
     text-decoration: underline;
     overflow-x: hidden;
-    font-size:28px;
+    font-size:38px;
     white-space: nowrap;
     text-align: center; 
 }    
@@ -62,7 +62,7 @@ div.top-bar .match-name {
     bottom: 20px;
     text-decoration: underline;
     overflow-x: hidden;
-    font-size:28px;
+    font-size:38px;
     white-space: nowrap;
     text-align: center;
     z-index:1;
@@ -96,7 +96,7 @@ div.top-bar .controller-name {
 }
 
 div.top-bar .contributor-prompt { 
-    left: 290px;
+    left: 355px;
     width: 200px;
 }
 
@@ -109,9 +109,9 @@ div.top-bar .contributor-prompt span:after {
 div.top-bar div.contributor-sideline {
     position: absolute;
     bottom: 10px;
-    left: 271px;
+    left: 301px;
     height: 5px;
-    width: 250px;
+    width: 325px;
     border-left: 2px solid white;
     border-right: 2px solid white;
     border-bottom: 2px solid white;
@@ -121,15 +121,15 @@ div.top-bar div.contributor-sideline {
 div.top-bar div.contributor {
     position: absolute;
     bottom: 15px;
-    left: 270px;
+    left: 300px;
     z-index: 2;
 }
 
 div.top-bar div.contributor .letter {
-    font-size: 25px;
+    font-size: 40px;
     padding-top: 3px;
-    height: 32px;
-    width: 32px;
+    height: 45px;
+    width: 45px;
     display: inline-block;
     text-align: center;
     border: 3px solid #ffffff00;
@@ -138,28 +138,28 @@ div.top-bar div.contributor .letter {
 
 div.top-bar div.contributor .letter:hover {
     border: 3px solid #ffdddd;
-    border-radius: 19px;
+    border-radius: 100%;
 }
 div.top-bar div.contributor .letter.selected {
     border: 3px solid #ff0000;
-    border-radius: 19px;
+    border-radius: 100%;
 }
 div.top-bar div.contributor .letter.selected:hover {
     border: 3px solid #ff4444;
-    border-radius: 19px;
+    border-radius: 100%;
 }
 
 div.top-bar .myname-line,
 div.top-bar .myname-name,
 div.top-bar .myname-prompt {
-    left: 550px;
-    width: 130px;
+    left: 650px;
+    width: 180px;
 }
 
 div.top-bar .match-name,
 div.top-bar .match-line,
 div.top-bar .match-prompt {
-    left: 700px;
+    left: 850px;
     width: 70px;
 }
 
@@ -282,7 +282,7 @@ div.bottom-bar {
     height: 70px;
     width: 100%;
     position: absolute;
-    top: 63px;
+    top: 83px;
     left: 0px;
     background-color: #7777ff;
     color: white;
@@ -390,10 +390,10 @@ div.bottom-bar button.send {
 
 div.content {
     position: absolute;
-    top: 133px;
+    top: 153px;
     left: 0px;
     width: calc(100% - 16px);
-    height: calc(100% - 141px );
+    height: calc(100% - 161px );
     border-left: 8px solid #7777ff;
     border-right: 8px solid #7777ff;
     border-bottom: 8px solid #7777ff;
