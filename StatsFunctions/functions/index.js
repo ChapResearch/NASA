@@ -54,7 +54,12 @@ exports.statistics = functions.database.ref('{year}/{robot}/{competition}/{match
 
 	// then, with the snapshot, calculate the metadata, pushing
 	// it back to the database
-	
+
+	// TODO - big todo here!  The "perspective" isn't taken in to account
+	//           yet. The data value write location is heavily dependent upon
+	//           the perspective. The data input is also heavily dependent upon
+	//           the perspective!
+
 	    .then((xmldata) => metaData.calcMetaData(snapshot.val(),context.params,xmldata))
 	    .then((newvalue) => snapshot.ref.set(newvalue))
 		

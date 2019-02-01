@@ -42,6 +42,63 @@ function calcMetaData(data,params,xmldata)
 //
 function calcMetaDataField(data,params,field)
 {
-    return(2);
+    var operation = field.op;
+
+    switch(operation) {
+    case 'count':    return(calcMetaDataField_count(data,params,field));
+    case 'average':  return(calcMetaDataField_average(data,params,field));
+    case 'combine':  return(calcMetaDataField_combine(data,params,field));
+    case 'delta':    return(calcMetaDataField_delta(data,params,field));
+    case 'sum':      return(calcMetaDataField_sum(data,params,field));
+    default:         console.log("BAD OP: " + operation); return(false);
+    }
+
 }
 
+//
+// calcMetaDataField_<operation>() - each of the following functions calculate
+//                                    the indicated operation on the incoming
+//                                    data. NOTE - the data is NOT changed at
+//                                    this level, it is just computed. It is
+//                                    well above where the data is updated.
+//
+
+function calcMetaDataField_count(data,params,field)
+{
+    var target = field.target;           // name of the data field to count
+
+    if(data.hasOwnProperty(target)) {    // make sure the target field exists
+	if(typeof data.target === 'object' && data.target !== null) {
+	    var count = 0;
+	    for(k in data.target) {
+		if(data.target.hasOwnProperty(k)) {
+		    count++;
+		}
+	    }
+	    return(count);
+	}
+	return(1);
+    }
+
+    return(0);
+}
+
+function calcMetaDataField_sum(data,params,field)
+{
+    return(-1);
+}
+
+function calcMetaDataField_combine(data,params,field)
+{
+    return(-1);
+}
+
+function calcMetaDataField_delta(data,params,field)
+{
+    return(-1);
+}
+
+function calcMetaDataField_average(data,params,field)
+{
+    return(-1);
+}
