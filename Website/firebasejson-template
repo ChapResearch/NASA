@@ -1,10 +1,19 @@
 {
   "hosting": {
-    "public": "deployment",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
+
+  	     "public": "deployment",
+
+	     "ignore": [
+	               "firebase.json",
+		       "**/.*",
+		       "**/node_modules/**"
+		       ],
+
+	      "rewrites": [
+	          	  { "source":"/season.xml", "function":"season" },
+			  { "source":"/catcher", "function":"catcher" },
+			  { "source":"/view/**", "function":"view" },
+			  ]
+    		
   }
 }
