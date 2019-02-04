@@ -301,15 +301,6 @@
   
   <layout>
 
-    <field>
-      <type>slider</type>
-      <name>rate</name>
-      <default>0</default>
-      <max>10</max>
-      <min>1</min>
-      <location>43,5</location>
-    </field>
-
 <!-- ############## PREMATCH #################### -->
     
     <field>
