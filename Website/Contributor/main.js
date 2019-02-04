@@ -308,6 +308,31 @@ function teamColorReset()
 }
 
 //
+// teamColorGet() - gets a representation of the team color for sending to the DB.
+//
+function teamColorGet()
+{
+    var target = $('div.team-color');
+
+    if(target.hasClass('blue')) {
+	return('blue');
+    } else if(target.hasClass('red')) {
+	return('red');
+    } else {
+	return('none');
+    }
+}
+
+//
+// teamNumberGet() - gets the team number for sending to the DB. NOTE that this number
+//                   is redundant in this data. The Controller sends the number itself.
+//
+function teamNumberGet()
+{
+    return($('div.team-number').text());
+}
+
+//
 // dataSend() - gathers the data from the season form, and sends it off to the controller.
 //
 function dataSend()
@@ -316,6 +341,9 @@ function dataSend()
     var jObject = $("app",xmldata);      // the jQuery'able xml data
 
     var data = seasonDataGather(jObject);
+
+    data.teamColor = teamColorGet();
+    data.teamNumber = teamNumberGet();
 
     console.log(data);
     myNASA.sendData(data,function(disable) { jQuery('button.send').prop('disabled',disable);});
