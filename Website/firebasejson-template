@@ -11,8 +11,9 @@
 
 	      "rewrites": [
 	          	  { "source":"/season.xml", "function":"season" },
+	          	  { "source":"/season.json", "function":"seasonJSON" },
 			  { "source":"/catcher", "function":"catcher" },
-			  { "source":"/view/**", "function":"view" },
+			  { "source":"/view/**", "function":"view" }
 			  ]
     		
   }

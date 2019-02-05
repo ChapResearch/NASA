@@ -660,7 +660,25 @@
     
   <metaData>
 
+<<<<<<< HEAD
     <field> <!-- Panel Pickup -->
+=======
+    <field>
+      <name>totalPenalties</name>
+      <type>int</type>
+      <label>Total Penalties</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>sum</op>
+      <target>gamePieceOffRocket</target>
+      <target>gamePieceOffCargo</target>
+      <target>defensivePenalty</target>
+    </field>
+
+
+    <field>
+>>>>>>> 903d017efe88820e74b128dd39733218dfeadbb2
       <name>panelPickup</name>
       <type>event</type>
       <label>Combined pickup events</label>

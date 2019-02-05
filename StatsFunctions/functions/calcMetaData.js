@@ -85,7 +85,34 @@ function calcMetaDataField_count(data,params,field)
 
 function calcMetaDataField_sum(data,params,field)
 {
-    return(-1);
+        var target = field.target;           // name of the data field to count
+
+	var ourTargets;
+
+	if (Array.isArray(target)) {
+	    ourTargets = target;
+	} else {
+	    ourTargets = [target];
+	}
+
+	var sum = 0;
+	
+	for (var i = 0; i<ourTargets.length; i++) {
+
+	    if(data.hasOwnProperty(ourTargets[i])) {    // make sure the target field exists
+		if(typeof data[ourTargets[i]] === 'object' && data[ourTargets[i]] !== null) {
+		    for(k in data[ourTargets[i]]) {
+			if(data[ourTargets[i]].hasOwnProperty(k)) {
+			    sum += parseInt(data[ourTarget[i]][k]);
+			}
+		    }
+       		} else {
+		    sum += parseInt(data[ourTargets[i]]);
+		}
+	    }
+	}	
+	return(sum);
+
 }
 
 function calcMetaDataField_combine(data,params,field)
