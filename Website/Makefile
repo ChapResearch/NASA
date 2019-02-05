@@ -82,6 +82,7 @@ deploy:	.firebaserc firebase.json deploycopy
 	firebase deploy --only hosting
 
 testdeploy: deploycopy
+	cp ../Season/DeepSpace2019.xml $(DEPLOYDIR)/season.xml
 	cd $(DEPLOYDIR); python -m SimpleHTTPServer
 
 refresh:

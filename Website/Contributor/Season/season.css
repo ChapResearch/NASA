@@ -3,17 +3,26 @@
 /********************************************************************/
 
 div.NASA-field-radio {
-    font-family: sans-serif;
-    font-size: 18px;
+    font-family: sans-serif;    
+    font-size: 25px;
 }
+
+div.NASA-field-checkbox {
+    font-family: sans-serif;    
+    font-size: 25px;
+}
+
 div.NASA-field-radio input[type=radio] {
     margin: 5px 0px 5px 0px;
 }
 
 div.NASA-field-radio label {
-    font-size: 16px;
+    font-size: 23px;
 }
 
+div.NASA-field-checkbox label {
+    font-size: 23px;
+}
 
 .NASA-event-window div.time > span{
     margin-left: 7px;
@@ -24,7 +33,7 @@ div.NASA-event-window {
 }
 
 div.NASA-event-window div.time { 
-    font-size: 1.5em;
+    font-size: 24px;
 }	
 
 div.NASA-event-window span.close{
@@ -56,12 +65,12 @@ div.NASA-box {
 
 div.NASA-field-text {
     font-weight: bold;
-    font-size: 120%;
+    font-size: 26px;
 }
 
 div.NASA-field-checkbox {
     font-family: sans-serif;    
-    font-size: 16px;
+    font-size: 20px;
 }
 
 .NASA-field-radio label:checked {
@@ -76,7 +85,7 @@ body {
 button {
     background: #005BA6;
     border: solid black;
-    height: 3.5em;
+    height: 50;
     color: white;
     border-radius: 10%;
 }
@@ -85,6 +94,9 @@ button:active {
     background: red;
 }
 
+div.NASA-field-intChoice {
+    font-size: 18px;
+}
 
 div.NASA-field-checkbox [type="checkbox"] {
   border: 0; 
@@ -104,26 +116,26 @@ div.NASA-field-checkbox [type="checkbox"] + span {
 div.NASA-field-checkbox [type="checkbox"] + span:before {
   content: '';
   display: inline-block;
-  width: 1em;
-  height: .75em;
-  vertical-align: -0.25em;
-  border: 0.125em solid #fff;
-  box-shadow: 0 0 0 0.1em #000;
-  margin-right: 0.75em;
+  width: 23px;
+  height: 17px;
+  vertical-align: -5px;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px #000;
+  margin-right: 15px;
   transition: 0.1s ease all;
 }
 
 /* the checked style using the :checked pseudo class */
 div.NASA-field-checkbox [type="checkbox"]:checked + span:before {
   background: #005BA6;
-  box-shadow: 0 0 0 0.25em #000;
+  box-shadow: 0 0 0 5px #000;
 }
 
 /* never forget focus styling */
 div.NASA-field-checkbox [type="checkbox"]:focus + span:after {
-  font-size: 1.5em;
+  font-size: 20px;
   line-height: .5;
-  vertical-align: -0.125em;
+  vertical-align: -3px;
 }
 
 
@@ -154,27 +166,26 @@ label {
 [type="radio"] + span:before {
   content: '';
   display: inline-block;
-  width: 1em;
-  height: .75em;
-  vertical-align: -0.25em;
-  border-radius: 1em;
+  width: 23px;
+  height: 17px;
+  vertical-align: -5px;
+  border-radius: 20px;
   border: 0.125em solid #fff;
-  box-shadow: 0 0 0 0.1em #000;
-  margin-right: 0.75em;
+  box-shadow: 0 0 0 2px #000;
+  margin-right: 15px;
   transition: 0.1s ease all;
 }
 
 /* the checked style using the :checked pseudo class */
 [type="radio"]:checked + span:before {
   background: #005BA6;
-  box-shadow: 0 0 0 0.25em #000;
+  box-shadow: 0 0 0 5px #000;
 }
 
 /* never forget focus styling */
 [type="radio"]:focus + span:after {
-  font-size: 1.5em;
   line-height: .5;
-  vertical-align: -0.125em;
+  vertical-align: -3px;
 }
 
 

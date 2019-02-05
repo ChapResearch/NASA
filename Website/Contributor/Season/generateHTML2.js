@@ -25,6 +25,7 @@ function seasonLoad_generateHTML(seasonXML)
 			  switch(type)
 			  {
 			      case "text":        output += generateTextField($(this)); break;
+			      case "textInput":   output += generateTextInputField($(this),targetElementField);break;
 			      case "radio":       output += generateRadioField($(this),targetElementField); break;
 			      case "intChoice":   output += generateIntChoiceField($(this),targetElementField); break;
 			      case "dropdown":    output += generateDropField($(this),targetElementField); break;
@@ -212,6 +213,20 @@ function generateTextField(layoutField)
     return output;
 }
 
+
+function generateTextInputField(layoutField,elementField)
+{
+    
+    var output = "";
+
+    output += '<div class="NASA-field-text" ' + fieldPosition(layoutField) + '>';
+    var label = elementField.find("label").text();
+    var name = layoutField.find("name").text();
+    output += '<form>' + label + ':<br><input type="text" name="' + name + '"</form>';    
+    output += '</div>';
+    
+    return output;
+}
 
 
 function generateRadioField(layoutField, elementField)
