@@ -301,15 +301,6 @@
   
   <layout>
 
-    <field>
-      <type>slider</type>
-      <name>rate</name>
-      <default>0</default>
-      <max>10</max>
-      <min>1</min>
-      <location>43,5</location>
-    </field>
-
 <!-- ############## PREMATCH #################### -->
     
     <field>
@@ -649,6 +640,9 @@
 
   </layout>
 
+
+<!--###############################################################-->
+  
   <views>
 
     <view>
@@ -660,12 +654,13 @@
     </view>
     
   </views>
+  
       
-
+<!--####################################################################-->
     
   <metaData>
 
-    <field>
+    <field> <!-- Panel Pickup -->
       <name>panelPickup</name>
       <type>event</type>
       <label>Combined pickup events</label>
@@ -675,10 +670,7 @@
       <target>panelPickupHuman</target>
     </field>
 
-
-
-
-    <field>
+    <field> <!-- Combine the raw data (times) for the Rocket panel scored events -->
       <name>panelScoredRocket</name>
       <type>event</type>
       <label>Combined panel rocket scoring events</label>
@@ -689,7 +681,7 @@
       <target>panelScoredRocketLvl3</target>
     </field>
 
-    <field>
+    <field> <!-- Combine raw data for Cargo panel Scored events -->
       <name>panelScoredCargo</name>
       <type>event</type>
       <label>Combined panel cargo scoring events</label>
@@ -700,7 +692,10 @@
       <target>panelScoredCargoLeft</target>
     </field>
 
-    <field>
+    
+    <!-- METADATA FOR CARGO PANEL SCORING-->
+
+    <field> <!-- Times for Cargo based on Panel Pickup events and any Panel score on Cargo -->
       <name>panelScoredCargoTime</name>
       <type>event</type>
       <label>Cargo scoring times</label>
@@ -710,7 +705,7 @@
       <end>panelScoredCargo</end>
     </field>
 
-    <field>
+    <field> <!-- Counts of number of times a panel was scored on cargo based on the panelScoredCargoTime -->
       <name>panelScoredCargoCount</name>
       <type>int</type>
       <label>Cargo scoring counts</label>
@@ -720,8 +715,8 @@
       <op>count</op>
       <target>panelScoredCargoTime</target>
     </field>
-
-    <field>
+    
+    <field> <!-- Gets average time for cargo scoring based on panelScoredCargoTime -->
       <name>panelScoredCargoTimeAverage</name>
       <type>int</type>
       <label>Cargo scoring times average</label>
@@ -731,6 +726,146 @@
       <op>average</op>
       <target>panelScoredCargoTime</target>
     </field>
+
+
+    <!--METADATA FOR ROCKET PANEL SCORING-->
+    
+    <field> <!-- Times for Rocket based on Panel Pickup events and any Panel score on Rocket -->
+      <name>panelScoredRocketTime</name>
+      <type>event</type>
+      <label>Rocket scoring times</label>
+      <perspective>match</perspective>
+      <op>delta</op>
+      <start>panelPickup</start>
+      <end>panelScoredRocket</end>
+    </field>
+
+    <field> <!-- Counts of number of times a panel was scored on cargo based on the panelScoredCargoTime -->
+      <name>panelScoredRocketCount</name>
+      <type>int</type>
+      <label>Rocket scoring counts</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>count</op>
+      <target>panelScoredRocketTime</target>
+    </field>
+
+    <field> <!-- Gets average time for Rocket scoring based on panelScoredRocketTime -->
+      <name>panelScoredRocketTimeAverage</name>
+      <type>int</type>
+      <label>Rocket scoring times average</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>average</op>
+      <target>panelScoredRocketTime</target>
+    </field>
+
+    <!--HAB SCORING-->
+
+    <field> <!-- Percent HAB Level 3 -->
+      <name>HABEndPos3Percent</name>
+      <type>int</type>
+      <label>Percent Succes HAB Level 3</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>percent</op>
+      <target>HABEndPos</target>
+      <targetVal>3</targetVal>
+    </field>
+
+    <field> <!-- Percent HAB Level 2 -->
+      <name>HABEndPos2Percent</name>
+      <type>int</type>
+      <label>Percent Succes HAB Level 2</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>percent</op>
+      <target>HABEndPos</target>
+      <targetVal>2</targetVal>
+    </field>
+
+    <field> <!-- Starting Position 2 Success -->
+      <name>startingPos2Success</name>
+      <type>int</type>
+      <label>Percent Succes Off Starting Position 2</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>percent</op>
+      <target>CrossHABLine</target>
+      <targetVal>2</targetVal>
+      <targetVal>3</targetVal>      
+    </field>
+
+    <field> <!-- Starting Position 1 Success -->
+      <name>startingPos1Success</name>
+      <type>int</type>
+      <label>Percent Success Off Starting Position 1</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>percent</op>
+      <target>CrossHABLine</target>
+      <targetVal>1</targetVal>
+      <targetVal>3</targetVal>      
+    </field>
+
+    <field> <!-- Starting Position fail Position 2 -->
+      <name>startingPos2Fail</name>
+      <type>int</type>
+      <label>Percent Fail Off Starting Position 2</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>percent</op>
+      <target>CrossHABLine</target>
+      <targetVal>2</targetVal>
+      <targetVal>4</targetVal>      
+    </field>
+    
+    <field> <!-- Starting Position fail Position 1 -->
+      <name>startingPos1Fail</name>
+      <type>int</type>
+      <label>Percent Fail Off Starting Position 1</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>percent</op>
+      <target>CrossHABLine</target>
+      <targetVal>1</targetVal>
+      <targetVal>4</targetVal>      
+    </field>
+
+
+    <field> <!--Average Number of Level 3 assists-->
+      <name>averageHAB3Assists</name>
+      <type>int</type>
+      <label>Average Level 3 HAB Assists</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>average</op>
+      <target>HABAssistLvl3</target>
+    </field>
+    
+    <field> <!--Average Number of Level 2 assists-->
+      <name>averageHAB2Assists</name>
+      <type>int</type>
+      <label>Average Level 2 HAB Assists</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>average</op>
+      <target>HABAssistLvl2</target>
+    </field>
+    
+    <field> <!--Average Number of Level 1 assists-->
+      <name>averageHAB1Assists</name>
+      <type>int</type>
+      <label>Average Level 1 HAB Assists</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>average</op>
+      <target>HABAssistLvl1</target>
+    </field>
+    
+
   </metaData>
     
 </app>
