@@ -370,6 +370,10 @@ div.bottom-bar button.start {
     background-color: #00aa00;
 }
 
+div.bottom-bar button.reset {
+    left: 650px;
+}
+
 div.bottom-bar button.stop {
     left: 535px;
     background-color: #ff3333;

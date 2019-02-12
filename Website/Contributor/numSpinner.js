@@ -33,7 +33,7 @@ function numSpinner_initAll()
 
 	target.hide();                    // hide the number field itself
 
-	target.parent().append('<br><div class="numSpinner_minus numSpinner_field">&ndash;</div>');
+	target.parent().append('<div class="numSpinner_minus numSpinner_field">&ndash;</div>');
 	target.parent().append('<div class="numSpinner_value numSpinner_field">0</div>');
 	target.parent().append('<div class="numSpinner_plus numSpinner_field">+</div>');
     });
