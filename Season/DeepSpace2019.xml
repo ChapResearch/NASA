@@ -661,15 +661,90 @@
   <views>
 
     <view>
-      <name>testView</name>
+      <name>Robot Competitions</name>
+      <label>Lists all of the competitions for a given robot - along with summary data.</label>
       <type>table</type>
       <perspective>robot</perspective>
+      <constraint>year</constraint>
+      <constraint>robot</constraint>
+      <field>robot</field>
+      <field>competition</field>
+      <field>panelScoredCargoTimeAverage</field>
+    </view>
+    
+    <view>
+      <name>Competition List</name>
+      <label>Lists all of the robots at a particular competition - along with summary data.</label>
+      <type>table</type>
+      <perspective>robot</perspective>
+      <constraint>competition</constraint>
+      <constraint>year</constraint>
       <field>robot</field>
       <field>panelScoredCargoTimeAverage</field>
     </view>
     
+    <view>
+      <name>Robot Competition Performance - 1</name>
+      <label>Shows the performance of a particular robot at a particular competition, by match.</label>
+      <type>table</type>
+      <perspective>robot</perspective>
+      <constraint>competition</constraint>
+      <constraint>robot</constraint>
+      <constraint>year</constraint>
+      <field>robot</field>
+      <field>panelScoredCargoTimeAverage</field>
+    </view>
+
+    <view>
+      <name>Robot Competition Performance - 2</name>
+      <label>Shows the performance of a particular robot at a particular competition, by match (different stats).</label>
+      <type>record</type>
+      <perspective>robot</perspective>
+      <constraint>competition</constraint>
+      <constraint>robot</constraint>
+      <constraint>year</constraint>
+      <field>robot</field>
+      <field>panelScoredCargoTimeAverage</field>
+    </view>
+
+    <view>
+      <name>Robot Match Performance</name>
+      <label>Shows the performance of a particular robot at a particular competition for a particular match.</label>
+      <type>record</type>
+      <perspective>robot</perspective>
+      <constraint>competition</constraint>
+      <constraint>robot</constraint>
+      <constraint>year</constraint>
+      <constraint>match</constraint>
+      <field>robot</field>
+      <field>panelScoredCargoTimeAverage</field>
+    </view>
+    
+    <view>
+      <name>Competition Match Summary</name>
+      <label>Provides stats for all robots in a given competition and match.</label>
+      <type>table</type>
+      <perspective>match</perspective>
+      <constraint>competition</constraint>
+      <constraint>match</constraint>
+      <constraint>year</constraint>
+      <field>robot</field>
+    </view>
+    
+    <view>
+      <name>Robot Matches</name>
+      <label>Lists all matches for a given robot - with summary data</label>
+      <type>table</type>
+      <perspective>match</perspective>
+      <constraint>robot</constraint>
+      <field>robot</field>
+      <field>competition</field>
+      <field>match</field>
+      <constraint>year</constraint>
+    </view>
+    
   </views>
-  
+  <views>
       
 <!--####################################################################-->
     
