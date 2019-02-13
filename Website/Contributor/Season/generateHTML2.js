@@ -73,6 +73,21 @@ function fieldPosition(layoutField)
     if (pos.length != 2){
 	pos = [50, 50];
     }
+    var y = pos[1] + 2;
+    var x = pos[0];
+    
+    output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:230px"';
+    return output;
+}
+
+function labelPosition(layoutField)
+{
+    var output = ""
+    var location = layoutField.find('location').text();
+    var pos = location.split(",");
+    if (pos.length != 2){
+	pos = [50, 50];
+    }
 
     output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:230px"';
     return output;
@@ -219,10 +234,10 @@ function generateTextInputField(layoutField,elementField)
     
     var output = "";
 
-    output += '<div class="NASA-field-text" ' + fieldPosition(layoutField) + '>';
+    output += '<div class="NASA-field-textInput" ' + fieldPosition(layoutField) + '>';
     var label = elementField.find("label").text();
     var name = layoutField.find("name").text();
-    output += '<form>' + label + ':<br><input type="text" name="' + name + '"</form>';    
+    output += '<div><form>' + label + ':</div><input type="text" name="' + name + '"</form>';    
     output += '</div>';
     
     return output;
@@ -237,9 +252,11 @@ function generateRadioField(layoutField, elementField)
     var name = elementField.children("name").text();    
     
     output += '<div class="NASA-field-radio" ' + fieldPosition(layoutField) + '>';
-    output += '<Strong>' + label + "</Strong><br>";
+    output += '<div><Strong>' + label + "</Strong><br></div>";
+    output += '<div>';
     output += getChoices(name, elementField, "radio");
-    output += '</div>';
+    output += '</div>';    
+    output += '</div></div>';
     
     return output;
     
@@ -260,8 +277,12 @@ function generateIntChoiceField(layoutField, elementField)
 	
     
     output += '<div class="NASA-field-intChoice" ' + fieldPosition(layoutField) + '>';
+    output += '<div>';    
     output += label;
+    output += '</div>';
+    output += '<div>';    
     output += '<input type="number" name="' + name + '" step="1" value = "' + defaultValue + '">';
+    output += '</div>';    
     output += '</div>';
     
     return output;
@@ -277,9 +298,10 @@ function generateCheckboxField(layoutField, elementField)
     var label = elementField.children('label').text();
     
     output += '<div class="NASA-field-checkbox" ' + fieldPosition(layoutField) + '>';
-    output += '<Strong>' + label + "</Strong><br>";
+    output += '<div><Strong>' + label + "</Strong></div>";
+    output += '<div>'
     output += getChoices(name, elementField, "checkbox");
-    output += '</div>';
+    output += '</div></div>';
 
 //    console.log(output);
     return output;
@@ -298,8 +320,8 @@ function generateSliderField(layoutField, elementField)
     var defaultVal = elementField.find('default').text();
     
     output += '<div class="NASA-slider-field" ' + fieldPosition(layoutField) + '>';
-    output += label;
-    output += '<input type="range" max="' + max + '" min="' + min + '" id="' + name + '" value="' + defaultVal + '">';
+    output += '<div>' + label + '</div>';
+    output += '<div><input type="range" max="' + max + '" min="' + min + '" id="' + name + '" value="' + defaultVal + '">';
     output += '<span>Value: </span>';
     output += '<span id="' + textName + '">' + defaultVal + '</span>';
     output += '<script>'
@@ -307,7 +329,7 @@ function generateSliderField(layoutField, elementField)
     output += 'var output = $("#' + textName + '");';    
     output += 'slider.oninput = function() {';    
     output += 'output.innerHTML = this.value; }';
-    output += '</script>';
+    output += '</script></div>';
     output += '</div>';
     
     

@@ -4,12 +4,12 @@
 
 div.NASA-field-radio {
     font-family: sans-serif;    
-    font-size: 25px;
+    font-size: 22px;
 }
 
 div.NASA-field-checkbox {
     font-family: sans-serif;    
-    font-size: 25px;
+    font-size: 22px;
 }
 
 div.NASA-field-radio input[type=radio] {
@@ -33,7 +33,7 @@ div.NASA-event-window {
 }
 
 div.NASA-event-window div.time { 
-    font-size: 24px;
+    font-size: 23px;
 }	
 
 div.NASA-event-window span.close{
@@ -68,9 +68,13 @@ div.NASA-field-text {
     font-size: 26px;
 }
 
-div.NASA-field-checkbox {
-    font-family: sans-serif;    
-    font-size: 20px;
+div.NASA-field-textInput {
+    font-weight: bold;
+    font-size: 26px;
+}
+
+div.NASA-field-textInput form{
+    margin-bottom: 0;
 }
 
 .NASA-field-radio label:checked {
