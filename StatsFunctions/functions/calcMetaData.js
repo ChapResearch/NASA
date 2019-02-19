@@ -4,6 +4,9 @@
 //   This file implements all of the statistics calculations.
 //
 
+var combineDelta = require('./combineDelta');
+
+
 module.exports = {
     calcMetaData: function (data,params,xmldata) { return(calcMetaData(data,params,xmldata));}
 };
@@ -85,7 +88,7 @@ function calcMetaDataField_count(data,params,field)
 
 function calcMetaDataField_sum(data,params,field)
 {
-        var target = field.target;           // name of the data field to count
+       var target = field.target;           // name of the data field to count
 
 	var ourTargets;
 
@@ -117,12 +120,38 @@ function calcMetaDataField_sum(data,params,field)
 
 function calcMetaDataField_combine(data,params,field)
 {
-    return(-1);
+    var target = field.target;           // name of the data field to count
+
+    var ourTargets;
+
+    if (Array.isArray(target)) {
+	ourTargets = target;
+    } else {
+	ourTargets = [target];
+    }
+
+    var x = [];
+    for (var i = 0; i<ourTargets.length; i++) {
+
+	    if(data.hasOwnProperty(ourTargets[i])) {    // make sure the target field exists
+		if(typeof data[ourTargets[i]] === 'object' && data[ourTargets[i]] !== null) {
+		    console.log(data[ourTargets[i]]);
+		    x = combineDelta.combineOP(x,data[ourTargets[i]]);
+		}
+	    }
+    }
+    console.log(x);
+    return(x);
 }
 
 function calcMetaDataField_delta(data,params,field)
 {
-    return(-1);
+    var start = field.start;           // name of the data field to count
+    var end = field.end;
+    var delta = combineDelta.deltaOP(data[start],data[end]);
+    return(delta);
+
+
 }
 
 function calcMetaDataField_average(data,params,field)

@@ -77,3 +77,92 @@ exports.sum = functions.database.ref('/{year}/{team_number}/{competition}/{match
 
 
     });
+
+
+exports.sumPanelRocket = functions.database.ref('/{year}/{team_number}/{competition}/{match}')
+
+.onCreate((snapshot, context) => {
+	
+	const original = snapshot.val();
+	console.log('total number of panels on rocket');
+	console.log(original);
+	
+	var levelone = original.panelScoredRocketLvl1.length;
+	var leveltwo = original.panelScoredRocketLvl2.length;
+	var levelthree = original.panelScoredRocketLvl3.length;
+	var sumPanelRocket = levelone + leveltwo + levelthree;
+
+
+	original.sumPanelRocket = sumPanelRocket;
+	return snapshot.ref.update(original);
+
+
+    });
+
+exports.sumPanelCargo = functions.database.ref('/{year}/{team_number}/{competition}/{match}')
+
+.onCreate((snapshot, context) => {
+	
+	const original = snapshot.val();
+	console.log('total number of panels in cargo bay');
+	console.log(original);
+	
+	var levelone = original.panelScoredCargoLeft.length;
+	var leveltwo = original.panelScoredCargoMiddle.length;
+	var levelthree = original.panelScoredCargoRight.length;
+	var sumPanelCargo = levelone + leveltwo + levelthree;
+
+
+	original.sumPanelCargo = sumPanelCargo;
+	return snapshot.ref.update(original);
+
+
+    });
+
+
+exports.sumCargoRocket = functions.database.ref('/{year}/{team_number}/{competition}/{match}')
+
+.onCreate((snapshot, context) => {
+	
+	const original = snapshot.val();
+	console.log('total number of cargo in rocket');
+	console.log(original);
+	
+	var levelone = original.cargoScoredRocketLvl1.length;
+	var countCargoRocket = levelone;
+
+	var sum = 0;
+	for (var i = 0; i<countCargoRocket; i++){
+	    sum += parseInt(original.cargoScoredRocketLvl1[i]);
+	} 
+ 
+	var avg = sum/countCargoRocket;
+
+	original.countCargoRocket = countCargoRocket;
+	original.avgCargoRocket = avg;
+	return snapshot.ref.update(original);
+
+
+    });
+
+exports.general = functions.database.ref('/{year}/{team_number}/{competition}/{match}')
+
+.onCreate((snapshot, context) => {
+	
+	var m_strFilePath = "https://nasa.chapresearch.com/DeepSpace2019.xml";
+	string xmlStr;
+	using(var wc = new WebClient())
+	{
+	    xmlStr = wc.DownloadString(m_strFilePath);
+	}
+
+	parser = new DOMParser();
+	xmlDoc = parser.parseFromString(xmlStr,"text/xml");
+
+	var x = xmlDoc.getElementsByTagName("field");
+
+	for (i = 0; i <x.length; i++) {
+	    // look for type event
+	}
+	
+    });

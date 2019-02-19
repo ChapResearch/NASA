@@ -68,6 +68,12 @@ deploy:
 deploy2:
 	firebase deploy --only functions:sum
 
+deployPanelRocket:
+	firebase deploy --only functions:sumPanelRocket
+
+deployPanelCargo:
+	firebase deploy --only functions:sumPanelCargo
+
 test:
 	curl -d "password=floopy" -X POST https://us-central1-nasa-7a363.cloudfunctions.net/catcher
 
@@ -89,3 +95,8 @@ sumtest:
 sumtest2:
 	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"5628","competition":"ElPaso","match":"1","record":{"one":"47","two":"2","three":"3"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
 
+sumPanelRocket:
+	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"5628","competition":"ElPaso","match":"1","record":{"panelScoredRocketLvl1":"2", "panelScoredRocketLvl2":"1", "panelScoredRocketLvl3":"1"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+
+countCargoRocket:
+	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"5628","competition":"ElPaso","match":"1","record":{"cargoScoredRocketLvl1":["100","150","200"]}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
