@@ -28,7 +28,9 @@ function calcMetaData(data,params,xmldata)
 
     for(var i=0; i < metaData.length; i++) {
 	console.log("Processing: " + metaData[i].name);
+	console.log(metaData[i]);
 	data[metaData[i].name] = calcMetaDataField(data,params,metaData[i]);
+     
     }
 
     return(data);
@@ -53,6 +55,7 @@ function calcMetaDataField(data,params,field)
     case 'combine':  return(calcMetaDataField_combine(data,params,field));
     case 'delta':    return(calcMetaDataField_delta(data,params,field));
     case 'sum':      return(calcMetaDataField_sum(data,params,field));
+    case 'percent':  return(calcMetaDataField_percent(data,params,field));
     default:         console.log("BAD OP: " + operation); return(false);
     }
 
@@ -74,9 +77,7 @@ function calcMetaDataField_count(data,params,field)
 	if(typeof data.target === 'object' && data.target !== null) {
 	    var count = 0;
 	    for(k in data.target) {
-		if(data.target.hasOwnProperty(k)) {
-		    count++;
-		}
+		count++;
 	    }
 	    return(count);
 	}
@@ -88,7 +89,7 @@ function calcMetaDataField_count(data,params,field)
 
 function calcMetaDataField_sum(data,params,field)
 {
-       var target = field.target;           // name of the data field to count
+        var target = field.target;           // name of the data field to count
 
 	var ourTargets;
 
@@ -106,7 +107,7 @@ function calcMetaDataField_sum(data,params,field)
 		if(typeof data[ourTargets[i]] === 'object' && data[ourTargets[i]] !== null) {
 		    for(k in data[ourTargets[i]]) {
 			if(data[ourTargets[i]].hasOwnProperty(k)) {
-			    sum += parseInt(data[ourTarget[i]][k]);
+			    sum += parseInt(data[ourTargets[i]][k]);
 			}
 		    }
        		} else {
@@ -156,5 +157,72 @@ function calcMetaDataField_delta(data,params,field)
 
 function calcMetaDataField_average(data,params,field)
 {
-    return(-1);
+    var target = field.target;           // name of the data field to count
+
+    var ourTargets;
+
+    if (Array.isArray(target)) {
+	ourTargets = target;
+    } else {
+	ourTargets = [target];
+    }
+
+    var sum = 0.0;
+    var avg = 0.0;
+    var count = 0.0;
+
+    for (var i = 0; i<ourTargets.length; i++) {
+
+	if(data.hasOwnProperty(ourTargets[i])) {    // make sure the target field exists
+	    if(typeof data[ourTargets[i]] === 'object' && data[ourTargets[i]] !== null) {
+		for(k in data[ourTargets[i]]) {
+		    if(data[ourTargets[i]].hasOwnProperty(k)) {
+			sum += parseFloat(data[ourTargets[i]][k]);
+			count++;
+		    }
+		}
+	    } else {
+		sum += parseFloat(data[ourTargets[i]]);
+		count++;
+	    }
+	}
+    }	
+
+	
+    avg = sum/count;
+
+    return(avg);
+
+}
+
+function calcMetaDataField_percent(data,params,field)
+{
+    var target = field.target;           // name of the data field to count
+
+    var ourTargets;
+
+    if (Array.isArray(target)) {
+	ourTargets = target;
+    } else {
+	ourTargets = [target];
+    }
+
+    var count = 0.0;
+    var percent = 0;
+
+    if(data.hasOwnProperty(ourTargets)) {    // make sure the target field exists
+	console.log(field);
+
+	if(typeof data.target === 'object' && data.target !== null) {
+	    for(var i=0;i<ourTargets.length;i++) {
+		if (parseFloat(data[ourTargets[i]]) == parseFloat(field.targetVal)) {
+		    count++;
+		}
+	    }
+	}
+    }
+    console.log(count);
+    console.log(ourTargets.length);
+    percent = (count/ourTargets.length) * 100;
+    return(percent);
 }

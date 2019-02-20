@@ -1,0 +1,19 @@
+{"year":"2020",
+"team_number":"2468",
+"competition":"ElPaso",
+"match":"1",
+"record":{
+	"panelPickupGround":[10,20,30],
+	 "panelPickupHuman":[12,23,34],
+	 "panelScoredCargoMiddle":[31,35,40],
+	 "panelScoredCargoRight":[35,37,45],
+	 "panelScoredCargoLeft":[33,45,50],
+	 "panelScoredRocketLvl1":[42,44,46],
+	 "panelScoredRocketLvl2":[49,51,53], 
+	 "panelScoredRocketLvl3":[55,57,59],
+	 "HABAssistLvl3":[1,1],
+	 "HABAssistLvl2":[2,3],
+	 "HABAssistLvl1":[1,2],
+	 "HABEndPos":[1,2,3,2,3,3,1,2]
+	 }
+}
