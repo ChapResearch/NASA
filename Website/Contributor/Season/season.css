@@ -32,8 +32,14 @@ div.NASA-event-window {
     overflow-y: auto;
 }
 
-div.NASA-event-window div.time { 
-    font-size: 23px;
+div.NASA-event-window div.time {
+    height: 30px;
+    font-size: 18px;
+}
+
+div.NASA-event-window span.timeText {
+    position: relative;
+    top: 5px;
 }	
 
 div.NASA-event-window span.close{
@@ -41,6 +47,7 @@ div.NASA-event-window span.close{
     position: absolute;
     right: 7px;
     color: red;
+    font-size: 25;
 
 }
 
@@ -98,8 +105,8 @@ button:active {
     background: red;
 }
 
-div.NASA-field-intChoice {
-    font-size: 18px;
+div.NASA-field-intChoice div.numSpinner{
+    width: 150px;
 }
 
 div.NASA-field-checkbox [type="checkbox"] {

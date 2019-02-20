@@ -237,7 +237,13 @@ function generateTextInputField(layoutField,elementField)
     output += '<div class="NASA-field-textInput" ' + fieldPosition(layoutField) + '>';
     var label = elementField.find("label").text();
     var name = layoutField.find("name").text();
-    output += '<div><form>' + label + ':</div><input type="text" name="' + name + '"</form>';    
+    var size = layoutField.find('size').text();
+    var sizeArray = size.split(',');
+    var width = sizeArray[0];
+    var height = sizeArray[1];
+    output += '<div><form>' + label;
+    output += ':</div><input type="text" name="' + name + '"';
+    output += 'style="height:' + height + '%; width:' + width + '%;"></form>';    
     output += '</div>';
     
     return output;
@@ -280,7 +286,7 @@ function generateIntChoiceField(layoutField, elementField)
     output += '<div>';    
     output += label;
     output += '</div>';
-    output += '<div>';    
+    output += '<div class="numSpinner">';    
     output += '<input type="number" name="' + name + '" step="1" value = "' + defaultValue + '">';
     output += '</div>';    
     output += '</div>';

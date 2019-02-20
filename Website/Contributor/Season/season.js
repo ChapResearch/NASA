@@ -25,6 +25,7 @@ function eventTagTime(id, event, eventName)
     var divToAdd = "" + minString + ":" + secString + "            " + event;
     divToAdd = document.createTextNode(divToAdd);
     time.appendChild(divToAdd);
+    time.className = "timeText";
     element.className = "time";
     element.dataset.event = eventName;
     element.dataset.time = totalSeconds;

@@ -104,10 +104,6 @@
 	<label>No</label>
 	<value>4</value>
       </choice>
-      <choice>
-	<label>Unknown</label>
-	<value>0</value>
-      </choice>
     </field>
 
     <field>
@@ -328,7 +324,7 @@
       <name>preloadAreaRight</name>
       <optional>false</optional>
       <layout>B</layout>
-      <location>23,5</location>    
+      <location>22,5</location>    
     </field>
       
     <field> <!-- Start Side -->
@@ -336,7 +332,7 @@
       <name>startSide</name>
       <optional>false</optional>
       <layout>B</layout>
-      <location>63,5</location>    
+      <location>41,5</location>    
     </field>
       
     <field> <!-- Robot Preload -->
@@ -344,7 +340,15 @@
       <name>robotPreload</name>
       <optional>false</optional>
       <layout>R</layout>
-      <location>83,5</location>    
+      <location>60,5</location>    
+    </field>
+
+    <field> <!-- Cross HAB Line -->
+      <type>checkbox</type>
+      <name>crossHABLine</name>
+      <optional>false</optional>
+      <layout>R</layout>
+      <location>79,5</location>    
     </field>
 
 
@@ -354,14 +358,6 @@
       <type>text</type>
       <label>Sandstorm and Teleop</label>
       <location>2,20</location>
-    </field>
-
-    <field> <!-- Cross HAB Line -->
-      <type>checkbox</type>
-      <name>crossHABLine</name>
-      <optional>false</optional>
-      <layout>R</layout>
-      <location>3,23</location>    
     </field>
 
     <!-- ############### PANEL EVENTS ################ -->    
@@ -529,7 +525,7 @@
     <field>
       <type>text</type>
       <label>End Game</label>
-      <location>2,50</location>
+      <location>2,70</location>
     </field>
 
     <field> <!-- HAB End Position -->
@@ -537,7 +533,7 @@
       <name>HABEndPos</name>
       <optional>false</optional>
       <layout>R</layout>
-      <location>3,53</location>
+      <location>80,77</location>
     </field>
 
 
@@ -546,7 +542,7 @@
     <field>
       <type>text</type>
       <label>HAB Assist</label>
-      <location>3,75</location>
+      <location>40,72</location>
     </field>
     
     <field> <!-- HAB Assist Lvl 1 -->
@@ -554,7 +550,7 @@
       <name>HABAssist1</name>
       <default>0</default>
       <layout>B</layout>
-      <location>5,78</location>    
+      <location>42,77</location>    
     </field>
 
     <field> <!-- HAB Assist Lvl 2 -->
@@ -562,7 +558,7 @@
       <name>HABAssist2</name>
       <default>0</default>
       <layout>B</layout>
-      <location>40,78</location>    
+      <location>42,85</location>    
     </field>
 
     <field> <!-- HAB Assist Lvl 3 -->
@@ -570,7 +566,7 @@
       <name>HABAssist3</name>
       <default>0</default>
       <layout>B</layout>
-      <location>70,78</location>    
+      <location>42,93</location>    
     </field>
 
     
@@ -579,7 +575,7 @@
     <field>
       <type>text</type>
       <label>Penalties</label>
-      <location>3,86</location>
+      <location>60,72</location>
     </field>
     
     <field> <!-- Game Piece Off Rocket -->
@@ -587,7 +583,7 @@
       <name>gamePieceOffRocket</name>
       <default>0</default>
       <layout>B</layout>
-      <location>5,89</location>    
+      <location>62,77</location>    
     </field>
 
     <field> <!-- Game Piece Off Cargo -->
@@ -595,7 +591,7 @@
       <name>gamePieceOffCargo</name>
       <default>0</default>
       <layout>B</layout>
-      <location>40,89</location>    
+      <location>62,85</location>    
     </field>
 
     <field> <!-- Defensive Penalty -->
@@ -603,7 +599,7 @@
       <name>defensivePenalty</name>
       <default>0</default>
       <layout>B</layout>
-      <location>70,89</location>    
+      <location>62,93</location>    
     </field>
 
     
@@ -650,6 +646,7 @@
     <field>
       <name>comments</name>
       <type>textInput</type>
+      <size>20,30</size>
       <location>2,95</location>
     </field>
 
@@ -744,7 +741,6 @@
     </view>
     
   </views>
-  <views>
       
 <!--####################################################################-->
     
