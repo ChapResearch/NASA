@@ -289,6 +289,48 @@
       <type>event</type>
     </field>
 
+    <field>
+      <name>defenseYesNo</name>
+      <label>Did they play Defense</label>
+      <type>choice</type>
+      <choice>
+	<label>Yes</label>
+	<value>1</value>
+      </choice>
+      <choice>
+	<label>No</label>
+	<value>2</value>
+      </choice>
+      <choice>
+	<label>Unknown</label>
+	<value>0</value>
+      </choice>
+    </field>
+
+    <field>
+      <name>defenseTeamNum</name>
+      <label>on which team? (team #)</label>
+      <type>text</type>
+    </field>
+
+    <field>
+      <name>startClimb</name>
+      <label>Start Climb</label>
+      <type>event</type>
+    </field>
+
+    <field>
+      <name>endClimb</name>
+      <label>End Climb</label>
+      <type>event</type>
+    </field>    
+
+    <field>
+      <name>failClimb</name>
+      <label>Fail Climb</label>
+      <type>event</type>
+    </field>    
+    
     <field> <!--Text input-->
       <name>comments</name>
       <label>Comments</label>
@@ -357,7 +399,7 @@
     <field>
       <type>text</type>
       <label>Sandstorm and Teleop</label>
-      <location>2,20</location>
+      <location>2,24</location>
     </field>
 
     <!-- ############### PANEL EVENTS ################ -->    
@@ -520,12 +562,26 @@
     </field>
 
 
+    <!--SANDSTORM AND HAB EXTRAS -->
+    <field>
+      <type>radio</type>
+      <name>defenseYesNo</name>
+      <location>3,33</location>
+    </field>
+
+    <field>
+      <name>defenseTeamNum</name>
+      <type>textInput</type>
+      <size>20,3</size>
+      <location>5,46</location>
+    </field>
+
 <!-- ################ END GAME ################## -->
     
     <field>
       <type>text</type>
       <label>End Game</label>
-      <location>2,70</location>
+      <location>1,70</location>
     </field>
 
     <field> <!-- HAB End Position -->
@@ -542,7 +598,7 @@
     <field>
       <type>text</type>
       <label>HAB Assist</label>
-      <location>40,72</location>
+      <location>44,72</location>
     </field>
     
     <field> <!-- HAB Assist Lvl 1 -->
@@ -550,7 +606,7 @@
       <name>HABAssist1</name>
       <default>0</default>
       <layout>B</layout>
-      <location>42,77</location>    
+      <location>44,77</location>    
     </field>
 
     <field> <!-- HAB Assist Lvl 2 -->
@@ -558,7 +614,7 @@
       <name>HABAssist2</name>
       <default>0</default>
       <layout>B</layout>
-      <location>42,85</location>    
+      <location>44,85</location>    
     </field>
 
     <field> <!-- HAB Assist Lvl 3 -->
@@ -566,7 +622,7 @@
       <name>HABAssist3</name>
       <default>0</default>
       <layout>B</layout>
-      <location>42,93</location>    
+      <location>44,93</location>    
     </field>
 
     
@@ -575,7 +631,7 @@
     <field>
       <type>text</type>
       <label>Penalties</label>
-      <location>60,72</location>
+      <location>64,72</location>
     </field>
     
     <field> <!-- Game Piece Off Rocket -->
@@ -583,7 +639,7 @@
       <name>gamePieceOffRocket</name>
       <default>0</default>
       <layout>B</layout>
-      <location>62,77</location>    
+      <location>64,77</location>    
     </field>
 
     <field> <!-- Game Piece Off Cargo -->
@@ -591,7 +647,7 @@
       <name>gamePieceOffCargo</name>
       <default>0</default>
       <layout>B</layout>
-      <location>62,85</location>    
+      <location>64,85</location>    
     </field>
 
     <field> <!-- Defensive Penalty -->
@@ -599,17 +655,48 @@
       <name>defensivePenalty</name>
       <default>0</default>
       <layout>B</layout>
-      <location>62,93</location>    
+      <location>64,93</location>    
     </field>
 
+
+    <!-- EVENTS FOR CLIMB -->
+    <field>
+      <name>startClimb</name>
+      <type>event</type>
+      <ewid>climb</ewid>
+      <location>19,73</location>
+    </field>
+
+    <field>
+      <name>endClimb</name>
+      <type>event</type>
+      <ewid>climb</ewid>
+      <location>26,73</location>
+    </field>
+
+    <field>
+      <name>failClimb</name>
+      <type>event</type>
+      <ewid>climb</ewid>
+      <location>33,73</location>
+    </field>
+
+    <field>
+      <type>eventWindow</type>
+      <ewid>climb</ewid>
+      <label>Climb Window</label>
+      <location>19,80</location>
+      <size>20,15</size>
+    </field>    
+    
     
     <!--Lines and Boxes and stuff -->
 
     <field>
       <type>line</type>
-      <direction>vertical</direction>
-      <length>30</length>
-      <location>24,38</location>
+      <direction>horizontal</direction>
+      <length>98</length>
+      <location>1,68</location>
       <color>red</color>
     </field>
 
@@ -617,17 +704,9 @@
       <type>line</type>
       <direction>horizontal</direction>
       <length>23</length>
-      <location>1,38</location>
+      <location>1,22</location>
       <color>red</color>
-    </field>
-    
-    <field>
-      <type>line</type>
-      <direction>horizontal</direction>
-      <length>75</length>
-      <location>24,68</location>
-      <color>red</color>
-    </field>    
+    </field>        
 
     <field>
       <type>box</type>
@@ -646,14 +725,15 @@
     <field>
       <name>comments</name>
       <type>textInput</type>
-      <size>20,30</size>
-      <location>2,95</location>
+      <size>14,20</size>
+      <location>2,73</location>
     </field>
 
   </layout>
 
 
 <!--###############################################################-->
+  
   
   <views>
 
@@ -705,6 +785,18 @@
     </view>
 
     <view>
+      <name>Robot Competition Performance - 3</name>
+      <label>Comparative performance for all robots at a competition</label>
+      <type>bar</type>
+      <perspective>robot</perspective>
+      <constraint>competition</constraint>
+      <constraint>robot</constraint>
+      <constraint>year</constraint>
+      <field>robot</field>
+      <field>panelScoredCargoTimeAverage</field>
+    </view>
+
+    <view>
       <name>Robot Match Performance</name>
       <label>Shows the performance of a particular robot at a particular competition for a particular match.</label>
       <type>record</type>
@@ -727,7 +819,18 @@
       <constraint>year</constraint>
       <field>robot</field>
     </view>
-    
+
+    <view>
+      <name>Best Match Performance</name>
+      <label>Shows the performance of each robot in a match</label>
+      <type>pie</type>
+      <perspective>match</perspective>
+      <constraint>competition</constraint>
+      <constraint>match</constraint>
+      <constraint>year</constraint>
+      <field>robot</field>
+    </view>
+
     <view>
       <name>Robot Matches</name>
       <label>Lists all matches for a given robot - with summary data</label>
