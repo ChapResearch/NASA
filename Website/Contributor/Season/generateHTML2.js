@@ -139,8 +139,24 @@ function fieldStyleBox(layoutField)
     return output;
 }
 
-
-
+function fieldStyleTextInput(layoutField)
+{
+    var output = ""
+    var location = layoutField.find('location').text();
+    var pos = location.split(",");
+    if (pos.length != 2){
+	pos = [50, 50];
+    }
+    var y = pos[1] + 2;
+    var x = pos[0];
+    var size = layoutField.find('size').text();
+    var sizeArray = size.split(',');
+    var width = sizeArray[0];
+    var height = sizeArray[1];
+    
+    output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:' + width + '%;height:' + height + '%;"';
+    return output;
+}
 
 function getChoices(name, targetElementField, type)
 {
@@ -234,17 +250,13 @@ function generateTextInputField(layoutField,elementField)
     
     var output = "";
 
-    output += '<div class="NASA-field-textInput" ' + fieldPosition(layoutField) + '>';
+    output += '<div class="NASA-field-textInput" ' + fieldStyleTextInput(layoutField) + '>';
     var label = elementField.find("label").text();
     var name = layoutField.find("name").text();
-    var size = layoutField.find('size').text();
-    var sizeArray = size.split(',');
-    var width = sizeArray[0];
-    var height = sizeArray[1];
-    output += '<div><form>' + label;
-    output += ':</div><input type="text" name="' + name + '"';
-    output += 'style="height:' + height + '%; width:' + width + '%;"></form>';    
+    output += '<div>' + label;
+    output += '</div><div style="height: 100%; width: 100%;"><textarea name="' + name + '" style="width:100%;height:100%;"></textarea>';
     output += '</div>';
+    output += '</div>';    
     
     return output;
 }
