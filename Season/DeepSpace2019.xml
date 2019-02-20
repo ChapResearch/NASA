@@ -734,6 +734,7 @@
 
 <!--###############################################################-->
   
+  
   <views>
 
     <view>
@@ -784,6 +785,18 @@
     </view>
 
     <view>
+      <name>Robot Competition Performance - 3</name>
+      <label>Comparative performance for all robots at a competition</label>
+      <type>bar</type>
+      <perspective>robot</perspective>
+      <constraint>competition</constraint>
+      <constraint>robot</constraint>
+      <constraint>year</constraint>
+      <field>robot</field>
+      <field>panelScoredCargoTimeAverage</field>
+    </view>
+
+    <view>
       <name>Robot Match Performance</name>
       <label>Shows the performance of a particular robot at a particular competition for a particular match.</label>
       <type>record</type>
@@ -806,7 +819,18 @@
       <constraint>year</constraint>
       <field>robot</field>
     </view>
-    
+
+    <view>
+      <name>Best Match Performance</name>
+      <label>Shows the performance of each robot in a match</label>
+      <type>pie</type>
+      <perspective>match</perspective>
+      <constraint>competition</constraint>
+      <constraint>match</constraint>
+      <constraint>year</constraint>
+      <field>robot</field>
+    </view>
+
     <view>
       <name>Robot Matches</name>
       <label>Lists all matches for a given robot - with summary data</label>
