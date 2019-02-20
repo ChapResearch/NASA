@@ -1,3 +1,36 @@
+//
+// Season Functions
+//
+//   These are Google Firebase functions for processing the NASA scouting season
+//   XML files.  The following are currently implemented here:
+//
+//   season() - returns the XML for the "current" season. The idea is that
+//                   the Contributor app can just go to one spot and get the
+//                   right file for painting the screen.  It is normally connected to the
+//                   website through a rewrite.
+//
+//                   CURRENTLY it is hardwired to the 2019 season. 
+//
+//   seasonJSON() - returns a JSON representation of the XML file. Not only
+//                   is it a representation of the XML file, it has also been
+//                   processed into a form more suitable for all of the tools that
+//                   use it. (see below) It is normally connected to the webite through
+//                   a rewrite.  NOTE, that the Contributor app always uses
+//                   the XML because it needs to have a file that is cached for
+//                   offline operation. NOTE that the JSON file doesn't even HAVE
+//                   the layout information in it.
+//
+//                   CURRENTLY it is hardwired to the 2019 season. 
+//                   CURRENTLY it does a redirection return, it should really just
+//                   do it like the season() above.
+//
+//   seasonJSONgenerate() - parses the season XML file and generates the associated
+//                   JSON. It re-organizes the file into an appropriate form to make
+//                   the other tools' jobs easier.  It is connect to an upload event
+//                   to the NASA storage.
+//
+//                   CURRENTLY it doesn't do error checking like it should.
+
 const functions = require('firebase-functions');
 var firebase = require("firebase");
 
@@ -42,12 +75,14 @@ exports.season = functions.https.onRequest((request, response) =>
     //    var ref = storage.ref("NASA/Season/powerUp.xml");
     var ref = storage.ref("NASA/Season/DeepSpace2019.xml");
 
-    ref.getDownloadURL().then(function(url) {
-	response.redirect(url);
-    }).catch(function(error) {
-	console.log(error.code);
-	response.send("Error");
-    });
+    ref.getDownloadURL()
+    	.then((url) => reqGet(url))
+	.then((body) => response.send(body))
+//	.then((url) => response.redirect(url))
+	.catch(function(error) {
+	    console.log(error.code);
+	    response.send("Error");
+	});
 
 });
 
@@ -71,6 +106,8 @@ exports.seasonJSON = functions.https.onRequest((request, response) =>
     //    var ref = storage.ref("NASA/Season/powerUp.xml");
     var ref = storage.ref("NASA/Season/DeepSpace2019.json");
 
+    // TODO - allow specifying the JSON
+    
     ref.getDownloadURL().then(function(url) {
 	response.redirect(url);
     }).catch(function(error) {
@@ -135,6 +172,9 @@ exports.seasonJSONgenerate = functions.storage.object().onFinalize((object) => {
     fromRef.getDownloadURL()
 	.then((url) => reqGet(url))
 	.then((body) => XMLparse(body,{trim: true}))
+	.catch((err) => {
+	    console.log("error from XML parsing: " + err);
+	})
 	.then((xmlresult) => organizeFieldData(xmlresult))
 	.then((xmlobject) => toRef.putString(JSON.stringify(xmlobject)))
 	.then((snapshot) => {
@@ -145,8 +185,17 @@ exports.seasonJSONgenerate = functions.storage.object().onFinalize((object) => {
 
 //
 // organizeFieldData() - given the XML file, organize all of the field data (both raw and meta)
-//                       so that it can be processed well/easily.
-//           RETURNS: an array where [0] = raw field data, and [1] = meta field data
+//                       so that it can be processed well/easily.  Note that the metadata fields
+//                       are topographically ordered, so they can be processed in the order given
+//                       to ensure that dependencies are satisfied before use.
+//             
+//           RETURNS: { rawData:[raw data fields],
+//                      views:[views],
+//                      metaData:{ match:[match meta data fields],
+//                                 competition:[competition meta data fields],
+//                                 robot:[robot meta data fields],
+//                                 year:[year meta data fields] }
+//                     }
 //
 function organizeFieldData(xmlObj)
 {
@@ -219,6 +268,29 @@ function rawFieldData(xmlObj)
 }
 
 //
+// fieldClone() - Clones a field object into a brand-spanking new field object
+//                which is returned. This is necessary when modifying objects as
+//                they are copied for multiple perspectives.
+//
+function fieldClone(field)
+{
+    // first, just get a copy of the object itself
+
+    var clone = Object.assign({},field);                // clone ALL object fields
+
+    var listFields = ["perspective","target","start","end"];    // then replace arrays with clones
+
+    listFields.forEach((listField) => {
+	if(clone.hasOwnProperty(listField)) {
+	    clone[listField] = field[listField].slice(0);
+	}
+    });
+
+    return(clone);
+}
+    
+
+//
 // metaFieldData() - examines the "<metaData>" section of the XML file to extract
 //                  all of the fields found there. They are organized into an
 //                  ORDERED array, where the order refers to the calculation order
@@ -250,7 +322,7 @@ function metaFieldData(xmlObj)
 	    }
 	});
 
-	var listFields = [ "perspective","target","start","end" ];
+	var listFields = [ "perspective","target","start","end","targetVal" ];
 	
 	listFields.forEach(function(field) {
 	    if(incomingFieldObj.hasOwnProperty(field)) {
@@ -264,49 +336,87 @@ function metaFieldData(xmlObj)
     // at this point we have all of the fields in an object
     //   but we need to deal with the inherent ordering required
     //   because of dependencies among the meta fields and their
-    //   targets and start/end fields. That is, if one meta field
-    //   depends upon another, it needs to be behind it. This is
-    //   done through a topological sort. The first step, though,
-    //   is to create the graph to allow the sort to work.
+    //   differing perspectives.  There are two rules:
+    //
+    //   1 - "higher" perspective metadata is computed AFTER "lower"
+    //       perspective metadata
+    //   2 - Metadata that depends upon other metadata is computed
+    //       after it - on whichever level it is being computed.
+    //   3 - References to "target data" from one perspective is
+    //       filled, first, from a lower-level perspective, then
+    //       from fields in the current perspective.
+    //
+    //   Rules 1 & 2 have a couple imporant corollaries:
+    //   - ALL lower level computations are done before higher
+    //     level computations are done - even if a high-level
+    //     computation doesn't depend on a particular lower-level item.
+    //   - no lower-level computation can depend on a higher-level
+    //     computation.
+    //   - dependencies come ONLY from the current perspective
+    //     AND the next lower perspective.
+    //   - a perspective can assume that ALL lower-level computations
+    //     have been done.
+    //
+    //   These two rules are implemented in two steps'ish.  First,
+    //   the metadata fields are organized into buckets for each
+    //   perspective level (and possibly duplicated to live in each
+    //   level) and then a topographic sort is done to ensure that
+    //   all data is computed in the right order.
+    //   
+    //   To do all of this, a graph is created, and then a topographical
+    //   sort is done upon it.
 
-    var graph = [];
+    var perspectives = [ "match", "competition", "robot", "year" ];
 
-    var dependencyFields = ["target","start","end"];
+    var returnData = {};
     
-    fields.forEach(function(field) {
-	var name = field.name;
-	dependencyFields.forEach(function(dependencyField) {
-	    if(field.hasOwnProperty(dependencyField)) {
-		field[dependencyField].forEach(function(field) {
-		    graph.push([name,field]);
-		})
+    perspectives.forEach((perspective) => {
+
+	// do each perspective separately, then add them back to back
+
+	var graph = [];
+
+	var dependencyFields = ["target","start","end"];
+    
+	fields.forEach((field) => {
+	    if(field.perspective.includes(perspective)) {
+		var name = field.name;
+		dependencyFields.forEach((dependencyField) => {
+		    if(field.hasOwnProperty(dependencyField)) {
+			field[dependencyField].forEach((f) => {
+			    graph.push([name,f]);
+			})
+		    }
+		});
 	    }
 	});
-    });
 
-    // the "legalOrder" is one such order that ensures that all
-    //   dependencies are calculated first, before the fields that
-    //   depend upon them. Because there are probably numerous fields
-    //   that are from raw data, there are probably multiple legal orders.
+	// the "legalOrder" is one such order that ensures that all
+	//   dependencies are calculated first, before the fields that
+	//   depend upon them. Because there are probably numerous fields
+	//   that are from raw data, there are probably multiple legal orders.
     
-    var legalOrder = toposort(graph).reverse();
+	var legalOrder = toposort(graph).reverse();
 
-    // now we take that legal order, and ensure that fields are in
-    // that order. Note that legalOrder is a superset of all fields,
-    // so we use that to enumerate the list.
+	// now we take that legal order, and ensure that fields are in
+	// that order. Note that legalOrder is a superset of all fields,
+	// so we use that to enumerate the list.
 
-    var retFields = [];
+	var perspectiveFields = [];
     
-    legalOrder.forEach(function(orderedField) {
-	var target = fields.find(function(fieldObject) {
-	    return(fieldObject.name == orderedField);
+	legalOrder.forEach(function(orderedField) {
+	    var target = fields.find((fieldObject) => fieldObject.name == orderedField);
+	    if(target) {
+		var clone = fieldClone(target);
+		clone.perspective = [perspective];      // each fields ends-up with only ONE perspective
+		perspectiveFields.push(clone);          //    with potentially multiple copies of the field
+	    }
 	});
-	if(target) {
-	    retFields.push(target);
-	}
+
+	returnData[perspective] = perspectiveFields;
     });
 
-    return(retFields);
+    return(returnData);
 }
 
 //
