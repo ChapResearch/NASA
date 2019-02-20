@@ -291,7 +291,7 @@
 
     <field>
       <name>defenseYesNo</name>
-      <label>Did they play Defense</label>
+      <label>Did they play Defense?</label>
       <type>choice</type>
       <choice>
 	<label>Yes</label>
@@ -399,7 +399,7 @@
     <field>
       <type>text</type>
       <label>Sandstorm and Teleop</label>
-      <location>2,24</location>
+      <location>1,24</location>
     </field>
 
     <!-- ############### PANEL EVENTS ################ -->    
@@ -664,29 +664,29 @@
       <name>startClimb</name>
       <type>event</type>
       <ewid>climb</ewid>
-      <location>19,68</location>
+      <location>2,73</location>
     </field>
 
     <field>
       <name>endClimb</name>
       <type>event</type>
       <ewid>climb</ewid>
-      <location>32,68</location>
+      <location>10,73</location>
     </field>
 
     <field>
       <name>failClimb</name>
       <type>event</type>
       <ewid>climb</ewid>
-      <location>26,74</location>
+      <location>18,73</location>
     </field>
 
     <field>
       <type>eventWindow</type>
       <ewid>climb</ewid>
       <label>Climb Window</label>
-      <location>19,80</location>
-      <size>20,15</size>
+      <location>2,79</location>
+      <size>20,10</size>
     </field>    
     
     
@@ -704,7 +704,7 @@
       <type>line</type>
       <direction>horizontal</direction>
       <length>23</length>
-      <location>1,22</location>
+      <location>1,20</location>
       <color>red</color>
     </field>        
 
@@ -725,7 +725,7 @@
     <field>
       <name>comments</name>
       <type>textInput</type>
-      <size>14,20</size>
+      <size>40,7</size>
       <location>2,73</location>
     </field>
 
