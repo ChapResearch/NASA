@@ -589,7 +589,7 @@
       <name>HABEndPos</name>
       <optional>false</optional>
       <layout>R</layout>
-      <location>80,77</location>
+      <location>81,77</location>
     </field>
 
 
@@ -639,7 +639,7 @@
       <name>gamePieceOffRocket</name>
       <default>0</default>
       <layout>B</layout>
-      <location>64,77</location>    
+      <location>63,77</location>    
     </field>
 
     <field> <!-- Game Piece Off Cargo -->
@@ -647,7 +647,7 @@
       <name>gamePieceOffCargo</name>
       <default>0</default>
       <layout>B</layout>
-      <location>64,85</location>    
+      <location>63,85</location>    
     </field>
 
     <field> <!-- Defensive Penalty -->
@@ -655,7 +655,7 @@
       <name>defensivePenalty</name>
       <default>0</default>
       <layout>B</layout>
-      <location>64,93</location>    
+      <location>63,93</location>    
     </field>
 
 
@@ -664,21 +664,21 @@
       <name>startClimb</name>
       <type>event</type>
       <ewid>climb</ewid>
-      <location>19,73</location>
+      <location>19,68</location>
     </field>
 
     <field>
       <name>endClimb</name>
       <type>event</type>
       <ewid>climb</ewid>
-      <location>26,73</location>
+      <location>32,68</location>
     </field>
 
     <field>
       <name>failClimb</name>
       <type>event</type>
       <ewid>climb</ewid>
-      <location>33,73</location>
+      <location>26,74</location>
     </field>
 
     <field>
