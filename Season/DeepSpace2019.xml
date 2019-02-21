@@ -291,7 +291,7 @@
 
     <field>
       <name>defenseYesNo</name>
-      <label>Did they play Defense?</label>
+      <label>Play Defense?</label>
       <type>choice</type>
       <choice>
 	<label>Yes</label>
@@ -573,7 +573,7 @@
       <name>defenseTeamNum</name>
       <type>textInput</type>
       <size>20,3</size>
-      <location>5,46</location>
+      <location>5,45</location>
     </field>
 
 <!-- ################ END GAME ################## -->
@@ -589,7 +589,7 @@
       <name>HABEndPos</name>
       <optional>false</optional>
       <layout>R</layout>
-      <location>81,77</location>
+      <location>81,80</location>
     </field>
 
 
@@ -671,14 +671,14 @@
       <name>endClimb</name>
       <type>event</type>
       <ewid>climb</ewid>
-      <location>10,73</location>
+      <location>17,73</location>
     </field>
 
     <field>
       <name>failClimb</name>
       <type>event</type>
       <ewid>climb</ewid>
-      <location>18,73</location>
+      <location>32,73</location>
     </field>
 
     <field>
@@ -686,7 +686,7 @@
       <ewid>climb</ewid>
       <label>Climb Window</label>
       <location>2,79</location>
-      <size>20,10</size>
+      <size>38,8</size>
     </field>    
     
     
@@ -703,7 +703,7 @@
     <field>
       <type>line</type>
       <direction>horizontal</direction>
-      <length>23</length>
+      <length>98</length>
       <location>1,20</location>
       <color>red</color>
     </field>        
@@ -725,8 +725,8 @@
     <field>
       <name>comments</name>
       <type>textInput</type>
-      <size>40,7</size>
-      <location>2,73</location>
+      <size>39,7</size>
+      <location>2,90</location>
     </field>
 
   </layout>
@@ -854,8 +854,6 @@
       <type>int</type>
       <label>Total Penalties</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>sum</op>
       <target>gamePieceOffRocket</target>
       <target>gamePieceOffCargo</target>
@@ -913,8 +911,6 @@
       <type>int</type>
       <label>Cargo scoring counts</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>count</op>
       <target>panelScoredCargoTime</target>
     </field>
@@ -924,8 +920,6 @@
       <type>int</type>
       <label>Cargo scoring times average</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>average</op>
       <target>panelScoredCargoTime</target>
     </field>
@@ -948,8 +942,6 @@
       <type>int</type>
       <label>Rocket scoring counts</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>count</op>
       <target>panelScoredRocketTime</target>
     </field>
@@ -959,8 +951,6 @@
       <type>int</type>
       <label>Rocket scoring times average</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>average</op>
       <target>panelScoredRocketTime</target>
     </field>
@@ -972,7 +962,6 @@
       <type>int</type>
       <label>Percent Succes HAB Level 3</label>
       <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>percent</op>
       <target>HABEndPos</target>
       <targetVal>3</targetVal>
@@ -983,7 +972,6 @@
       <type>int</type>
       <label>Percent Succes HAB Level 2</label>
       <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>percent</op>
       <target>HABEndPos</target>
       <targetVal>2</targetVal>
@@ -994,7 +982,6 @@
       <type>int</type>
       <label>Percent Succes Off Starting Position 2</label>
       <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>percent</op>
       <target>CrossHABLine</target>
       <targetVal>2</targetVal>
@@ -1006,7 +993,6 @@
       <type>int</type>
       <label>Percent Success Off Starting Position 1</label>
       <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>percent</op>
       <target>CrossHABLine</target>
       <targetVal>1</targetVal>
@@ -1018,7 +1004,6 @@
       <type>int</type>
       <label>Percent Fail Off Starting Position 2</label>
       <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>percent</op>
       <target>CrossHABLine</target>
       <targetVal>2</targetVal>
@@ -1030,7 +1015,6 @@
       <type>int</type>
       <label>Percent Fail Off Starting Position 1</label>
       <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>percent</op>
       <target>CrossHABLine</target>
       <targetVal>1</targetVal>
@@ -1043,7 +1027,6 @@
       <type>int</type>
       <label>Average Level 3 HAB Assists</label>
       <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>average</op>
       <target>HABAssistLvl3</target>
     </field>
@@ -1053,7 +1036,6 @@
       <type>int</type>
       <label>Average Level 2 HAB Assists</label>
       <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>average</op>
       <target>HABAssistLvl2</target>
     </field>
@@ -1063,7 +1045,6 @@
       <type>int</type>
       <label>Average Level 1 HAB Assists</label>
       <perspective>competition</perspective>
-      <perspective>robot</perspective>
       <op>average</op>
       <target>HABAssistLvl1</target>
     </field>
