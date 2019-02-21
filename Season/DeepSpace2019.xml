@@ -291,7 +291,7 @@
 
     <field>
       <name>defenseYesNo</name>
-      <label>Did they play Defense</label>
+      <label>Play Defense?</label>
       <type>choice</type>
       <choice>
 	<label>Yes</label>
@@ -399,7 +399,7 @@
     <field>
       <type>text</type>
       <label>Sandstorm and Teleop</label>
-      <location>2,24</location>
+      <location>1,24</location>
     </field>
 
     <!-- ############### PANEL EVENTS ################ -->    
@@ -573,7 +573,7 @@
       <name>defenseTeamNum</name>
       <type>textInput</type>
       <size>20,3</size>
-      <location>5,46</location>
+      <location>5,45</location>
     </field>
 
 <!-- ################ END GAME ################## -->
@@ -589,7 +589,7 @@
       <name>HABEndPos</name>
       <optional>false</optional>
       <layout>R</layout>
-      <location>80,77</location>
+      <location>81,80</location>
     </field>
 
 
@@ -639,7 +639,7 @@
       <name>gamePieceOffRocket</name>
       <default>0</default>
       <layout>B</layout>
-      <location>64,77</location>    
+      <location>63,77</location>    
     </field>
 
     <field> <!-- Game Piece Off Cargo -->
@@ -647,7 +647,7 @@
       <name>gamePieceOffCargo</name>
       <default>0</default>
       <layout>B</layout>
-      <location>64,85</location>    
+      <location>63,85</location>    
     </field>
 
     <field> <!-- Defensive Penalty -->
@@ -655,7 +655,7 @@
       <name>defensivePenalty</name>
       <default>0</default>
       <layout>B</layout>
-      <location>64,93</location>    
+      <location>63,93</location>    
     </field>
 
 
@@ -664,29 +664,29 @@
       <name>startClimb</name>
       <type>event</type>
       <ewid>climb</ewid>
-      <location>19,73</location>
+      <location>2,73</location>
     </field>
 
     <field>
       <name>endClimb</name>
       <type>event</type>
       <ewid>climb</ewid>
-      <location>26,73</location>
+      <location>17,73</location>
     </field>
 
     <field>
       <name>failClimb</name>
       <type>event</type>
       <ewid>climb</ewid>
-      <location>33,73</location>
+      <location>32,73</location>
     </field>
 
     <field>
       <type>eventWindow</type>
       <ewid>climb</ewid>
       <label>Climb Window</label>
-      <location>19,80</location>
-      <size>20,15</size>
+      <location>2,79</location>
+      <size>38,8</size>
     </field>    
     
     
@@ -703,8 +703,8 @@
     <field>
       <type>line</type>
       <direction>horizontal</direction>
-      <length>23</length>
-      <location>1,22</location>
+      <length>98</length>
+      <location>1,20</location>
       <color>red</color>
     </field>        
 
@@ -725,8 +725,8 @@
     <field>
       <name>comments</name>
       <type>textInput</type>
-      <size>14,20</size>
-      <location>2,73</location>
+      <size>39,7</size>
+      <location>2,90</location>
     </field>
 
   </layout>
@@ -854,7 +854,10 @@
       <type>int</type>
       <label>Total Penalties</label>
       <perspective>match</perspective>
+<<<<<<< HEAD
       <perspective>competition</perspective>
+=======
+>>>>>>> 00befb94c5e0b64556521f455437e20b26460947
       <op>sum</op>
       <target>gamePieceOffRocket</target>
       <target>gamePieceOffCargo</target>
