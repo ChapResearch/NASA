@@ -854,6 +854,10 @@
       <type>int</type>
       <label>Total Penalties</label>
       <perspective>match</perspective>
+<<<<<<< HEAD
+      <perspective>competition</perspective>
+=======
+>>>>>>> 00befb94c5e0b64556521f455437e20b26460947
       <op>sum</op>
       <target>gamePieceOffRocket</target>
       <target>gamePieceOffCargo</target>
@@ -1048,6 +1052,105 @@
       <op>average</op>
       <target>HABAssistLvl1</target>
     </field>
+
+
+
+    <!-- CARGO -->
+    
+    <field> <!-- Cargo Pickup -->
+      <name>cargoPickup</name>
+      <type>event</type>
+      <label>Combined pickup events</label>
+      <perspective>match</perspective>
+      <op>combine</op>
+      <target>cargoPickupGround</target>
+      <target>cargoPickupHuman</target>
+    </field>
+
+    <field> <!-- Combine the raw data (times) for the Rocket cargo scored events -->
+      <name>cargoScoredRocket</name>
+      <type>event</type>
+      <label>Combined cargo rocket scoring events</label>
+      <perspective>match</perspective>
+      <op>combine</op>
+      <target>cargoScoredRocketLvl1</target>
+      <target>cargoScoredRocketLvl2</target>
+      <target>cargoScoredRocketLvl3</target>
+    </field>
+
+    <field> <!-- Combine raw data for Cargo cargo Scored events -->
+      <name>cargoScoredCargo</name>
+      <type>event</type>
+      <label>Combined cargo cargo scoring events</label>
+      <perspective>match</perspective>
+      <op>combine</op>
+      <target>cargoScoredCargoMiddle</target>
+      <target>cargoScoredCargoRight</target>
+      <target>cargoScoredCargoLeft</target>
+    </field>
+
+ <!-- METADATA FOR CARGO CARGO SCORING-->
+
+    <field> <!-- Times for Cargo based on Cargo Pickup events and any Cargo score on Cargo -->
+      <name>cargoScoredCargoTime</name>
+      <type>event</type>
+      <label>Cargo scoring times</label>
+      <perspective>match</perspective>
+      <op>delta</op>
+      <start>cargoPickup</start>
+      <end>cargoScoredCargo</end>
+    </field>
+
+    <field> <!-- Counts of number of times a cargo was scored on cargo based on the cargoScoredCargoTime -->
+      <name>cargoScoredCargoCount</name>
+      <type>int</type>
+      <label>Cargo scoring counts</label>
+      <perspective>match</perspective>
+      <op>count</op>
+      <target>cargoScoredCargoTime</target>
+    </field>
+
+    <field> <!-- Gets average time for cargo scoring based on cargoScoredCargoTime -->
+      <name>cargoScoredCargoTimeAverage</name>
+      <type>int</type>
+      <label>Cargo scoring times average</label>
+      <perspective>match</perspective>
+      <op>average</op>
+      <target>cargoScoredCargoTime</target>
+    </field>
+
+
+    <!--METADATA FOR ROCKET CARGO SCORING-->
+
+    <field> <!-- Times for Rocket based on Cargo Pickup events and any Cargo score on Rocket -->
+      <name>cargoScoredRocketTime</name>
+      <type>event</type>
+      <label>Rocket scoring times</label>
+      <perspective>match</perspective>
+      <op>delta</op>
+      <start>cargoPickup</start>
+      <end>cargoScoredRocket</end>
+    </field>
+
+    <field> <!-- Counts of number of times a cargo was scored on cargo based on the cargoScoredCargoTime -->
+      <name>cargoScoredRocketCount</name>
+      <type>int</type>
+      <label>Rocket scoring counts</label>
+      <perspective>match</perspective>
+      <op>count</op>
+      <target>cargoScoredRocketTime</target>
+    </field>
+
+    <field> <!-- Gets average time for Rocket scoring based on cargoScoredRocketTime -->
+      <name>cargoScoredRocketTimeAverage</name>
+      <type>int</type>
+      <label>Rocket scoring times average</label>
+      <perspective>match</perspective>
+      <op>average</op>
+      <target>cargoScoredRocketTime</target>
+    </field>
+
+
     
 
   </metaData>
