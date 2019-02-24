@@ -860,11 +860,21 @@
       <target>defensivePenalty</target>
     </field>
 
-
+    <field>
+      <name>totalPenalties</name>
+      <type>int</type>
+      <label>Total Penalties</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>      
+      <op>sum</op>
+      <target>totalPenalties</target>
+    </field>
+    
+    <!--################## PANEL SCORING EVENTS ######################### -->
     <field> <!-- Panel Pickup -->
       <name>panelPickup</name>
-      <type>event</type>
-      <label>Combined pickup events</label>
+      <type>array</type>
+      <label>Panel Pickup Events</label>
       <perspective>match</perspective>
       <op>combine</op>
       <target>panelPickupGround</target>
@@ -873,7 +883,7 @@
 
     <field> <!-- Combine the raw data (times) for the Rocket panel scored events -->
       <name>panelScoredRocket</name>
-      <type>event</type>
+      <type>array</type>
       <label>Combined panel rocket scoring events</label>
       <perspective>match</perspective>
       <op>combine</op>
@@ -884,7 +894,7 @@
 
     <field> <!-- Combine raw data for Cargo panel Scored events -->
       <name>panelScoredCargo</name>
-      <type>event</type>
+      <type>array</type>
       <label>Combined panel cargo scoring events</label>
       <perspective>match</perspective>
       <op>combine</op>
@@ -901,16 +911,18 @@
       <type>event</type>
       <label>Cargo scoring times</label>
       <perspective>match</perspective>
+      <perspective>competition</perspective>      
       <op>delta</op>
       <start>panelPickup</start>
       <end>panelScoredCargo</end>
     </field>
 
     <field> <!-- Counts of number of times a panel was scored on cargo based on the panelScoredCargoTime -->
-      <name>panelScoredCargoCount</name>
+      <name>panelScoredCargoTotal</name>
       <type>int</type>
       <label>Cargo scoring counts</label>
       <perspective>match</perspective>
+      <perspective>competition</perspective>
       <op>count</op>
       <target>panelScoredCargoTime</target>
     </field>
@@ -920,30 +932,33 @@
       <type>int</type>
       <label>Cargo scoring times average</label>
       <perspective>match</perspective>
+      <perspective>competition</perspective>
       <op>average</op>
-      <target>panelScoredCargoTime</target>
+      <target>panelScoredCargoTimes</target>
     </field>
 
 
     <!--METADATA FOR ROCKET PANEL SCORING-->
     
     <field> <!-- Times for Rocket based on Panel Pickup events and any Panel score on Rocket -->
-      <name>panelScoredRocketTime</name>
-      <type>event</type>
+      <name>panelScoredRocketTimes</name>
+      <type>array</type>
       <label>Rocket scoring times</label>
       <perspective>match</perspective>
+      <perspective>competition</perspective>      
       <op>delta</op>
       <start>panelPickup</start>
       <end>panelScoredRocket</end>
     </field>
 
     <field> <!-- Counts of number of times a panel was scored on cargo based on the panelScoredCargoTime -->
-      <name>panelScoredRocketCount</name>
+      <name>panelScoredRocketTotal</name>
       <type>int</type>
-      <label>Rocket scoring counts</label>
+      <label>Rocket scoring Total</label>
       <perspective>match</perspective>
+      <perspective>competition</perspective>
       <op>count</op>
-      <target>panelScoredRocketTime</target>
+      <target>panelScoredRocket</target>
     </field>
 
     <field> <!-- Gets average time for Rocket scoring based on panelScoredRocketTime -->
@@ -951,9 +966,179 @@
       <type>int</type>
       <label>Rocket scoring times average</label>
       <perspective>match</perspective>
+      <perspective>competition</perspective>      
       <op>average</op>
-      <target>panelScoredRocketTime</target>
+      <target>panelScoredRocketTimes</target>
     </field>
+
+    <field>
+      <name>panelScoredTotal</name>
+      <type>int</type>
+      <label>Total Panels Scored</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>
+      <op>sum</op>
+      <target>panelScoredRocketTotal</target>
+      <target>panelScoredCargoTotal</target>
+    </field>
+
+    <field>
+      <name>panelScoredTimes</name>
+      <type>array</type>
+      <label>Scored Panel Cycle Times</label>
+      <perspective>match</perspective>
+      <op>combine</op>
+      <target>panelScoredRocketTimes</target>
+      <target>panelScoredCargoTimes</target>
+    </field>    
+      
+    <field>
+      <name>panelScoredTimeAverage</name>
+      <type>int</type>
+      <label>Scored Panel Cycle Time Average</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>      
+      <op>average</op>
+      <target>panelScoredTimes</target>
+    </field>
+
+    <!-- ###################### END PANEL SCORING EVENTS ##################### -->
+
+    <!--################## Cargo SCORING EVENTS ######################### -->
+    <field> <!-- Cargo Pickup -->
+      <name>cargoPickup</name>
+      <type>array</type>
+      <label>Cargo Pickup Events</label>
+      <perspective>match</perspective>
+      <op>combine</op>
+      <target>cargoPickupGround</target>
+      <target>cargoPickupHuman</target>
+    </field>
+
+    <field> <!-- Combine the raw data (times) for the Rocket cargo scored events -->
+      <name>cargoScoredRocket</name>
+      <type>array</type>
+      <label>Combined cargo rocket scoring events</label>
+      <perspective>match</perspective>
+      <op>combine</op>
+      <target>cargoScoredRocketLvl1</target>
+      <target>cargoScoredRocketLvl2</target>
+      <target>cargoScoredRocketLvl3</target>
+    </field>
+
+    <field> <!-- Combine raw data for Cargo cargo Scored events -->
+      <name>cargoScoredCargo</name>
+      <type>array</type>
+      <label>Combined cargo cargo scoring events</label>
+      <perspective>match</perspective>
+      <op>combine</op>
+      <target>cargoScoredCargoMiddle</target>
+      <target>cargoScoredCargoRight</target>
+      <target>cargoScoredCargoLeft</target>
+    </field>
+
+    
+    <!-- METADATA FOR CARGO CARGO SCORING-->
+
+    <field> <!-- Times for Cargo based on Cargo Pickup events and any Cargo score on Cargo -->
+      <name>cargoScoredCargoTime</name>
+      <type>event</type>
+      <label>Cargo scoring times</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>      
+      <op>delta</op>
+      <start>cargoPickup</start>
+      <end>cargoScoredCargo</end>
+    </field>
+
+    <field> <!-- Counts of number of times a cargo was scored on cargo based on the cargoScoredCargoTime -->
+      <name>cargoScoredCargoTotal</name>
+      <type>int</type>
+      <label>Cargo scoring counts</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>
+      <op>count</op>
+      <target>cargoScoredCargoTime</target>
+    </field>
+    
+    <field> <!-- Gets average time for cargo scoring based on cargoScoredCargoTime -->
+      <name>cargoScoredCargoTimeAverage</name>
+      <type>int</type>
+      <label>Cargo scoring times average</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>
+      <op>average</op>
+      <target>cargoScoredCargoTime</target>
+    </field>
+
+
+    <!--METADATA FOR ROCKET CARGO SCORING-->
+    
+    <field> <!-- Times for Rocket based on Cargo Pickup events and any Cargo score on Rocket -->
+      <name>cargoScoredRocketTimes</name>
+      <type>array</type>
+      <label>Rocket scoring times</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>      
+      <op>delta</op>
+      <start>cargoPickup</start>
+      <end>cargoScoredRocket</end>
+    </field>
+
+    <field> <!-- Counts of number of times a cargo was scored on cargo based on the cargoScoredCargoTime -->
+      <name>cargoScoredRocketTotal</name>
+      <type>int</type>
+      <label>Rocket scoring Total</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>
+      <op>count</op>
+      <target>cargoScoredRocket</target>
+    </field>
+
+    <field> <!-- Gets average time for Rocket scoring based on cargoScoredRocketTime -->
+      <name>cargoScoredRocketTimeAverage</name>
+      <type>int</type>
+      <label>Rocket scoring times average</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>      
+      <op>average</op>
+      <target>cargoScoredRocketTimes</target>
+    </field>
+
+    <field>
+      <name>cargoScoredTotal</name>
+      <type>int</type>
+      <label>Total Cargos Scored</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>
+      <op>sum</op>
+      <target>cargoScoredRocketTotal</target>
+      <target>cargoScoredCargoTotal</target>
+    </field>
+
+    <field>
+      <name>cargoScoredTimes</name>
+      <type>array</type>
+      <label>Scored Cargo Cycle Times</label>
+      <perspective>match</perspective>
+      <op>combine</op>
+      <target>cargoScoredRocketTimes</target>
+      <target>cargoScoredCargoTimes</target>
+    </field>    
+      
+    <field>
+      <name>cargoScoredTimeAverage</name>
+      <type>int</type>
+      <label>Scored Cargo Cycle Time Average</label>
+      <perspective>match</perspective>
+      <perspective>competition</perspective>      
+      <op>average</op>
+      <target>cargoScoredTimes</target>
+    </field>
+
+    <!-- ###################### END PANEL SCORING EVENTS ##################### -->
+
+
 
     <!--HAB SCORING-->
 
@@ -984,8 +1169,8 @@
       <perspective>competition</perspective>
       <op>percent</op>
       <target>CrossHABLine</target>
-      <targetVal>2</targetVal>
-      <targetVal>3</targetVal>      
+      <targetVal>1</targetVal>
+      <targetVal>2</targetVal>      
     </field>
 
     <field> <!-- Starting Position 1 Success -->
@@ -995,32 +1180,9 @@
       <perspective>competition</perspective>
       <op>percent</op>
       <target>CrossHABLine</target>
-      <targetVal>1</targetVal>
-      <targetVal>3</targetVal>      
+      <targetVal>0</targetVal>
+      <targetVal>2</targetVal>      
     </field>
-
-    <field> <!-- Starting Position fail Position 2 -->
-      <name>startingPos2Fail</name>
-      <type>int</type>
-      <label>Percent Fail Off Starting Position 2</label>
-      <perspective>competition</perspective>
-      <op>percent</op>
-      <target>CrossHABLine</target>
-      <targetVal>2</targetVal>
-      <targetVal>4</targetVal>      
-    </field>
-    
-    <field> <!-- Starting Position fail Position 1 -->
-      <name>startingPos1Fail</name>
-      <type>int</type>
-      <label>Percent Fail Off Starting Position 1</label>
-      <perspective>competition</perspective>
-      <op>percent</op>
-      <target>CrossHABLine</target>
-      <targetVal>1</targetVal>
-      <targetVal>4</targetVal>      
-    </field>
-
 
     <field> <!--Average Number of Level 3 assists-->
       <name>averageHAB3Assists</name>
@@ -1048,8 +1210,143 @@
       <op>average</op>
       <target>HABAssistLvl1</target>
     </field>
-    
 
+    <field> <!--Average Number of Game Piece off Rocket Penalties-->
+      <name>pieceOffRocketPenaltyAverage</name>
+      <type>int</type>
+      <label>Average Number of Game Piece Off Rocket Penalties</label>
+      <perspective>competition</perspective>
+      <op>average</op>
+      <target>gamePieceOffRocket</target>
+    </field>
+
+    <field> <!--Average Number of Game Piece off Cargo Bay Penalties-->
+      <name>pieceOffCargoPenaltyAverage</name>      
+      <type>int</type>
+      <label>Average Number of Game Piece Off Cargo Penalties</label>      
+      <perspective>competition</perspective>
+      <op>average</op>
+      <target>gamePieceOffCargo</target>
+    </field>
+
+    <field> <!--Average Number of Defensive Penalties-->
+      <name>defensivePenaltyAverage</name>      
+      <type>int</type>
+      <label>Average Number of Defensive Penalties</label>      
+      <perspective>competition</perspective>
+      <op>average</op>
+      <target>defensivePenalty</target>
+    </field>
+
+    <field> <!-- Robot Preload Cargo Percent -->
+      <name>robotPreloadCargoPercent</name>
+      <type>int</type>
+      <label>Percent of Matches Preloaded With Cargo</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>robotPreload</target>
+      <targetVal>1</targetVal>
+    </field>
+
+    <field> <!-- Robot Preload Panel Percent -->
+      <name>robotPreloadPanelPercent</name>
+      <type>int</type>
+      <label>Percent of Matches Preloaded With Panel</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>robotPreload</target>
+      <targetVal>2</targetVal>
+    </field>
+
+    <field> <!-- Robot Start Left Side Percentage -->
+      <name>startingLeftSidePercent</name>
+      <type>int</type>
+      <label>Robot Start On Left Side Percentage</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>startSide</target>
+      <targetVal>1</targetVal>
+    </field>
+
+    <field> <!-- Robot Start Middle Side Percentage -->
+      <name>startingMiddleSidePercent</name>
+      <type>int</type>
+      <label>Robot Start On Middle Side Percentage</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>startSide</target>
+      <targetVal>2</targetVal>
+    </field>
+
+    <field> <!-- Robot Start Right Side Percentage -->
+      <name>startingRightSidePercent</name>
+      <type>int</type>
+      <label>Robot Start On Right Side Percentage</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>startSide</target>
+      <targetVal>3</targetVal>
+    </field>
+
+    <field> <!-- Right Area Preload Cargo Percent -->
+      <name>areaRightPreloadCargoPercent</name>
+      <type>int</type>
+      <label>Percent Preload Right area As Cargo</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>preloadAreaRight</target>
+      <targetVal>1</targetVal>
+    </field>
+    
+    <field> <!-- Right Area Preload Panel Percent -->
+      <name>areaRightPreloadPanelPercent</name>
+      <type>int</type>
+      <label>Percent Preload Right area As Panel</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>preloadAreaRight</target>
+      <targetVal>2</targetVal>
+    </field>
+
+    <field> <!-- Left Area Preload Cargo Percent -->
+      <name>areaLeftPreloadCargoPercent</name>
+      <type>int</type>
+      <label>Percent Preload Left area As Cargo</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>preloadAreaLeft</target>
+      <targetVal>1</targetVal>
+    </field>
+    
+    <field> <!-- Left Area Preload Panel Percent -->
+      <name>areaLeftPreloadPanelPercent</name>
+      <type>int</type>
+      <label>Percent Preload Left area As Panel</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>preloadAreaLeft</target>
+      <targetVal>2</targetVal>
+    </field>    
+
+    <field>
+      <name>percentDefensePlayed</name>
+      <type>int</type>
+      <label>Percent of Matches Defense was Played</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>defenseYesNo</target>
+      <targetVal>1</targetVal>
+    </field>
+
+    <field>
+      <name>climbTimeAverage</name>
+      <type>int</type>
+      <label>Average Climb Time</label>
+      <perspective>competition</perspective>
+      <op>average</op>
+      <target>climbTime</target>
+    </field>
+    
   </metaData>
     
 </app>
