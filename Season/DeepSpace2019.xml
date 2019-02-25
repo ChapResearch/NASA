@@ -941,7 +941,7 @@
     <!-- METADATA FOR CARGO PANEL SCORING-->
 
     <field> <!-- Times for Cargo based on Panel Pickup events and any Panel score on Cargo -->
-      <name>panelScoredCargoTime</name>
+      <name>panelScoredCargoTimes</name>
       <type>event</type>
       <label>Cargo scoring times</label>
       <perspective>match</perspective>
@@ -951,17 +951,17 @@
       <end>panelScoredCargo</end>
     </field>
 
-    <field> <!-- Counts of number of times a panel was scored on cargo based on the panelScoredCargoTime -->
+    <field> <!-- Counts of number of times a panel was scored on cargo based on the panelScoredCargoTimes -->
       <name>panelScoredCargoTotal</name>
       <type>int</type>
       <label>Cargo scoring counts</label>
       <perspective>match</perspective>
       <perspective>competition</perspective>
       <op>count</op>
-      <target>panelScoredCargoTime</target>
+      <target>panelScoredCargoTimes</target>
     </field>
     
-    <field> <!-- Gets average time for cargo scoring based on panelScoredCargoTime -->
+    <field> <!-- Gets average time for cargo scoring based on panelScoredCargoTimes -->
       <name>panelScoredCargoTimeAverage</name>
       <type>int</type>
       <label>Cargo scoring times average</label>
@@ -985,7 +985,7 @@
       <end>panelScoredRocket</end>
     </field>
 
-    <field> <!-- Counts of number of times a panel was scored on cargo based on the panelScoredCargoTime -->
+    <field> <!-- Counts of number of times a panel was scored on cargo based on the panelScoredCargoTimes -->
       <name>panelScoredRocketTotal</name>
       <type>int</type>
       <label>Rocket scoring Total</label>
@@ -1092,7 +1092,7 @@
       <perspective>match</perspective>
       <perspective>competition</perspective>
       <op>count</op>
-      <target>cargoScoredCargoTime</target>
+      <target>cargoScoredCargoTimes</target>
     </field>
     
     <field> <!-- Gets average time for cargo scoring based on cargoScoredCargoTime -->
@@ -1102,7 +1102,7 @@
       <perspective>match</perspective>
       <perspective>competition</perspective>
       <op>average</op>
-      <target>cargoScoredCargoTime</target>
+      <target>cargoScoredCargoTimes</target>
     </field>
 
 
@@ -1202,7 +1202,7 @@
       <label>Percent Succes Off Starting Position 2</label>
       <perspective>competition</perspective>
       <op>percent</op>
-      <target>CrossHABLine</target>
+      <target>crossHABLine</target>
       <targetVal>1</targetVal>
       <targetVal>2</targetVal>      
     </field>
@@ -1213,7 +1213,7 @@
       <label>Percent Success Off Starting Position 1</label>
       <perspective>competition</perspective>
       <op>percent</op>
-      <target>CrossHABLine</target>
+      <target>crossHABLine</target>
       <targetVal>0</targetVal>
       <targetVal>2</targetVal>      
     </field>
@@ -1224,7 +1224,7 @@
       <label>Average Level 3 HAB Assists</label>
       <perspective>competition</perspective>
       <op>average</op>
-      <target>HABAssistLvl3</target>
+      <target>HABAssist3</target>
     </field>
     
     <field> <!--Average Number of Level 2 assists-->
@@ -1233,7 +1233,7 @@
       <label>Average Level 2 HAB Assists</label>
       <perspective>competition</perspective>
       <op>average</op>
-      <target>HABAssistLvl2</target>
+      <target>HABAssist2</target>
     </field>
     
     <field> <!--Average Number of Level 1 assists-->
@@ -1242,7 +1242,7 @@
       <label>Average Level 1 HAB Assists</label>
       <perspective>competition</perspective>
       <op>average</op>
-      <target>HABAssistLvl1</target>
+      <target>HABAssist1</target>
     </field>
 
     <field> <!--Average Number of Game Piece off Rocket Penalties-->
@@ -1370,6 +1370,26 @@
       <op>percent</op>
       <target>defenseYesNo</target>
       <targetVal>1</targetVal>
+    </field>
+
+    <field>
+      <name>climbTime</name>
+      <type>array</type>
+      <label>Climb Time</label>
+      <op>delta</op>
+      <start>startClimb</start>
+      <end>climbStopped</end>
+      <perspective>match</perspective>
+    </field>
+
+    <field>
+      <name>climbStopped</name>
+      <type>array</type>
+      <label>Climb End Events</label>
+      <op>combine</op>
+      <target>endClimb</target>
+      <target>failClimb</target>
+      <perspective>match</perspective>
     </field>
 
     <field>
