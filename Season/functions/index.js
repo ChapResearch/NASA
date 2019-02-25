@@ -108,12 +108,13 @@ exports.seasonJSON = functions.https.onRequest((request, response) =>
 
     // TODO - allow specifying the JSON
     
-    ref.getDownloadURL().then(function(url) {
-	response.redirect(url);
-    }).catch(function(error) {
-	console.log(error.code);
-	response.send("Error");
-    });
+    ref.getDownloadURL()
+    	.then((url) => reqGet(url))
+	.then((body) => response.send(body))
+	.catch(function(error) {
+	    console.log(error.code);
+	    response.send("Error");
+	});
 
 });
 
@@ -278,7 +279,7 @@ function fieldClone(field)
 
     var clone = Object.assign({},field);                // clone ALL object fields
 
-    var listFields = ["perspective","target","start","end"];    // then replace arrays with clones
+    var listFields = ["perspective","target","start","end","targetVal"];    // then replace arrays with clones
 
     listFields.forEach((listField) => {
 	if(clone.hasOwnProperty(listField)) {
@@ -366,15 +367,16 @@ function metaFieldData(xmlObj)
     //   To do all of this, a graph is created, and then a topographical
     //   sort is done upon it.
 
-    var perspectives = [ "match", "competition", "robot", "year" ];
+    var perspectives = [ "match", "competition", "robot", "year", "top" ];
 
     var returnData = {};
     
     perspectives.forEach((perspective) => {
 
-	// do each perspective separately, then add them back to back
+	// do each perspective separately
 
 	var graph = [];
+	var selfDependentFields = [];
 
 	var dependencyFields = ["target","start","end"];
     
@@ -384,7 +386,11 @@ function metaFieldData(xmlObj)
 		dependencyFields.forEach((dependencyField) => {
 		    if(field.hasOwnProperty(dependencyField)) {
 			field[dependencyField].forEach((f) => {
-			    graph.push([name,f]);
+			    if(name == f) {                      // apparent self-dependent names are level-to-level
+				selfDependentFields.push(name);  //   so no dependencies are useful
+			    } else {
+				graph.push([name,f]);            // otherwise they are part of the topo-sort
+			    }
 			})
 		    }
 		});
@@ -398,6 +404,10 @@ function metaFieldData(xmlObj)
     
 	var legalOrder = toposort(graph).reverse();
 
+	// add the self-dependent fields to the end of the legal order
+
+	legalOrder.push.apply(legalOrder,selfDependentFields);
+
 	// now we take that legal order, and ensure that fields are in
 	// that order. Note that legalOrder is a superset of all fields,
 	// so we use that to enumerate the list.
@@ -405,7 +415,11 @@ function metaFieldData(xmlObj)
 	var perspectiveFields = [];
     
 	legalOrder.forEach(function(orderedField) {
-	    var target = fields.find((fieldObject) => fieldObject.name == orderedField);
+	    var target = fields.find((fieldObject) => {
+		var rightField = fieldObject.name == orderedField;
+		var rightPerspective = fieldObject.perspective.includes(perspective);
+		return(rightField && rightPerspective);
+	    });
 	    if(target) {
 		var clone = fieldClone(target);
 		clone.perspective = [perspective];      // each fields ends-up with only ONE perspective

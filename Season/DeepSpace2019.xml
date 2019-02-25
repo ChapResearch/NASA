@@ -137,6 +137,8 @@
       <label>HAB Assist Level 1</label>
       <type>int</type>            <!-- The int <type> which returns an single int value to the database -->
       <default>0</default>
+      <min>0</min>
+      <max>2</max>
     </field>
 
     <field><!--intChoice-->                   
@@ -144,6 +146,8 @@
       <label>HAB Assist Level 2</label>
       <type>int</type>
       <default>0</default>
+      <min>0</min>
+      <max>2</max>
     </field>
 
     <field><!--intChoice-->       
@@ -151,13 +155,17 @@
       <label>HAB Assist Level 3</label>
       <type>int</type>
       <default>0</default>
+      <min>0</min>
+      <max>2</max>      
     </field>
 
     <field><!--intChoice-->    
       <name>gamePieceOffRocket</name>
       <label>Game Piece Off Rocket</label>
       <type>int</type>
-      <default>0</default>
+      <default>0</default>      
+      <min>0</min>
+      <max>30</max>
     </field>
 
     <field><!--intChoice-->          
@@ -165,12 +173,16 @@
       <label>Game Piece Off Cargo</label>
       <type>int</type>
       <default>0</default>
+      <min>0</min>
+      <max>30</max>
     </field>
 
     <field><!--intChoice-->                   
       <name>defensivePenalty</name>
       <label>Defensive Penalty</label>
       <type>int</type>
+      <min>0</min>
+      <max>30</max>
     </field>
     
 
@@ -299,20 +311,28 @@
       </choice>
       <choice>
 	<label>No</label>
-	<value>2</value>
-      </choice>
-      <choice>
-	<label>Unknown</label>
 	<value>0</value>
       </choice>
     </field>
 
     <field>
-      <name>defenseTeamNum</name>
+      <name>defenseTeamNum1</name>
       <label>on which team? (team #)</label>
       <type>text</type>
     </field>
 
+    <field>
+      <name>defenseTeamNum2</name>
+      <label>on which team?</label>
+      <type>text</type>
+    </field>
+
+    <field>
+      <name>defenseTeamNum3</name>
+      <label>on which team?</label>
+      <type>text</type>
+    </field>
+    
     <field>
       <name>startClimb</name>
       <label>Start Climb</label>
@@ -542,7 +562,7 @@
       <type>event</type>
       <name>cargoScoredCargoMiddle</name>
       <ewid>cargo</ewid>
-      <location>58,55</location>
+      <location>58,60</location>
     </field>
 
     <field>
@@ -570,11 +590,25 @@
     </field>
 
     <field>
-      <name>defenseTeamNum</name>
+      <name>defenseTeamNum1</name>
       <type>textInput</type>
       <size>20,3</size>
       <location>5,45</location>
     </field>
+
+    <field>
+      <name>defenseTeamNum2</name>
+      <type>textInput</type>
+      <size>20,3</size>
+      <location>5,51</location>
+    </field>
+
+    <field>
+      <name>defenseTeamNum3</name>
+      <type>textInput</type>
+      <size>20,3</size>
+      <location>5,57</location>
+    </field>    
 
 <!-- ################ END GAME ################## -->
     
@@ -1041,7 +1075,7 @@
     <!-- METADATA FOR CARGO CARGO SCORING-->
 
     <field> <!-- Times for Cargo based on Cargo Pickup events and any Cargo score on Cargo -->
-      <name>cargoScoredCargoTime</name>
+      <name>cargoScoredCargoTimes</name>
       <type>event</type>
       <label>Cargo scoring times</label>
       <perspective>match</perspective>
@@ -1136,7 +1170,7 @@
       <target>cargoScoredTimes</target>
     </field>
 
-    <!-- ###################### END PANEL SCORING EVENTS ##################### -->
+    <!-- ###################### END Cargo SCORING EVENTS ##################### -->
 
 
 
