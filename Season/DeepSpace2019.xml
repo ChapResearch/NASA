@@ -945,7 +945,6 @@
       <type>event</type>
       <label>Cargo scoring times</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>      
       <op>delta</op>
       <start>panelPickup</start>
       <end>panelScoredCargo</end>
@@ -956,7 +955,6 @@
       <type>int</type>
       <label>Cargo scoring counts</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
       <op>count</op>
       <target>panelScoredCargoTimes</target>
     </field>
@@ -966,7 +964,6 @@
       <type>int</type>
       <label>Cargo scoring times average</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
       <op>average</op>
       <target>panelScoredCargoTimes</target>
     </field>
@@ -979,7 +976,6 @@
       <type>array</type>
       <label>Rocket scoring times</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>      
       <op>delta</op>
       <start>panelPickup</start>
       <end>panelScoredRocket</end>
@@ -990,7 +986,6 @@
       <type>int</type>
       <label>Rocket scoring Total</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
       <op>count</op>
       <target>panelScoredRocket</target>
     </field>
@@ -1000,7 +995,6 @@
       <type>int</type>
       <label>Rocket scoring times average</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>      
       <op>average</op>
       <target>panelScoredRocketTimes</target>
     </field>
@@ -1010,7 +1004,6 @@
       <type>int</type>
       <label>Total Panels Scored</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
       <op>sum</op>
       <target>panelScoredRocketTotal</target>
       <target>panelScoredCargoTotal</target>
@@ -1031,7 +1024,6 @@
       <type>int</type>
       <label>Scored Panel Cycle Time Average</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>      
       <op>average</op>
       <target>panelScoredTimes</target>
     </field>
@@ -1079,7 +1071,6 @@
       <type>event</type>
       <label>Cargo scoring times</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>      
       <op>delta</op>
       <start>cargoPickup</start>
       <end>cargoScoredCargo</end>
@@ -1090,7 +1081,6 @@
       <type>int</type>
       <label>Cargo scoring counts</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
       <op>count</op>
       <target>cargoScoredCargoTimes</target>
     </field>
@@ -1100,9 +1090,18 @@
       <type>int</type>
       <label>Cargo scoring times average</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
       <op>average</op>
       <target>cargoScoredCargoTimes</target>
+    </field>
+
+    <field> <!-- Gets average time for cargo scoring based on cargoScoredCargoTime -->
+      <name>cargoScoredCargoTimeAverage</name>
+      <type>int</type>
+      <label>Cargo scoring times average</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>average</op>
+      <target>cargoScoredCargoTimeAverage</target>
     </field>
 
 
@@ -1113,7 +1112,6 @@
       <type>array</type>
       <label>Rocket scoring times</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>      
       <op>delta</op>
       <start>cargoPickup</start>
       <end>cargoScoredRocket</end>
@@ -1124,7 +1122,6 @@
       <type>int</type>
       <label>Rocket scoring Total</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
       <op>count</op>
       <target>cargoScoredRocket</target>
     </field>
@@ -1134,7 +1131,6 @@
       <type>int</type>
       <label>Rocket scoring times average</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>      
       <op>average</op>
       <target>cargoScoredRocketTimes</target>
     </field>
@@ -1144,7 +1140,6 @@
       <type>int</type>
       <label>Total Cargos Scored</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>
       <op>sum</op>
       <target>cargoScoredRocketTotal</target>
       <target>cargoScoredCargoTotal</target>
@@ -1165,7 +1160,6 @@
       <type>int</type>
       <label>Scored Cargo Cycle Time Average</label>
       <perspective>match</perspective>
-      <perspective>competition</perspective>      
       <op>average</op>
       <target>cargoScoredTimes</target>
     </field>
