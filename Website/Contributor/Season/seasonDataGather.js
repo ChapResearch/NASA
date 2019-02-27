@@ -12,6 +12,8 @@ function seasonDataGather(seasonXML)
     gatherIntChoiceData(seasonData);
     gatherCheckboxData(seasonData);
     gatherEventData(seasonData);
+    console.log("we about to go in bois");
+    gatherTextInputData(seasonData);
 
     console.log(seasonData);
     return seasonData;
@@ -84,5 +86,22 @@ function gatherEventData(data)
 										      data[name].push(time);
 										  });
 						     });
+}
+
+
+function gatherTextInputData(data)
+{
+    console.log("we in bois");
+    $('div.content').find(".NASA-field-textInput").each(function()
+						     {
+							 $(this).find("textarea").each(function()
+										  {
+										      var name = $(this).attr("name");
+										      var text = "";										      
+										      var text = $(this).val();
+										      data[name] = text;
+										  });
+						     });
+
 }
 
