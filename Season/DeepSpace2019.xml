@@ -772,6 +772,78 @@
   <views>
 
     <view>
+      <name>Robot Ranking</name>
+      <label>Shows Master AAR rankings for all robots in a year.</label>
+      <type>table</type>
+      <perspective>robot</perspective>
+      <constraint>year</constraint>
+      <field>robot</field>
+      <field>masterAAR</field>
+      <sort>masterAAR,DESC</sort>
+      <format>masterAAR,toFixed,2</format>
+    </view>
+
+    <view>
+      <name>Robot Ranking (bar)</name>
+      <label>Shows Master AAR rankings for all robots in a year.</label>
+      <type>bar</type>
+      <perspective>robot</perspective>
+      <constraint>year</constraint>
+      <field>robot</field>
+      <field>masterAAR</field>
+      <sort>masterAAR,ASC</sort>
+    </view>
+
+    <view>
+      <name>Robot Ranking (pie)</name>
+      <label>Shows Master AAR rankings for all robots in a year.</label>
+      <type>pie</type>
+      <perspective>robot</perspective>
+      <constraint>year</constraint>
+      <field>robot</field>
+      <field>masterAAR</field>
+      <sort>masterAAR,ASC</sort>
+    </view>
+
+    <view>
+      <name>Detailed Robot Ranking (bar)</name>
+      <label>Shows Detailed AAR rankings for all robots in a year.</label>
+      <type>bar</type>
+      <perspective>robot</perspective>
+      <constraint>year</constraint>
+      <field>robot</field>
+      <field>masterAAR</field>
+      <field>scoringAAR</field>
+      <field>HABAAR</field>
+      <field>cycleTimeAAR</field>
+      <sort>masterAAR,ASC</sort>
+    </view>
+
+    <view>
+      <name>Robot Ranking at Competition</name>
+      <label>Shows Master AAR rankings for all robots in a selected competition.</label>
+      <type>table</type>
+      <perspective>competition</perspective>
+      <constraint>year</constraint>
+      <constraint>competition</constraint>
+      <field>robot</field>
+      <field>masterAAR</field>
+      <sort>masterAAR,DESC</sort>
+    </view>
+
+    <view>
+      <name>Robot Ranking at Competition (bar)</name>
+      <label>Shows Master AAR rankings for all robots in a selected competition.</label>
+      <type>bar</type>
+      <perspective>competition</perspective>
+      <constraint>year</constraint>
+      <constraint>competition</constraint>
+      <field>robot</field>
+      <field>masterAAR</field>
+      <sort>masterAAR,ASC</sort>
+    </view>
+
+    <view>
       <name>Robot Competitions</name>
       <label>Lists all of the competitions for a given robot - along with summary data.</label>
       <type>table</type>
@@ -926,6 +998,30 @@
       <target>panelScoredRocketLvl3</target>
     </field>
 
+    <field> <!-- totals needed for computing AAR -->
+      <name>panelScoredRocketLv1Total</name>
+      <label>Panels scored on rocket lev 1</label>
+      <perspective>match</perspective>
+      <op>count</op>
+      <target>panelScoredRocketLvl1</target>
+    </field>
+      
+    <field> <!-- totals needed for computing AAR -->
+      <name>panelScoredRocketLv2Total</name>
+      <label>Panels scored on rocket lev 2</label>
+      <perspective>match</perspective>
+      <op>count</op>
+      <target>panelScoredRocketLvl2</target>
+    </field>
+      
+    <field> <!-- totals needed for computing AAR -->
+      <name>panelScoredRocketLv3Total</name>
+      <label>Panels scored on rocket lev 3</label>
+      <perspective>match</perspective>
+      <op>count</op>
+      <target>panelScoredRocketLvl3</target>
+    </field>
+      
     <field> <!-- Combine raw data for Cargo panel Scored events -->
       <name>panelScoredCargo</name>
       <type>array</type>
@@ -1164,6 +1260,32 @@
       <target>cargoScoredTimes</target>
     </field>
 
+
+    <field> <!-- totals needed for computing AAR -->
+      <name>cargoScoredRocketLv1Total</name>
+      <label>Cargo scored on rocket lev 1</label>
+      <perspective>match</perspective>
+      <op>count</op>
+      <target>cargoScoredRocketLvl1</target>
+    </field>
+      
+    <field> <!-- totals needed for computing AAR -->
+      <name>cargoScoredRocketLv2Total</name>
+      <label>Cargo scored on rocket lev 2</label>
+      <perspective>match</perspective>
+      <op>count</op>
+      <target>cargoScoredRocketLvl2</target>
+    </field>
+      
+    <field> <!-- totals needed for computing AAR -->
+      <name>cargoScoredRocketLv3Total</name>
+      <label>Cargo scored on rocket lev 3</label>
+      <perspective>match</perspective>
+      <op>count</op>
+      <target>cargoScoredRocketLvl3</target>
+    </field>
+    
+
     <!-- ###################### END Cargo SCORING EVENTS ##################### -->
 
 
@@ -1174,7 +1296,7 @@
       <name>HABEndPos3Percent</name>
       <type>int</type>
       <label>Percent Succes HAB Level 3</label>
-      <perspective>competition</perspective>
+      <perspective>match</perspective>
       <op>percent</op>
       <target>HABEndPos</target>
       <targetVal>3</targetVal>
@@ -1184,39 +1306,68 @@
       <name>HABEndPos2Percent</name>
       <type>int</type>
       <label>Percent Succes HAB Level 2</label>
-      <perspective>competition</perspective>
+      <perspective>match</perspective>
       <op>percent</op>
       <target>HABEndPos</target>
       <targetVal>2</targetVal>
     </field>
 
+    <field> <!-- Percent HAB Level 1 -->
+      <name>HABEndPos1Percent</name>
+      <type>int</type>
+      <label>Percent Success HAB Level 1</label>
+      <perspective>match</perspective>
+      <op>percent</op>
+      <target>HABEndPos</target>
+      <targetVal>1</targetVal>
+    </field>
+
+    <field> <!-- Success in crossing HAB line -->
+      <name>startingSuccess</name>
+      <type>int</type>
+      <perspective>match</perspective>
+      <label>Percent Success Crossing HAB Line</label>
+      <op>contains</op>
+      <target>crossHABLine</target>
+      <targetVal>3</targetVal>
+    </field>
+
+    <field> <!-- Starting Position 1 -->
+      <name>startingPos1</name>
+      <type>int</type>
+      <label>Percent Starting Position 1</label>
+      <perspective>match</perspective>
+      <op>contains</op>
+      <target>crossHABLine</target>
+      <targetVal>1</targetVal>   <!-- started on 1 -->
+    </field>
+    
+    <field> <!-- Starting Position 2 -->
+      <name>startingPos2</name>
+      <type>int</type>
+      <label>Percent Starting Position 2</label>
+      <perspective>match</perspective>
+      <op>contains</op>
+      <target>crossHABLine</target>
+      <targetVal>2</targetVal>   <!-- started on 2 -->
+    </field>
+    
     <field> <!-- Starting Position 2 Success -->
       <name>startingPos2Success</name>
       <type>int</type>
-      <label>Percent Succes Off Starting Position 2</label>
-      <perspective>competition</perspective>
-      <op>percent</op>
+      <label>Success Starting Position 2</label>
+      <perspective>match</perspective>
+      <op>contains</op>
       <target>crossHABLine</target>
-      <targetVal>1</targetVal>
-      <targetVal>2</targetVal>      
+      <targetVal>2</targetVal>
+      <targetVal>3</targetVal>
     </field>
-
-    <field> <!-- Starting Position 1 Success -->
-      <name>startingPos1Success</name>
-      <type>int</type>
-      <label>Percent Success Off Starting Position 1</label>
-      <perspective>competition</perspective>
-      <op>percent</op>
-      <target>crossHABLine</target>
-      <targetVal>0</targetVal>
-      <targetVal>2</targetVal>      
-    </field>
-
+    
     <field> <!--Average Number of Level 3 assists-->
       <name>averageHAB3Assists</name>
       <type>int</type>
       <label>Average Level 3 HAB Assists</label>
-      <perspective>competition</perspective>
+      <perspective>match</perspective>
       <op>average</op>
       <target>HABAssist3</target>
     </field>
@@ -1225,7 +1376,7 @@
       <name>averageHAB2Assists</name>
       <type>int</type>
       <label>Average Level 2 HAB Assists</label>
-      <perspective>competition</perspective>
+      <perspective>match</perspective>
       <op>average</op>
       <target>HABAssist2</target>
     </field>
@@ -1234,7 +1385,7 @@
       <name>averageHAB1Assists</name>
       <type>int</type>
       <label>Average Level 1 HAB Assists</label>
-      <perspective>competition</perspective>
+      <perspective>match</perspective>
       <op>average</op>
       <target>HABAssist1</target>
     </field>
@@ -1390,11 +1541,150 @@
       <name>climbTimeAverage</name>
       <type>int</type>
       <label>Average Climb Time</label>
-      <perspective>competition</perspective>
+      <perspective>match</perspective>
       <op>average</op>
       <target>climbTime</target>
     </field>
-    
+
+    <!-- AAR Calculations -->
+
+    <field>
+      <name>panelAAR</name>
+      <type>number</type>
+      <label>Panel AAR</label>
+      <perspective>match</perspective>
+      <op>weight</op>
+      <target>panelScoredRocketLv1Total</target>
+      <low>0</low> <high>4</high> <multiplier>4</multiplier>
+      <target>panelScoredRocketLv2Total</target>
+      <low>0</low> <high>4</high> <multiplier>8</multiplier>
+      <target>panelScoredRocketLv3Total</target>
+      <low>0</low> <high>4</high> <multiplier>14</multiplier>
+      <target>panelScoredCargoTotal</target>
+      <low>0</low> <high>8</high> <multiplier>6</multiplier>
+    </field>
+
+    <field>
+      <name>cargoAAR</name>
+      <type>number</type>
+      <label>Cargo AAR</label>
+      <perspective>match</perspective>
+      <op>weight</op>
+      <target>cargoScoredRocketLv1Total</target>
+      <low>0</low> <high>4</high> <multiplier>4</multiplier>
+      <target>cargoScoredRocketLv2Total</target>
+      <low>0</low> <high>4</high> <multiplier>8</multiplier>
+      <target>cargoScoredRocketLv3Total</target>
+      <low>0</low> <high>4</high> <multiplier>14</multiplier>
+      <target>cargoScoredCargoTotal</target>
+      <low>0</low> <high>8</high> <multiplier>6</multiplier>
+    </field>
+
+    <field>
+      <name>scoringAAR</name>
+      <type>number</type>
+      <label>Scoring AAR</label>
+      <perspective>match</perspective>
+      <op>weight</op>
+      <target>panelAAR</target>
+      <low>0</low> <high>32</high> <multiplier>18</multiplier>
+      <target>cargoAAR</target>
+      <low>0</low> <high>32</high> <multiplier>12</multiplier>
+    </field>
+
+    <field>
+      <name>scoringAAR</name>
+      <type>number</type>
+      <label>Scoring AAR</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>average</op>
+      <target>scoringAAR</target>
+    </field>
+
+    <field>
+      <name>cycleTimeAAR</name>
+      <type>number</type>
+      <label>Cycle Time AAR</label>
+      <perspective>match</perspective>
+      <op>weight</op>
+      <target>panelScoredRocketTimeAverage</target>
+      <low>30</low> <high>4</high> <multiplier>15</multiplier>
+      <target>panelScoredCargoTimeAverage</target>
+      <low>30</low> <high>4</high> <multiplier>12</multiplier>
+      <target>cargoScoredRocketTimeAverage</target>
+      <low>30</low> <high>4</high> <multiplier>15</multiplier>
+      <target>cargoScoredCargoTimeAverage</target>
+      <low>30</low> <high>4</high> <multiplier>12</multiplier>
+      <target>climbTimeAverage</target>
+      <low>30</low> <high>3</high> <multiplier>10</multiplier>
+    </field>
+
+    <field>
+      <name>cycleTimeAAR</name>
+      <type>number</type>
+      <label>Cycle Time AAR</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>average</op>
+      <target>cycleTimeAAR</target>
+    </field>
+
+    <field>
+      <name>HABAAR</name>
+      <type>number</type>
+      <label>HAB AAR</label>
+      <perspective>match</perspective>
+      <op>weight</op>
+      <target>HABEndPos3Percent</target>
+      <low>0</low> <high>100</high> <multiplier>10</multiplier>
+      <target>HABEndPos2Percent</target>
+      <low>0</low> <high>100</high> <multiplier>5</multiplier>
+      <target>HABEndPos1Percent</target>
+      <low>0</low> <high>100</high> <multiplier>1</multiplier>
+      <target>startingPos2Success</target>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
+      <target>averageHAB3Assists</target>      
+      <low>0</low> <high>2</high> <multiplier>15</multiplier>
+      <target>averageHAB2Assists</target>      
+      <low>0</low> <high>2</high> <multiplier>9</multiplier>
+    </field>
+
+    <field>
+      <name>HABAAR</name>
+      <type>number</type>
+      <label>HAB AAR</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>average</op>
+      <target>HABAAR</target>
+    </field>
+
+    <field>
+      <name>masterAAR</name>
+      <type>number</type>
+      <label>Master AAR</label>
+      <perspective>match</perspective>
+      <op>weight</op>
+      <target>scoringAAR</target>
+      <low>0</low> <high>30</high> <multiplier>54</multiplier>
+      <target>HABAAR</target>
+      <low>0</low> <high>43</high> <multiplier>32.25</multiplier>
+      <target>cycleTimeAAR</target>
+      <low>0</low> <high>55.8</high> <multiplier>6.975</multiplier>
+    </field>
+
+    <field>
+      <name>masterAAR</name>
+      <type>number</type>
+      <label>Master AAR</label>
+      <perspective>competition</perspective>
+      <perspective>robot</perspective>
+      <op>average</op>
+      <target>masterAAR</target>
+    </field>
+
+
   </metaData>
     
 </app>
