@@ -110,4 +110,5 @@ function reset(seasonXML)
 
     
     $('div.content').find(".NASA-event-window").empty();
+    $('div.content').find("textarea").val("");
 }
