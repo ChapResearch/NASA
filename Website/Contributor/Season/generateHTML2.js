@@ -292,14 +292,23 @@ function generateIntChoiceField(layoutField, elementField)
     console.log(defaultValue);
     if(defaultValue=="")
 	defaultValue = 0;
-	
+
+    var min = elementField.find('min');
+    var max = elementField.find('max');
     
     output += '<div class="NASA-field-intChoice" ' + fieldPosition(layoutField) + '>';
     output += '<div>';    
     output += label;
     output += '</div>';
     output += '<div class="numSpinner">';    
-    output += '<input type="number" name="' + name + '" step="1" value = "' + defaultValue + '">';
+    output += '<input type="number" name="' + name + '" step="1" ';
+    if(min.length) {
+	output += 'min="' + min.text() + '" ';
+    }
+    if(max.length) {
+	output += 'max="' + max.text() + '" ';
+    }
+    output += 'value = "' + defaultValue + '">';
     output += '</div>';    
     output += '</div>';
     
