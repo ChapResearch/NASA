@@ -1,0 +1,470 @@
+div.top-bar {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 110px;
+    width: 100%;
+    background-color: #5555ff;
+    color: white;
+    font-family: 'Arial',sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+body > div.content {
+    position: absolute;
+    top: 110px;
+    left: 0px;
+    width: calc(100% - 16px);
+    height: calc(100% - 126px );
+    border: 8px solid #7777ff;
+    overflow: hidden;
+    min-width: 1175px;
+    min-height: 650px;
+}
+
+#contentBirdy {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    width: 150px;
+}
+
+.menu-buttons {
+    position: absolute;
+    right: 0px;
+    top: 27px;
+}
+.menu-button {
+    float: left;
+    font-size: 36px;
+    color: white;
+    font-family: sans-serif;
+    margin-right: 30px;
+    cursor: pointer;
+    background-color: #5555ff;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.menu-button:hover {
+    color: #3333ff;
+    background-color: #8888ff;
+}
+
+.listbox {
+    position: absolute;
+    top: 10px;
+    left: calc((100% - 516px) / 2);
+    width: 500px;
+    height: calc(100% - 200px);
+    border: 8px solid #ff7777;
+    border-radius: 5px;
+    background-color: #bbbbff;
+    text-align: center;
+    padding: 5px;
+    z-index: 100;
+}
+
+.listbox .throbber {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    left: calc((100% - 100px) / 2);
+    top: calc((100% - 100px) / 2);
+}
+
+.listbox > .title {
+    width: 100%;
+    height: 40px;
+    font-size: 30px;
+    font-family: sans-serif;
+    background-color: #ff7777;
+    color: white;
+}
+
+.listbox > .list {
+    margin: 10px;
+    height: calc(100% - 160px);
+    width: calc(100% - 20px);
+    background-color: white;
+    border: 2px solid gray;
+    overflow: auto;
+}
+
+.listbox > .prompt {
+    font-family: sans-serif;
+    font-size: 18px;
+    color: black;
+}
+
+.listbox > .menu-button {
+    margin-top: 10px;
+    margin-left: calc((100% - 130px) / 2);
+    background-color: red;
+}
+
+.listbox > .menu-button:hover {
+    color: red;
+    background-color: #ff8888;
+}
+
+.list-choice {
+    padding-left: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: calc(100% - 5px);
+    font-size: 20px;
+    font-family: sans-serif;
+    text-align: left;
+    background-color: #ddddff;
+    cursor: pointer;
+}
+
+.list-choice.even {
+    background-color: #eeeeff;
+}
+
+.list-choice:hover {
+    background-color: #8888ff;
+}
+
+.list-choice .list-icon {
+    float: left;
+    margin-right: 10px;
+    padding-bottom: 20px;
+    padding-top: 10px;
+}
+
+.list-choice .list-icon img {
+    height: 50px;
+    width: 50px;
+}
+
+.list-choice .list-name {
+    font-weight: bold;
+}
+.list-choice .list-label {
+}
+    
+.list-constraint {
+    font-size: 15px;
+    font-weight: bold;
+    font-family: sans-serif;
+    padding-left: 10px;
+}
+
+.constraint-year {
+    color:black;
+}
+
+.constraint-competition {
+    color: red;
+}
+.constraint-robot {
+    color: blue;
+}
+.constraint-match {
+    color: green;
+}
+
+.constraint-box {
+    margin: 20px;
+}
+
+.results-box {
+}
+
+.constraint-input {
+    width: 125px;
+    border: 3px solid grey;
+    margin-left: 20px;
+    float: left;
+    padding-left: 10px;
+    padding-bottom: 10px;
+    border-radius: 5px;
+    height: 50px;
+    position: relative;   /* necessary for lower level positioning */
+}
+
+.constraint-input.constraint-input-competition {
+    width: 175px;
+}
+
+.constraint-input.constraint-input-match {
+    width: 75px;
+}
+
+.constraint-input select {
+    background: url("select-arrow-22x30.png") no-repeat 97% 0;
+    font-size: 24px;
+    height: 30px;
+    width: 100%;
+    background-color: #3b8ec2;
+    border-radius: 5px;
+    border: 0px;
+    color: white;
+}
+
+.constraint-input select[disabled] {
+    background-color: #aaaaaa;
+}
+
+.constraint-input > div.content:not(.single) {    /* used for buttons only */
+    margin: 0px;
+    padding: 0px;
+    box-shadow: 5px 5px 10px #777777;
+    width: 90%;
+    backgound-color: transparent;
+    border-radius: 5px;
+}
+
+.constraint-input > div.content.single {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: sans-serif;
+    color: red;
+    padding-right: 10px;
+}
+
+.constraint-input > .title {
+    position: relative;
+    top: -10px;
+    left: 5px;
+    background-color: white;
+    font-size: 18px;
+    font-family: sans-serif;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.constraint-input.go {
+    font-size: 30px;
+    font-family: sans-serif;
+    font-weight: bold;
+    padding-top: 13px;
+    padding-left: 5px;
+    width: 60px;
+    height: 38px;
+    background-color: #3b8ec2;
+    color: white;
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+.constraint-input.go.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.constraint-input.go.disabled:hover {
+    opacity: 0.3;
+}
+
+.constraint-input.go:hover {
+    opacity: 1;
+}
+.constraint-input.go:active {
+    opacity: 0.6;
+}
+
+.viewtitle-box {
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-family: sans-serif;
+    height: 50px;
+    border: 3px solid grey;
+    margin-left: 20px;
+    float: left;
+    padding-left: 10px;
+    padding-bottom: 10px;
+    border-radius: 5px;
+    max-width: 400px;
+}
+
+.viewtitle-box .title {
+    position: relative;
+    top: -15px;
+    left: 5px;
+    background-color: white;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.viewtitle-box .description {
+    display: table;
+    position: relative;
+    top: -15px;
+    padding-right: 5px;
+    height: 40px;
+}
+
+.viewtitle-box .description div {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+/*** the results box is absolutely positioned to provide the ability to
+     size it for the screen ****/
+
+.results-box {
+    clear: both;
+    position: absolute;
+    top: 100px;
+    left: 20px;
+    height: calc(100% - 150px);
+    width: calc(100% - 30px);
+    background-color: transparent;
+}
+
+.results-box > table {
+    border: 2px solid blue;
+    font-family: sans-serif;
+    font-size: 15px;
+    color: black;
+    background-color: white;
+    border-collapse: collapse;
+}
+
+.results-box > table > thead > tr > th {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #3b8ec2;
+    padding-right: 5px;
+    padding-left: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.results-box > table > thead > tr > th + th {
+    border-left: 1px solid #cccccc;
+}
+
+.results-box > table > thead > tr {
+    border-bottom: 2px solid black;
+}
+
+.results-box > table > tbody > tr > td {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border-left: 2px solid blue;
+    border-bottom: 2px solid white;
+}
+
+.results-box > table > tbody > tr > td:last-child {
+    border-right: 2px solid blue;
+}
+
+    
+.results-box > table > tbody > tr > td + td {
+    border-left: 1px solid #aaaaaa;
+}
+
+.results-box > table > tbody > tr {
+    background-color: #eeeeee;
+}
+
+.results-box > table > tbody > tr:nth-child(odd) {
+    background-color: #bcdaeb;
+}
+
+.results-box > table > tbody > tr:hover {
+    background-color: #3b8ec2;
+    color: white;
+}
+
+.results-box > table > tfoot > tr {
+    font-size: 10px;
+    font-weight: bold;
+    color: white;
+    background-color: #3b8ec2;
+}
+.results-box > table > tfoot > tr > td {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 5px;
+}
+
+/******** sorting header symbols **********/
+
+.sortsymbol {
+    color: white;
+    opacity: .1;
+}
+
+.sortsymbol:hover {
+    opacity: .7;
+}
+
+.sortsymbol.selected,
+.sortsymbol.selected:hover {
+    opacity: 1;
+}
+
+.sortsymbol.up {
+    position: relative;
+    left: -3px;
+}
+
+.headersymbol.x {
+    color: white;
+    opacity: .1;
+    padding-left: 5px;
+}
+.headersymbol.x:hover {
+    opacity: .9;
+}
+.headersymbol.x.no {
+    cursor: not-allowed;
+}
+
+/******** multi selection ********/
+
+div.multi-on {
+    position: absolute;
+    top: -20px;
+    right: 5px;
+    font-size: 35px;
+    font-family: sans-serif;
+    cursor: pointer;
+}
+
+div.constraint-box-multi {
+    margin-left: 500px;
+}
+    
+div.constraint-input-multi {
+    position: relative;
+    clear: both;
+    width: 420px;
+    border: 3px solid grey;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: white;
+    z-index: 1;
+}
+
+div.multi-selection {
+    font-size: 24px;
+    font-family: sans-serif;
+    border-radius: 5px;
+    border: 0px;
+    color: white;
+    padding: 2px 5px 2px 5px;
+    width: auto;
+    text-align: center;
+    margin: 4px;
+    float: left;
+    background-color: #aaaaaa;
+    cursor: pointer;
+}
+
+div.multi-selection.selected {
+    background-color: #3b8ec2;
+}

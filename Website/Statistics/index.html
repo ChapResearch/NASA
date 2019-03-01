@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" type="text/css" href="statistics.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.8.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.8.2/firebase-database.js"></script>
+    <script src="statistics.js"></script>
+    <script src="firebase.js"></script>
+    <script src="view.js"></script>
+  </head>
+  <body>
+    <div class="overlay" style="display:none"></div>
+    <div class="top-bar">
+      <a href=".."><img src="nasa-logo-white-250x110.png"></a>
+      <div class="menu-buttons">
+	<div class="menu-button list" title="Choose a new statistic view">List</div>
+	<div class="menu-button reset" title="Reset current display to default (no refresh)">Reset</div>
+	<div class="menu-button refresh" title="Refresh data in this view">Refresh</div>
+	<div class="menu-button back" title="Go back to main page">Back</div>
+	</div>
+    </div>
+    <div class="content">
+      <div class="listbox" style="display:none">
+	<div class="title">Available Views</div>
+	<img src="throbber.gif" class="throbber" style="display:none">
+	<div class="list"></div>
+	<div class="prompt">(click on a view to load it)</div>
+	<div class="menu-button cancel" title="">Cancel</div>
+      </div>
+      <img id="contentBirdy" src="birdy.png">
+      <div class="viewtitle-box">
+	<span class="title"></span><br>
+	<div class="description"><div>Please click List and select view</div></div>
+      </div>
+      <div class="constraint-box">
+	<div class="constraint-input constraint-input-year">
+	  <span class="title">Year</span><br>
+	  <div class="multi-on" data-selector="year">&hellip;</div>
+	  <div class="content"></div>
+	</div>
+	<div class="constraint-input constraint-input-robot">
+	  <span class="title">Robot</span><br>
+	  <div class="multi-on" data-selector="robot">&hellip;</div>
+	  <div class="content"></div>
+	</div>
+	<div class="constraint-input constraint-input-competition">
+	  <span class="title">Competition</span><br>
+	  <div class="multi-on" data-selector="competition">&hellip;</div>
+	  <div class="content"></div>
+	</div>
+	<div class="constraint-input constraint-input-match">
+	  <span class="title">Match</span><br>
+	  <div class="multi-on" data-selector="match">&hellip;</div>
+	  <div class="content"></div>
+	</div>
+	<div class="constraint-input go">GO!</div>
+      </div>
+      <div class="constraint-box-multi">
+	<div class="constraint-input-multi constraint-input-multi-year" style="display:none">
+	</div>
+	<div class="constraint-input-multi constraint-input-multi-robot" style="display:none">
+	</div>
+	<div class="constraint-input-multi constraint-input-multi-competition" style="display:none">
+	</div>
+	<div class="constraint-input-multi constraint-input-multi-match" style="display:none">
+	</div>
+      </div>
+	
+      <div class="results-box">
+      </div>
+    </div>
+  </body>
+</html>
