@@ -22,14 +22,14 @@ var toposort = require("toposort");
 
 var metaData = require('./calcMetaData');
 
-//
-// statistics() - compute statistics for a robot, based upon being notified
-//                that a change in the database occurred.
-//
-exports.statistics = functions.database.ref('{year}/{robot}/{competition}/{match}').
-    onCreate((snapshot,context) => {
+var METADATA = "_metaData";
 
-	var config = {
+//
+// firebaseInit() - inits if necessary.
+//
+function firebaseInit()
+{
+    var NASA_FBconfig = {
 	    apiKey: "AIzaSyAJtiy-xB69zjg7VRdBiEDmtupBeoGgS9A",
 	    authDomain: "nasa-7a363.firebaseapp.com",
 	    databaseURL: "https://nasa-7a363.firebaseio.com",
@@ -38,46 +38,213 @@ exports.statistics = functions.database.ref('{year}/{robot}/{competition}/{match
 	    messagingSenderId: "885889218553"
 	};
 
+
+    // don't initialize the app if it already appears to be intialized
+    //   note that this only works right if we have 1 app - otherwise,
+    //   this would need to see if THIS app is initialized
+    
+    if(firebase.apps.length == 0) {
+	firebase.initializeApp(NASA_FBconfig);
+//	console.log("initialized");
+    } else {
+//	console.log("didn't initialize");
+    }
+}
+
+//
+// superiorStats() - compute the statistics at all upper levels beyond the match.
+//                   This is a URL that is called to refresh the stats. It CAN be
+//                   called like a CRON job, or can be called from the UI.
+//
+exports.superiorStats = functions.https.onRequest((request, response) => {
+
+    // the request itslef is currently ignored, just calling it causes the computation
+    //   of the superior stats.
+
+    firebaseInit();
+
+    // get the ENTIRE DATABASE (yikes) for doing this computation
+    
+    var ref = firebase.database().ref("/");
+    var data;
+
+    ref.once("value")
+        .then((snapshot) => {
+	    data = snapshot.val();
+	    return(getNASAdataJSON());
+	})
+	.then((nasaData) => metaData.calcMetaDataUpper(data,nasaData.metaData,ref))
+
+    // The above routine used to update all of the data, then the following would
+    // slam it all back into the database. But this caused a cascade of things that
+    // "looked" like they changed. So now the routine does the changes directly to
+    // the right spot in the database.  OLD CODE BELOW:
+    //
+    //	.then((newvalue) => ref.set(newvalue))
+    
+    // and if things go wrong
+    
+	.catch((e)=>console.log(e));
+
+    response.send("OK");
+    return(1);
+    
+});
+
+//
+// matchStats() - compute the statistics for a particular match. NOTE that this
+//                does NOT compute the stats for higher perspectives. This is
+//                wired to a an onWrite() event so that it notices both when
+//                the record is created and when it is updated (this WILL be
+//                necessary when new stats are added).
+//
+exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match}').
+    onWrite((change,context) => {
+
+	firebaseInit();
+
+	if(context.params.match == METADATA ||
+	   context.params.competition == METADATA ||
+	   context.params.robot == METADATA ||
+	   context.params.year == METADATA	  ) {
+	    return null;               // don't process metaData leaves that just "happen" sometimes
+	                               // particularly at the competition & match levels
+	}
+
+	if(!change.after.exists()) {   // key deleted - so just exit
+	    return null;
+	}
+
+	if(change.before.exists()) {  // updating an existing record
+	    if(change.after.val().hasOwnProperty('updated')) {
+		// it's already been updated, don't do it again
+		// delete this key to cause a re-update
+		return(null);
+	    } else {
+		console.log("re-computing existing record");
+	    }
+	}
+	
+	// otherwise we have either a create or a change, in any event
+	//  work with the new data.
+
+	getNASAdataJSON()
+	    .then((nasaData) => metaData.calcMetaData(change.after.val(),context.params,nasaData.metaData.match))
+	    .then((newvalue) => {
+		newvalue.updated = firebase.database.ServerValue.TIMESTAMP;
+		change.after.ref.set(newvalue);
+	    })
+		
+	// and if things go wrong
+	
+	    .catch((e)=>console.log(e));
+
+	return(1);
+    });
+	
+
+
+//
+// recalculate() - kicks-off a recalculation of ALL of the match metadata.
+//                 This is done by simply deleting the "updated" key in
+//                 each match - everywhere!  Only do this if the metaData
+//                 for the match changes.
+//
+exports.recalculate = functions.https.onRequest((request, response) => {
+
+    firebaseInit();
+
+    // get the ENTIRE DATABASE (yikes) for doing this computation
+    
+    var ref = firebase.database().ref("/");
+
+    // now cruise through the data to each leaf (match), deleting the "updated" field
+
+    ref.once("value")
+        .then((snapshot) => {
+	    data = snapshot.val();
+	    for(var year in data) {
+		if(year != METADATA && data.hasOwnProperty(year)) {
+		    for(var robot in data[year]) {
+			if(robot != METADATA && data[year].hasOwnProperty(robot)) {
+			    for(var competition in data[year][robot]) {
+				if(competition != METADATA && data[year][robot].hasOwnProperty(competition)) {
+				    for(var match in data[year][robot][competition]) {
+					if(match != METADATA && data[year][robot][competition].hasOwnProperty(match)) {
+					    ref.child(year).child(robot).child(competition).child(match).child("updated").remove();
+					}
+				    }
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	});
+
+    response.send(200);
+});
+
+
+
+//
+// statistics() - compute statistics for a robot, based upon being notified
+//                that a change in the database occurred.
+//
+exports.statistics = functions.database.ref('{year}/{robot}/{competition}/{match}').
+    onCreate((snapshot,context) => {
+
 	// don't initialize the app if it already appears to be intialized
 	//   note that this only works right if we have 1 app - otherwise,
 	//   this would need to see if THIS app is initialized
 	
 	if(firebase.apps.length == 0) {
-	    firebase.initializeApp(config);
+	    firebase.initializeApp(NASA_FBconfig);
 	    console.log("initialized");
 	} else {
 	    console.log("didn't initialize");
 	}
 	
 	// first, get the XML data describing our data/metadata
-	getNASAXMLdata()
+	//	getNASAdataXML()
 
-	// then, with the snapshot, calculate the metadata, pushing
-	// it back to the database
-
-	// TODO - big todo here!  The "perspective" isn't taken in to account
-	//           yet. The data value write location is heavily dependent upon
-	//           the perspective. The data input is also heavily dependent upon
-	//           the perspective!
-
-	    .then((xmldata) => metaData.calcMetaData(snapshot.val(),context.params,xmldata))
+	getNASAdataJSON()
+	    .then((nasaData) => metaData.calcMetaData(context.params,nasaData))
 	    .then((newvalue) => snapshot.ref.set(newvalue))
 		
 	// and if things go wrong
 	
-	    .catch();
+	    .catch((e)=>console.log(e));
 
 	return(1);
     });
 
 //
-// getNASAXMLdata() - get the "standard" xml data for NASA. This is kept in
+// getNASAdataJSON() - get the "standard" xml data for NASA, but in json format.
+//                     This counts on the XML processing that occurs in the Season
+//                     functions directory.
+//
+//                     Returns a promise, that propagates with the data object that
+//                     was converted from JSON.
+//
+function getNASAdataJSON()
+{
+    var storage = firebase.storage();
+    var ref = storage.ref("NASA/Season/DeepSpace2019.json");
+
+    return(ref.getDownloadURL()
+	   .then((url) => reqGet(url))
+           .then((body) => JSON.parse(body)));
+}    
+
+//
+// getNASAdataXML() - get the "standard" xml data for NASA. This is kept in
 //                    the storage side of firebase, so it is referenced as
 //                    such.
 //          RETURNS: a promise that is the last in the chain of ops needed to
 //                    retrieve and parse the XML data.
 //
-function getNASAXMLdata()
+function getNASAdataXML()
 {
     var storage = firebase.storage();
     var ref = storage.ref("NASA/Season/DeepSpace2019.xml");
