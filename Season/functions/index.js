@@ -44,16 +44,34 @@ require('firebase/storage');            // extremely important! (firebase must e
 global.XMLHttpRequest = require("xhr2");   // necessary for the getDownloadURL()
 
 var toposort = require("toposort");
+const Busboy = require('busboy');
+
+//
+// firebaseInit() - inits if necessary.
+//
+function firebaseInit()
+{
+    var NASA_FBconfig = {
+	    apiKey: "AIzaSyAJtiy-xB69zjg7VRdBiEDmtupBeoGgS9A",
+	    authDomain: "nasa-7a363.firebaseapp.com",
+	    databaseURL: "https://nasa-7a363.firebaseio.com",
+	    projectId: "nasa-7a363",
+	    storageBucket: "nasa-7a363.appspot.com",
+	    messagingSenderId: "885889218553"
+	};
 
 
-var config = {
-    apiKey: "AIzaSyAJtiy-xB69zjg7VRdBiEDmtupBeoGgS9A",
-    authDomain: "nasa-7a363.firebaseapp.com",
-    databaseURL: "https://nasa-7a363.firebaseio.com",
-    projectId: "nasa-7a363",
-    storageBucket: "nasa-7a363.appspot.com",
-    messagingSenderId: "885889218553"
-};
+    // don't initialize the app if it already appears to be intialized
+    //   note that this only works right if we have 1 app - otherwise,
+    //   this would need to see if THIS app is initialized
+    
+    if(firebase.apps.length == 0) {
+	firebase.initializeApp(NASA_FBconfig);
+//	console.log("initialized");
+    } else {
+//	console.log("didn't initialize");
+    }
+}
 
 //
 // season() - return the XML for the "current" season, or for the
@@ -62,14 +80,9 @@ var config = {
 //            to database).
 //
 
-exports.season = functions.https.onRequest((request, response) =>
-{
-    if(firebase.apps.length == 0) {
-	firebase.initializeApp(config);
-	console.log("initialized");
-    } else {
-	console.log("didn't initialize");
-    }
+exports.season = functions.https.onRequest((request, response) => {
+
+    firebaseInit();
 
     var storage = firebase.storage();
     //    var ref = storage.ref("NASA/Season/powerUp.xml");
@@ -93,14 +106,9 @@ exports.season = functions.https.onRequest((request, response) =>
 //            to database).
 //
 
-exports.seasonJSON = functions.https.onRequest((request, response) =>
-{
-    if(firebase.apps.length == 0) {
-	firebase.initializeApp(config);
-	console.log("initialized");
-    } else {
-	console.log("didn't initialize");
-    }
+exports.seasonJSON = functions.https.onRequest((request, response) => {
+
+    firebaseInit();
 
     var storage = firebase.storage();
     //    var ref = storage.ref("NASA/Season/powerUp.xml");
@@ -127,25 +135,7 @@ exports.seasonJSON = functions.https.onRequest((request, response) =>
 //
 exports.seasonJSONgenerate = functions.storage.object().onFinalize((object) => {
 
-	var config = {
-	    apiKey: "AIzaSyAJtiy-xB69zjg7VRdBiEDmtupBeoGgS9A",
-	    authDomain: "nasa-7a363.firebaseapp.com",
-	    databaseURL: "https://nasa-7a363.firebaseio.com",
-	    projectId: "nasa-7a363",
-	    storageBucket: "nasa-7a363.appspot.com",
-	    messagingSenderId: "885889218553"
-	};
-
-	// don't initialize the app if it already appears to be intialized
-	//   note that this only works right if we have 1 app - otherwise,
-	//   this would need to see if THIS app is initialized
-	
-	if(firebase.apps.length == 0) {
-	    firebase.initializeApp(config);
-	    console.log("initialized");
-	} else {
-	    console.log("didn't initialize");
-	}
+    firebaseInit();
 	
     var storage = firebase.storage();
 
@@ -279,7 +269,8 @@ function fieldClone(field)
 
     var clone = Object.assign({},field);                // clone ALL object fields
 
-    var listFields = ["perspective","target","start","end","targetVal"];    // then replace arrays with clones
+    var listFields = ["perspective","target","start","end","targetVal",
+		      "multiplier","low","high" ];    // then replace arrays with clones
 
     listFields.forEach((listField) => {
 	if(clone.hasOwnProperty(listField)) {
@@ -323,7 +314,8 @@ function metaFieldData(xmlObj)
 	    }
 	});
 
-	var listFields = [ "perspective","target","start","end","targetVal" ];
+	var listFields = [ "perspective","target","start","end","targetVal",
+			   "multiplier","low","high" ];
 	
 	listFields.forEach(function(field) {
 	    if(incomingFieldObj.hasOwnProperty(field)) {
@@ -381,6 +373,9 @@ function metaFieldData(xmlObj)
 	var dependencyFields = ["target","start","end"];
     
 	fields.forEach((field) => {
+	    if(!field.hasOwnProperty("perspective")) {
+		throw "METADATA ERROR: " + field.name + " missing perspective (fatal)";
+	    }
 	    if(field.perspective.includes(perspective)) {
 		var name = field.name;
 		dependencyFields.forEach((dependencyField) => {
@@ -453,7 +448,7 @@ function viewsData(xmlObj)
 
 	var newObject = {};
 
-	var baseFields = [ "name","type","label", "perspective" ];
+	var baseFields = [ "name","type","label", "perspective", "sort" ];
 
 	baseFields.forEach(function(field) {
 	    if(viewObject.hasOwnProperty(field)) {	    
@@ -461,7 +456,7 @@ function viewsData(xmlObj)
 	    }
 	});
 
-	var listFields = [ "field","constraint" ];
+	var listFields = [ "field","constraint","format" ];
 	
 	listFields.forEach(function(field) {
 	    if(viewObject.hasOwnProperty(field)) {
@@ -473,4 +468,136 @@ function viewsData(xmlObj)
     }
 
     return(views);
+}
+
+//
+// seasonXMLvalidate() - given an incoming multi-part post request with an XML file, validate
+//                       that it is "correct" - where "correct" is defined as parsable,
+//                       full with the appropriate sections, and referentially correct.
+//
+exports.seasonXMLvalidate = functions.https.onRequest((request, response) => {
+
+    firebaseInit();
+
+    // TODO - currently this is written for multipart data ONLY - it should
+    //   be smarter.
+
+    // busboy - is a library used to extract stuff from a form submit - it is
+    //    being used in a very simple way here, because the XML files are small
+
+    const busboy = new Busboy({headers:request.headers});
+
+    busboy.on('file',(fieldname,file,filename) => {
+	file.on('data',(data)=> {
+	    var xml = data.toString('utf8');
+	    
+	    XMLparse(xml,{trim: true})
+		.catch((err) => {
+		    response.send("Error from XML parsing: " + err + "\n");
+		})
+		.then((xmlresult) => organizeFieldData(xmlresult))
+		.then((xmlobject) => checkData(xmlobject))
+		.then((results) => response.send(results))
+		.catch(function(error) {
+		    response.send(error);
+		});
+	});
+    });
+
+    // kick-off the busboy processing of our data
+	      
+    busboy.end(request.rawBody);
+
+    return;
+});
+
+//
+// checkData() - given an object, representing the parse of the XML, look
+//               through it, validating things.  The output comes back
+//               as a string.
+//
+function checkData(xmlobject)
+{
+    var output = "";
+
+    // TODO - make sure each field has a name, type, op, label (warning), and perspective
+
+    // TODO - make sure, depending upon the op, that the other fields are there
+    //        (the array below is the current requirements)
+
+    var reqFields = { count:   ["target"],
+		      average: ["target"],
+		      combine: ["target"],
+		      delta:   ["start","end"],
+		      sum:     ["target"],
+		      percent: ["target","targetVal"],
+		      weight:  ["target","high","low","multiplier"],
+		      contains:["target","targetVal"]
+		    };
+	
+    // TODO - should check that all of the right things are there for the ops
+    //          (like start and end for delta, etc.)
+
+    // TODO - make sure all sections are there
+
+    // TODO - make sure the layout looks good relative to elements
+
+    var rawData = xmlobject.rawData;
+
+    var rawDataFields = [];
+    for(var i=0; i < rawData.length; i++) {
+	rawDataFields.push(rawData[i].name);
+    }
+
+    var metaData = xmlobject.metaData;
+
+    // need to check the perspectives in order, from lowest to highest
+    
+    var perspectives = [ "match", "competition", "robot", "year", "top" ];
+    var previousLevelFields = null;      // allows upper levels to check lower levels
+    
+    for(var perspective in perspectives) {
+	var thisMetaData = metaData[perspectives[perspective]];
+
+	// first, gather the names of all of the metaData fields at this perspective
+	var thisMetaDataFields = [];
+	for(var i=0; i < thisMetaData.length; i++) {
+	    thisMetaDataFields.push(thisMetaData[i].name);
+	}
+
+	// now check to see that they refer to rawData, the current metaData, or lower MetaData
+
+	for(var i=0; i < thisMetaData.length; i++) {
+
+	    // need to check the targets, start list, and end list
+
+	    var checks = ["target","start","end"];
+
+	    for(var check in checks) {
+		var thisCheck = checks[check];
+		
+		if(thisMetaData[i].hasOwnProperty(thisCheck)) {
+		    for(var j=0; j < thisMetaData[i][thisCheck].length; j++) {
+			if(!thisMetaDataFields.includes(thisMetaData[i][thisCheck][j])) {
+			    if(!rawDataFields.includes(thisMetaData[i][thisCheck][j])) {
+				if(!previousLevelFields || !previousLevelFields.includes(thisMetaData[i][thisCheck][j])) {
+				    output += "METADATA ERROR: " +
+					perspectives[perspective] + ":" + thisMetaData[i].name + " - " +
+					'bad reference in ' + thisCheck + ' - ' +
+					thisMetaData[i][thisCheck][j]  + '<br>' + '\n';
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	previousLevelFields = thisMetaDataFields;
+    }
+
+    if(output == ""){
+	output += "NO ERRORS FOUND";
+    }
+    
+    return(output);
 }
