@@ -844,6 +844,33 @@
     </view>
 
     <view>
+      <name>Robot Performance Trend</name>
+      <label>Performance of robot(s) over all competitions.</label>
+      <type>trend</type>
+      <perspective>match</perspective>
+      <constraint>year</constraint>
+      <constraint>robot</constraint>
+      <field>date</field>
+      <field>robot</field>
+      <field>masterAAR</field>
+      <sort>date,ASC</sort>
+    </view>
+    
+    <view>
+      <name>Robot Competition Performance Trend</name>
+      <label>Performance of robot(s) over a given competition.</label>
+      <type>trend</type>
+      <perspective>match</perspective>
+      <constraint>year</constraint>
+      <constraint>robot</constraint>
+      <constraint>competition</constraint>
+      <field>date</field>
+      <field>robot</field>
+      <field>masterAAR</field>
+      <sort>date,ASC</sort>
+    </view>
+
+    <view>
       <name>Robot Competitions</name>
       <label>Lists all of the competitions for a given robot - along with summary data.</label>
       <type>table</type>
