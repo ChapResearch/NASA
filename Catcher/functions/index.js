@@ -40,7 +40,10 @@ var firebase = require("firebase");
 	     //firebase.initializeApp(config);
 	     var database = firebase.database();
 	     var ref = database.ref(refpath);
+
+	     // add the timestamp when the record was added
 	     
+	     record.date = firebase.database.ServerValue.TIMESTAMP;
 
 	     //	 ref.on('value', function(snapshot) {
 	     // console.log(snapshot.val());
@@ -143,26 +146,4 @@ exports.sumCargoRocket = functions.database.ref('/{year}/{team_number}/{competit
 	return snapshot.ref.update(original);
 
 
-    });
-
-exports.general = functions.database.ref('/{year}/{team_number}/{competition}/{match}')
-
-.onCreate((snapshot, context) => {
-	
-	var m_strFilePath = "https://nasa.chapresearch.com/DeepSpace2019.xml";
-	string xmlStr;
-	using(var wc = new WebClient())
-	{
-	    xmlStr = wc.DownloadString(m_strFilePath);
-	}
-
-	parser = new DOMParser();
-	xmlDoc = parser.parseFromString(xmlStr,"text/xml");
-
-	var x = xmlDoc.getElementsByTagName("field");
-
-	for (i = 0; i <x.length; i++) {
-	    // look for type event
-	}
-	
     });
