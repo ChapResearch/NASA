@@ -779,8 +779,14 @@
       <constraint>year</constraint>
       <field>robot</field>
       <field>masterAAR</field>
+      <field>scoringAAR</field>
+      <field>cycleTimeAAR</field>
+      <field>HABAAR</field>
       <sort>masterAAR,DESC</sort>
       <format>masterAAR,toFixed,2</format>
+      <format>scoringAAR,toFixed,2</format>
+      <format>cycleTimeAAR,toFixed,2</format>
+      <format>HABAAR,toFixed,2</format>
     </view>
 
     <view>
@@ -828,7 +834,14 @@
       <constraint>competition</constraint>
       <field>robot</field>
       <field>masterAAR</field>
+      <field>scoringAAR</field>
+      <field>cycleTimeAAR</field>
+      <field>HABAAR</field>
       <sort>masterAAR,DESC</sort>
+      <format>masterAAR,toFixed,2</format>
+      <format>scoringAAR,toFixed,2</format>
+      <format>cycleTimeAAR,toFixed,2</format>
+      <format>HABAAR,toFixed,2</format>
     </view>
 
     <view>
@@ -874,12 +887,20 @@
       <name>Robot Competitions</name>
       <label>Lists all of the competitions for a given robot - along with summary data.</label>
       <type>table</type>
-      <perspective>robot</perspective>
+      <perspective>competition</perspective>
       <constraint>year</constraint>
       <constraint>robot</constraint>
       <field>robot</field>
       <field>competition</field>
-      <field>panelScoredCargoTimeAverage</field>
+      <field>masterAAR</field>
+      <field>scoringAAR</field>
+      <field>cycleTimeAAR</field>
+      <field>HABAAR</field>
+      <sort>masterAAR,DESC</sort>
+      <format>masterAAR,toFixed,2</format>
+      <format>scoringAAR,toFixed,2</format>
+      <format>cycleTimeAAR,toFixed,2</format>
+      <format>HABAAR,toFixed,2</format>
     </view>
     
     <view>
@@ -890,43 +911,16 @@
       <constraint>competition</constraint>
       <constraint>year</constraint>
       <field>robot</field>
-      <field>panelScoredCargoTimeAverage</field>
-    </view>
-    
-    <view>
-      <name>Robot Competition Performance - 1</name>
-      <label>Shows the performance of a particular robot at a particular competition, by match.</label>
-      <type>table</type>
-      <perspective>robot</perspective>
-      <constraint>competition</constraint>
-      <constraint>robot</constraint>
-      <constraint>year</constraint>
-      <field>robot</field>
-      <field>panelScoredCargoTimeAverage</field>
-    </view>
-
-    <view>
-      <name>Robot Competition Performance - 2</name>
-      <label>Shows the performance of a particular robot at a particular competition, by match (different stats).</label>
-      <type>record</type>
-      <perspective>robot</perspective>
-      <constraint>competition</constraint>
-      <constraint>robot</constraint>
-      <constraint>year</constraint>
-      <field>robot</field>
-      <field>panelScoredCargoTimeAverage</field>
-    </view>
-
-    <view>
-      <name>Robot Competition Performance - 3</name>
-      <label>Comparative performance for all robots at a competition</label>
-      <type>bar</type>
-      <perspective>robot</perspective>
-      <constraint>competition</constraint>
-      <constraint>robot</constraint>
-      <constraint>year</constraint>
-      <field>robot</field>
-      <field>panelScoredCargoTimeAverage</field>
+      <field>competition</field>
+      <field>masterAAR</field>
+      <field>scoringAAR</field>
+      <field>cycleTimeAAR</field>
+      <field>HABAAR</field>
+      <sort>masterAAR,DESC</sort>
+      <format>masterAAR,toFixed,2</format>
+      <format>scoringAAR,toFixed,2</format>
+      <format>cycleTimeAAR,toFixed,2</format>
+      <format>HABAAR,toFixed,2</format>
     </view>
 
     <view>
@@ -939,7 +933,17 @@
       <constraint>year</constraint>
       <constraint>match</constraint>
       <field>robot</field>
-      <field>panelScoredCargoTimeAverage</field>
+      <field>competition</field>
+      <field>match</field>
+      <field>masterAAR</field>
+      <field>scoringAAR</field>
+      <field>cycleTimeAAR</field>
+      <field>HABAAR</field>
+      <sort>masterAAR,DESC</sort>
+      <format>masterAAR,toFixed,2</format>
+      <format>scoringAAR,toFixed,2</format>
+      <format>cycleTimeAAR,toFixed,2</format>
+      <format>HABAAR,toFixed,2</format>
     </view>
     
     <view>
@@ -951,17 +955,17 @@
       <constraint>match</constraint>
       <constraint>year</constraint>
       <field>robot</field>
-    </view>
-
-    <view>
-      <name>Best Match Performance</name>
-      <label>Shows the performance of each robot in a match</label>
-      <type>pie</type>
-      <perspective>match</perspective>
-      <constraint>competition</constraint>
-      <constraint>match</constraint>
-      <constraint>year</constraint>
-      <field>robot</field>
+      <field>competition</field>
+      <field>match</field>
+      <field>masterAAR</field>
+      <field>scoringAAR</field>
+      <field>cycleTimeAAR</field>
+      <field>HABAAR</field>
+      <sort>masterAAR,DESC</sort>
+      <format>masterAAR,toFixed,2</format>
+      <format>scoringAAR,toFixed,2</format>
+      <format>cycleTimeAAR,toFixed,2</format>
+      <format>HABAAR,toFixed,2</format>
     </view>
 
     <view>
@@ -969,11 +973,20 @@
       <label>Lists all matches for a given robot - with summary data</label>
       <type>table</type>
       <perspective>match</perspective>
+      <constraint>year</constraint>
       <constraint>robot</constraint>
       <field>robot</field>
       <field>competition</field>
       <field>match</field>
-      <constraint>year</constraint>
+      <field>masterAAR</field>
+      <field>scoringAAR</field>
+      <field>cycleTimeAAR</field>
+      <field>HABAAR</field>
+      <sort>masterAAR,DESC</sort>
+      <format>masterAAR,toFixed,2</format>
+      <format>scoringAAR,toFixed,2</format>
+      <format>cycleTimeAAR,toFixed,2</format>
+      <format>HABAAR,toFixed,2</format>
     </view>
     
   </views>
