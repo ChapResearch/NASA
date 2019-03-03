@@ -857,6 +857,18 @@
     </view>
 
     <view>
+      <name>Robot Average Score per Match by Competition (bar)</name>
+      <label>Shows Average Score for all robots in a selected competition.</label>
+      <type>bar</type>
+      <perspective>competition</perspective>
+      <constraint>year</constraint>
+      <constraint>competition</constraint>
+      <field>robot</field>
+      <field>pointsAAR</field>
+      <sort>pointsAAR,ASC</sort>
+    </view>    
+
+    <view>
       <name>Robot Performance Trend</name>
       <label>Performance of robot(s) over all competitions.</label>
       <type>trend</type>
@@ -905,23 +917,37 @@
     
     <view>
       <name>Competition List</name>
-      <label>Lists all of the robots at a particular competition - along with summary data.</label>
+      <label>
+	Lists all of the robots at a particular competition - along with summary data.
+      </label>
       <type>table</type>
-      <perspective>robot</perspective>
+      <perspective>competition</perspective>
       <constraint>competition</constraint>
       <constraint>year</constraint>
       <field>robot</field>
       <field>competition</field>
-      <field>masterAAR</field>
-      <field>scoringAAR</field>
-      <field>cycleTimeAAR</field>
-      <field>HABAAR</field>
-      <sort>masterAAR,DESC</sort>
-      <format>masterAAR,toFixed,2</format>
-      <format>scoringAAR,toFixed,2</format>
-      <format>cycleTimeAAR,toFixed,2</format>
-      <format>HABAAR,toFixed,2</format>
-    </view>
+      <field>cargoScoredTotalAverage</field>
+      <field>panelScoredTotalAverage</field>
+      <field>HABEndPos3Percent</field>
+      <field>HABEndPos2Percent</field>
+      <field>climbTimeAverage</field>
+      <field>startingPos2SuccessPercent</field>
+      <field>startingPos1SuccessPercent</field>
+      <field>defensePercent</field>
+      <field>panelScoredTimeAverageComp</field>
+      <field>cargoScoredTimeAverageComp</field>
+      <sort>robot,DESC</sort>
+      <format>cargoScoredTotalAverage,toFixed,2</format>
+      <format>panelScoredTotalAverage,toFixed,2</format>
+      <format>HABEndPos3Percent,toFixed,0</format>
+      <format>HABEndPos2Percent,toFixed,0</format>
+      <format>climbTimeAverage,toFixed,2</format>
+      <format>startingPos2SuccessPercent,toFixed,0</format>
+      <format>startingPos1SuccessPercent,toFixed,0</format>
+      <format>defensePercent,toFixed,0</format>
+      <format>cargoScoredTimeAverageComp,toFixed,2</format>
+      <format>panelScoredTimeAverageComp,toFixed,2</format>
+    </view>        
 
     <view>
       <name>Robot Match Performance</name>
@@ -1014,6 +1040,16 @@
       <perspective>robot</perspective>      
       <op>sum</op>
       <target>totalPenalties</target>
+    </field>
+
+    <field>
+      <name>defensePercent</name>
+      <type>int</type>
+      <label>Percent Defense Played</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>defenseYesNo</target>
+      <targetVal>1</targetVal>
     </field>
     
     <!--################## PANEL SCORING EVENTS ######################### -->
@@ -1164,6 +1200,15 @@
       <target>panelScoredTimes</target>
     </field>
 
+    <field>
+      <name>panelScoredTimeAverageComp</name>
+      <type>int</type>
+      <label>Panel Cycle Time Average</label>
+      <perspective>competition</perspective>
+      <op>average</op>
+      <target>panelScoredTimeAverage</target>
+    </field>    
+
     <!-- ###################### END PANEL SCORING EVENTS ##################### -->
 
     <!--################## Cargo SCORING EVENTS ######################### -->
@@ -1300,6 +1345,15 @@
       <target>cargoScoredTimes</target>
     </field>
 
+    <field>
+      <name>cargoScoredTimeAverageComp</name>
+      <type>int</type>
+      <label>Cargo Cycle Time Average</label>
+      <perspective>competition</perspective>
+      <op>average</op>
+      <target>cargoScoredTimeAverage</target>
+    </field>
+    
 
     <field> <!-- totals needed for computing AAR -->
       <name>cargoScoredRocketLv1Total</name>
@@ -1336,7 +1390,7 @@
       <name>HABEndPos3Percent</name>
       <type>int</type>
       <label>Percent Succes HAB Level 3</label>
-      <perspective>match</perspective>
+      <perspective>competition</perspective>
       <op>percent</op>
       <target>HABEndPos</target>
       <targetVal>3</targetVal>
@@ -1346,7 +1400,7 @@
       <name>HABEndPos2Percent</name>
       <type>int</type>
       <label>Percent Succes HAB Level 2</label>
-      <perspective>match</perspective>
+      <perspective>competition</perspective>
       <op>percent</op>
       <target>HABEndPos</target>
       <targetVal>2</targetVal>
@@ -1356,7 +1410,7 @@
       <name>HABEndPos1Percent</name>
       <type>int</type>
       <label>Percent Success HAB Level 1</label>
-      <perspective>match</perspective>
+      <perspective>competition</perspective>
       <op>percent</op>
       <target>HABEndPos</target>
       <targetVal>1</targetVal>
@@ -1373,23 +1427,14 @@
     </field>
 
     <field> <!-- Starting Position 1 -->
-      <name>startingPos1</name>
+      <name>startingPos1Success</name>
       <type>int</type>
       <label>Percent Starting Position 1</label>
       <perspective>match</perspective>
       <op>contains</op>
       <target>crossHABLine</target>
       <targetVal>1</targetVal>   <!-- started on 1 -->
-    </field>
-    
-    <field> <!-- Starting Position 2 -->
-      <name>startingPos2</name>
-      <type>int</type>
-      <label>Percent Starting Position 2</label>
-      <perspective>match</perspective>
-      <op>contains</op>
-      <target>crossHABLine</target>
-      <targetVal>2</targetVal>   <!-- started on 2 -->
+      <targetVal>3</targetVal>
     </field>
     
     <field> <!-- Starting Position 2 Success -->
@@ -1402,30 +1447,50 @@
       <targetVal>2</targetVal>
       <targetVal>3</targetVal>
     </field>
+
+    <field> <!-- Starting Position 2 Success Competition Level-->
+      <name>startingPos2SuccessPercent</name>
+      <type>int</type>
+      <label>Success Starting Position 2</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>startingPos2Success</target>
+      <targetVal>1</targetVal>
+    </field>    
+
+    <field> <!-- Starting Position 1 Success Competition Level-->
+      <name>startingPos1SuccessPercent</name>
+      <type>int</type>
+      <label>Success Starting Position 1</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>startingPos1Success</target>
+      <targetVal>1</targetVal>
+    </field>    
     
     <field> <!--Average Number of Level 3 assists-->
-      <name>averageHAB3Assists</name>
+      <name>avgHABAssistLvl3</name>
       <type>int</type>
       <label>Average Level 3 HAB Assists</label>
-      <perspective>match</perspective>
+      <perspective>competition</perspective>
       <op>average</op>
       <target>HABAssist3</target>
     </field>
     
     <field> <!--Average Number of Level 2 assists-->
-      <name>averageHAB2Assists</name>
+      <name>avgHABAssistLvl2</name>
       <type>int</type>
       <label>Average Level 2 HAB Assists</label>
-      <perspective>match</perspective>
+      <perspective>competition</perspective>
       <op>average</op>
       <target>HABAssist2</target>
     </field>
     
     <field> <!--Average Number of Level 1 assists-->
-      <name>averageHAB1Assists</name>
+      <name>avgHABAssistLvl1</name>
       <type>int</type>
       <label>Average Level 1 HAB Assists</label>
-      <perspective>match</perspective>
+      <perspective>competition</perspective>
       <op>average</op>
       <target>HABAssist1</target>
     </field>
@@ -1558,14 +1623,22 @@
     </field>
 
     <field>
-      <name>climbTime</name>
-      <type>array</type>
-      <label>Climb Time</label>
-      <op>delta</op>
-      <start>startClimb</start>
-      <end>climbStopped</end>
-      <perspective>match</perspective>
+      <name>panelScoredTotalAverage</name>
+      <type>int</type>
+      <label>Average Panels Scored</label>
+      <perspective>competition</perspective>
+      <op>average</op>
+      <target>panelScoredTotal</target>
     </field>
+
+    <field>
+      <name>cargoScoredTotalAverage</name>
+      <type>int</type>
+      <label>Average Cargo Scored</label>
+      <perspective>competition</perspective>      
+      <op>average</op>
+      <target>cargoScoredTotal</target>
+    </field>    
 
     <field>
       <name>climbStopped</name>
@@ -1578,14 +1651,65 @@
     </field>
 
     <field>
-      <name>climbTimeAverage</name>
+      <name>climbTimeArray</name>
+      <type>array</type>
+      <label>Climb Time</label>
+      <op>delta</op>
+      <start>startClimb</start>
+      <end>climbStopped</end>
+      <perspective>match</perspective>
+    </field>
+
+    <field>
+      <name>climbTime</name>
       <type>int</type>
       <label>Average Climb Time</label>
       <perspective>match</perspective>
       <op>average</op>
+      <target>climbTimeArray</target>
+    </field>
+
+    <field>
+      <name>climbTimeAverage</name>
+      <type>int</type>
+      <label>Average Climb Time</label>
+      <perspective>competition</perspective>
+      <op>average</op>
       <target>climbTime</target>
     </field>
 
+    <!--################## HAB FIELDS ################# -->
+    <field>
+      <name>HABEndPos3</name>
+      <type>int</type>
+      <label>Ended on HAB Lvl 3 (1=yes)</label>
+      <perspective>match</perspective>
+      <op>contains</op>
+      <target>HABEndPos</target>
+      <targetVal>3</targetVal>
+    </field>
+
+    <field>
+      <name>HABEndPos2</name>
+      <type>int</type>
+      <label>Ended on HAB Lvl 2 (1=yes)</label>
+      <perspective>match</perspective>
+      <op>contains</op>
+      <target>HABEndPos</target>
+      <targetVal>2</targetVal>
+    </field>
+
+    <field>
+      <name>HABEndPos1</name>
+      <type>int</type>
+      <label>Ended on HAB Lvl 1 (1=yes)</label>
+      <perspective>match</perspective>
+      <op>contains</op>
+      <target>HABEndPos</target>
+      <targetVal>1</targetVal>
+    </field>
+    
+    
     <!-- AAR Calculations -->
 
     <field>
@@ -1656,7 +1780,7 @@
       <low>30</low> <high>4</high> <multiplier>15</multiplier>
       <target>cargoScoredCargoTimeAverage</target>
       <low>30</low> <high>4</high> <multiplier>12</multiplier>
-      <target>climbTimeAverage</target>
+      <target>climbTime</target>
       <low>30</low> <high>3</high> <multiplier>10</multiplier>
     </field>
 
@@ -1676,17 +1800,19 @@
       <label>HAB AAR</label>
       <perspective>match</perspective>
       <op>weight</op>
-      <target>HABEndPos3Percent</target>
-      <low>0</low> <high>100</high> <multiplier>10</multiplier>
-      <target>HABEndPos2Percent</target>
+      <target>HABEndPos3</target>
+      <low>0</low> <high>1</high> <multiplier>10</multiplier>
+      <target>HABEndPos2</target>
       <low>0</low> <high>100</high> <multiplier>5</multiplier>
-      <target>HABEndPos1Percent</target>
+      <target>HABEndPos1</target>
       <low>0</low> <high>100</high> <multiplier>1</multiplier>
       <target>startingPos2Success</target>
       <low>0</low> <high>1</high> <multiplier>3</multiplier>
-      <target>averageHAB3Assists</target>      
+      <target>startingPos1Success</target>
+      <low>0</low> <high>1</high> <multiplier>1</multiplier>
+      <target>HABAssist3</target>      
       <low>0</low> <high>2</high> <multiplier>15</multiplier>
-      <target>averageHAB2Assists</target>      
+      <target>HABAssist2</target>      
       <low>0</low> <high>2</high> <multiplier>9</multiplier>
     </field>
 
@@ -1723,6 +1849,62 @@
       <op>average</op>
       <target>masterAAR</target>
     </field>
+
+    <field>
+      <name>pointsAAR</name>
+      <type>number</type>
+      <label>Points AAR</label>
+      <perspective>match</perspective>
+      <op>weight</op>
+      <target>cargoScoredTotal</target>
+      <low>0</low> <high>20</high> <multiplier>3</multiplier>
+      <target>panelScoredTotal</target>
+      <low>0</low> <high>20</high> <multiplier>2</multiplier>
+      <target>HABEndPos3</target>
+      <low>0</low> <high>100</high> <multiplier>12</multiplier>
+      <target>HABEndPos2</target>
+      <low>0</low> <high>100</high> <multiplier>6</multiplier>
+      <target>HABEndPos1</target>
+      <low>0</low> <high>100</high> <multiplier>3</multiplier>
+      <target>HABAssist3</target>
+      <low>0</low> <high>3</high> <multiplier>12</multiplier>
+      <target>HABAssist2</target>
+      <low>0</low> <high>3</high> <multiplier>6</multiplier>
+      <target>HABAssist1</target>
+      <low>0</low> <high>3</high> <multiplier>3</multiplier>
+      <target>startingPos2Success</target>
+      <low>0</low> <high>100</high> <multiplier>6</multiplier>
+      <target>startingPos1Success</target>
+      <low>0</low> <high>100</high> <multiplier>3</multiplier>
+    </field>    
+
+    <field>
+      <name>pointsAAR</name>
+      <type>number</type>
+      <label>Points AAR</label>
+      <perspective>Competition</perspective>
+      <op>weight</op>
+      <target>cargoScoredTotalAverage</target>
+      <low>0</low> <high>20</high> <multiplier>3</multiplier>
+      <target>panelScoredTotalAverage</target>
+      <low>0</low> <high>20</high> <multiplier>2</multiplier>
+      <target>HABEndPos3Percent</target>
+      <low>0</low> <high>100</high> <multiplier>0.12</multiplier>
+      <target>HABEndPos2Percent</target>
+      <low>0</low> <high>100</high> <multiplier>0.06</multiplier>
+      <target>HABEndPos1Percent</target>
+      <low>0</low> <high>100</high> <multiplier>0.03</multiplier>
+      <target>avgHABAssistLvl3</target>
+      <low>0</low> <high>3</high> <multiplier>12</multiplier>
+      <target>avgHABAssistLvl2</target>
+      <low>0</low> <high>3</high> <multiplier>6</multiplier>
+      <target>avgHABAssistLvl1</target>
+      <low>0</low> <high>3</high> <multiplier>3</multiplier>
+      <target>startingPos2SuccessPercent</target>
+      <low>0</low> <high>100</high> <multiplier>0.06</multiplier>
+      <target>startingPos1SuccessPercent</target>
+      <low>0</low> <high>100</high> <multiplier>0.03</multiplier>
+    </field>    
 
 
   </metaData>
