@@ -18,7 +18,6 @@ body > div.content {
     width: calc(100% - 16px);
     height: calc(100% - 126px );
     border: 8px solid #7777ff;
-    overflow: hidden;
     min-width: 1175px;
     min-height: 650px;
 }

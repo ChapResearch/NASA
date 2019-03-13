@@ -12,7 +12,8 @@ $( document ).ready(function() {
     });
 
     $('.menu-button.refresh').click(function() {
-	alert("refresh");
+	// reload the database, and refresh the current view
+	databaseLoad(true,viewGoLoad);
     });
 
     $('.menu-button.back').click(function() {

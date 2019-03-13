@@ -7,6 +7,7 @@
 //             data[][]   - the data it will be justified based upon the dataType
 //             dataType[] - either 'number' or 'string'
 //             sort[]     - either 'ASC' or 'DESC' (like SQL!) or 'none'.
+//             sortType[] - an override for the sort type (optional)
 //             format[]   - format instructions
 //
 var CURRENT_VIEW = {};
@@ -268,14 +269,24 @@ function viewPopulate(callback)
 	for(var i=0; i < filtered.length; i++) {   // loop through the records
 	    var currentRow = [];
 	    for(var j=0; j < fields.length; j++) {
-		var fieldName = fields[j].name;
+		var fieldName = fields[j].name; 
 		console.log("trying to populate " +fieldName);
 		if(!fields[j].hasOwnProperty("perspective") || fields[j].perspective == "match") {
 		    console.log("match data or match metaData");
 		    currentRow.push(filtered[i][fieldName]);
 		} else {
-		    console.log("perspective " + fields[j].perspective + " data");
-		    currentRow.push(filtered[i][fields[j].perspective + "_metaData"][fieldName]);
+		    var meta = fields[j].perspective + "_metaData";
+		    if(filtered[i].hasOwnProperty(meta)) {
+			if(filtered[i][meta].hasOwnProperty(fieldName) &&
+			   typeof filtered[i][meta][fieldName] != "undefined") {
+			    currentRow.push(filtered[i][meta][fieldName]);
+			} else {
+			    currentRow.push("-");
+			}
+		    } else {
+			currentRow.push("NA");
+		    }
+//		    currentRow.push(filtered[i][fields[j].perspective + "_metaData"][fieldName]);
 		}
 	    }
 
@@ -287,15 +298,21 @@ function viewPopulate(callback)
 	// sort comes in as a single field setting in the view
 
 	CURRENT_VIEW.sort = [];
+	CURRENT_VIEW.sortType = [];
 	
 	if(view.hasOwnProperty("sort")) {
-	    var sort = view.sort.split(",");    // [0] is the column, [1] is the sort dir
+	    var sort = view.sort.split(",");    // [0] is the column, [1] is the sort dir, ([2] data type)
 	    for(var i=0; i < fields.length; i++) {
 		if(fields[i].name == sort[0]) {
 		    CURRENT_VIEW.sort.push(sort[1]);
 		} else {
 		    CURRENT_VIEW.sort.push("none");
-		}		    
+		}
+		if(sort.length > 2) {
+		    CURRENT_VIEW.sortType.push(sort[2]);
+		} else {
+		    CURRENT_VIEW.sortType.push(null);
+		}
 	    }
 	} else {
 	    for(var i=0; i < fields.length; i++) {
@@ -391,7 +408,7 @@ function viewBar(target)
     google.charts.load('current', {packages: ['corechart', 'bar']});
     google.charts.setOnLoadCallback(viewBar_FN.bind(null,target));
 
-    $(window).resize(viewBar_FN.bind(null,target));
+//    $(window).resize(viewBar_FN.bind(null,target));
 }
 
 function viewBar_FN(target)
@@ -401,6 +418,7 @@ function viewBar_FN(target)
     var data = CURRENT_VIEW.data;
     var dataTypes = CURRENT_VIEW.dataTypes;
     var sort = CURRENT_VIEW.sort;
+    var sortType = CURRENT_VIEW.sortType;
     var format = CURRENT_VIEW.format;
 
     viewTableSort(data,dataTypes,sort);         // replaces the data by a sorted version
@@ -434,6 +452,13 @@ function viewBar_FN(target)
 
     var chart = new google.visualization.ColumnChart(target.get(0));
 
+    google.visualization.events.addOneTimeListener(chart,
+						   'ready',
+						   function() {
+						       $('.results-box .throbber').hide();
+						   });
+
+    $('.results-box .throbber').show();
     chart.draw(dataTable, options);
 }
 
@@ -448,7 +473,7 @@ function viewTrend(target)
     google.charts.setOnLoadCallback(viewTrend_FN.bind(null,target));
 
     // TODO - need to remove these when viewing multiple charts!
-    $(window).resize(viewTrend_FN.bind(null,target));
+//    $(window).resize(viewTrend_FN.bind(null,target));
 }
 
 //
@@ -542,7 +567,8 @@ function viewTrend_FN(target)
         title: name,
 	interpolateNulls: true,
 	vAxis: { title: headers[2] },
-	backgroundColor: { fill:'transparent' }
+	backgroundColor: { fill:'transparent' },
+	pointSize: 10,
     };
 
     var chart = new google.visualization.LineChart(target.get(0));
@@ -561,7 +587,7 @@ function viewPie(target)
     google.charts.load('current', {packages: ['corechart']});
     google.charts.setOnLoadCallback(viewPie_FN.bind(null,target));
 
-    $(window).resize(viewPie_FN.bind(null,target));
+//    $(window).resize(viewPie_FN.bind(null,target));
 }
 
 function viewPie_FN(target)
@@ -718,7 +744,22 @@ function viewDataFormat(data,format)
     var formatted = data;
     
     switch(format[0]) {
-    case "toFixed":    formatted = data.toFixed(format[1]); break;
+
+    case "toFixed":
+	var num = parseFloat(data);
+	if(!isNaN(num)) {
+	    formatted = num.toFixed(format[1]);
+	}
+	break;
+	
+    case "percent":
+    	var num = parseFloat(data);
+	if(!isNaN(num)) {
+	    formatted = num * 100;
+	    formatted = formatted.toFixed(0);
+	    formatted = formatted.toString() + "%";
+	}
+	break;
     }
 
     return(formatted);
@@ -743,13 +784,18 @@ function viewTableSort(data,dataTypes,sort)
 //
 function viewTableSort_FN(dataTypes,sort,a,b)
 {
-    // TODO - create the function that will return -1 if a<b, 0 if equal, 1 if b < a
-
     for(var i=0; i < sort.length; i++) {
 	if(sort[i] != "none") {
+	    var aUndef = typeof a[i] == "undefined";
+	    var bUndef = typeof b[i] == "undefined";
+	    if(aUndef && bUndef) return(0);
 	    if(sort[i] == "ASC") {
+		if(aUndef) return(-1);
+		if(bUndef) return(1);
 		return((a[i] <= b[i])?((a[i]==b[i])?0:-1):1);
 	    } else {
+		if(aUndef) return(1);
+		if(bUndef) return(-1);
 		return((a[i] <= b[i])?((a[i]==b[i])?0:1):-1);
 	    }
 	}
@@ -782,6 +828,10 @@ function constraintPopulateAll(previousValues)
 
 function constraintPopulate(constraints,selector,cvalues,callback)
 {
+    console.log("constraintPopulate with selector: " + selector);
+    console.log(constraints);
+    console.log(cvalues);
+    
     // first check to see if this one is a constraint,
     //   if not, then just call the next one
     //
@@ -817,6 +867,8 @@ function constraintPopulate(constraints,selector,cvalues,callback)
 		    if(callback) callback(cvalues);
 		});
 	    }
+	    console.log("just got robots");
+	    console.log(cvalues);
 	    break;
 
 	case 'competition':
@@ -892,8 +944,9 @@ function checkConstraints()
 
     for(var i=0; i < viewConstraints.length; i++) {
 	console.log("checkConstraints: looking at " + viewConstraints[i]);
-	console.log('selector value: ' + selectorValue(viewConstraints[i]));
-	if(!selectorValue(viewConstraints[i])) {
+	console.log('selector value: ');
+	console.log(selectorValue(viewConstraints[i]));
+	if(selectorValue(viewConstraints[i]).length == 0) {
 	    return(false);
 	}
     }
@@ -908,19 +961,22 @@ function checkConstraints()
 function selectorValue(name)
 {
     var target = $('.constraint-input-' + name);
-    var selection = target.find('div');
+    var selection = target.find('div.content');
 
-    if(selection.hasClass('single')) {
+    if(selection.hasClass('single')) {             // a non-selector value just with text - currently blank
 	return(selection.find('div').text());
     } else {
-	var dropDownVal = selection.find('select').val();
+	var returnVal = [];
+	var dropDownVal = selection.find('select').val();   // gets the current value of the <select> (the #)
 	var multi = [];
 	$('.multi-selection-' + name + ".selected").each(function() {
 	    multi.push($(this).data("value"));
 	});
-	console.log(multi);
-	return(dropDownVal);
-//	return(multi);
+	//	console.log(multi);
+	if(dropDownVal) {
+	    returnVal.push(dropDownVal);
+	}
+	return(arrayUnion(returnVal,multi));
     }
 }
 
@@ -945,7 +1001,7 @@ function selectorSet(name,values)
     var html = "";
 
     if(Array.isArray(values)) {
-	html += '<select>';
+	html += '<select data-selector="' + name + '">';
 	if(values.length != 1) {
 	    html += '<option value="">&nbsp;---&nbsp;</option>';
 	}
@@ -963,16 +1019,25 @@ function selectorSet(name,values)
     if(Array.isArray(values) && values.length > 1) {
 	selection.change(function() {
 
+// causes duplicate values for year because one is int, the other string
+//
+//	    var targetSelect = $(this).find("select");
+//	    if(targetSelect.val()) {
+//		var selector = targetSelect.data("selector");
+//		$('.multi-selection-' + selector + '[data-value="' + targetSelect.val() + '"]').addClass("selected");
+//	    }
+
 	    var values = {};
 	    year = selectorValue('year');
 	    robot = selectorValue('robot');
 	    competition = selectorValue('competition');
 	    match = selectorValue('match');
-	    if(year) { values.year = [year]; }
-	    if(robot) { values.robot = [robot]; }
-	    if(competition) { values.competition = [competition]; }
-	    if(match) { values.match = [match]; }
 
+	    if(year.length) values.year = year;
+	    if(robot.length) values.robot = robot;
+	    if(competition.length) values.competition = competition;
+	    if(match.length) values.match = match;
+	    
 	    // tricky cascade switch - removes the values that need to be re-prompted
 	    switch(name) {
 	    case 'year':	delete values.robot;
@@ -982,7 +1047,6 @@ function selectorSet(name,values)
 		break;
 	    }
 
-	    console.log(values);
 	    constraintPopulateAll(values);
 	    selectorGoEnable(checkConstraints());
 	});
@@ -1033,7 +1097,17 @@ function selectorEnable(name,enable)
     selection.prop('disabled',enable?false:'disabled');
 }
 
-    
+function arrayUnion(a1,a2)
+{
+    var both = a1.concat(a2);
 
+    for(var i=0; i < both.length; i++) {
+	for (var j=i+1; j < both.length; j++) {
+	    if(both[i] === both[j]) {
+		both.splice(j--,1);
+	    }
+	}
+    }
 
-    
+    return(both);
+}

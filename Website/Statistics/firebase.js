@@ -215,6 +215,8 @@ function databaseGetYears(callback)
 //
 function databaseGetRobots(years,callback)
 {
+    console.log("getting robots with years as " + years);
+    
     databaseLoad(false,
 		 (snapshot) => {
 		     var robots = [];
