@@ -531,9 +531,13 @@ function checkData(xmlobject)
 		      delta:   ["start","end"],
 		      sum:     ["target"],
 		      percent: ["target","targetVal"],
-		      weight:  ["target","high","low","multiplier"],
+		      weight:  ["target","multiplier"],
 		      contains:["target","targetVal"]
+		      containsAny:["target","targetVal"]
 		    };
+
+    var optFields = { weight: ["high","low"] };
+	
 	
     // TODO - should check that all of the right things are there for the ops
     //          (like start and end for delta, etc.)
@@ -555,6 +559,8 @@ function checkData(xmlobject)
     
     var perspectives = [ "match", "competition", "robot", "year", "top" ];
     var previousLevelFields = null;      // allows upper levels to check lower levels
+
+    var allMetaDataFields = [];
     
     for(var perspective in perspectives) {
 	var thisMetaData = metaData[perspectives[perspective]];
@@ -563,6 +569,7 @@ function checkData(xmlobject)
 	var thisMetaDataFields = [];
 	for(var i=0; i < thisMetaData.length; i++) {
 	    thisMetaDataFields.push(thisMetaData[i].name);
+	    allMetaDataFields.push(thisMetaData[i].name);
 	}
 
 	// now check to see that they refer to rawData, the current metaData, or lower MetaData
@@ -595,9 +602,84 @@ function checkData(xmlobject)
 	previousLevelFields = thisMetaDataFields;
     }
 
+    output += checkViews(xmlobject.views,rawDataFields,allMetaDataFields);
+   
     if(output == ""){
 	output += "NO ERRORS FOUND";
     }
     
     return(output);
 }
+
+function checkViews(views,rawDataFields,metaDataFields)
+{
+    var output = "";
+    
+    var viewReqSections = [ 'name','label','type','perspective','field' ];
+    var validConstraints = [ 'year','robot','competition','match'];
+    var validFormats = [ 'toFixed','percent' ];
+    var validSorts = [ 'ASC','DESC' ];
+
+    // fields added automatically by the system
+    var specialFields = [ 'year','robot','competition','match', 'date'];
+
+    for(var i=0; i < views.length; i++) {
+
+	// make sure we have the required sections
+	for(var j=0; j < viewReqSections.length; j++) {
+	    if(!views[i].hasOwnProperty(viewReqSections[j])) {
+		output += "VIEWS ERROR: " + views[i].name + ' - Missing section: "' + viewReqSections[j] + '"<br>\n';
+	    }
+	}
+
+	// if there is no constraint, warn
+	if(!views[i].hasOwnProperty("constraint")) {
+	    output += "VIEWS WARNING: " + views[i].name + ' - Missing section: "constraint"<br>\n';
+	} else {
+	    // make sure the named constraints are valid ones
+	    for(var j=0; j < views[i].constraint.length; j++) {
+		var constraint = views[i].constraint[j];
+		if(!validConstraints.includes(constraint)) {
+		    output += "VIEWS ERROR: " + views[i].name + ' - invalid constraint: "' + constraint + '"<br>\n';
+		}
+	    }
+	}
+
+	// make sure all fields can be found SOMEWHERE (it's hard to tell where they SHOULD come from)
+
+	for(var j=0; j < views[i].field.length; j++) {
+	    var fieldName = views[i].field[j];
+	    if(!rawDataFields.includes(fieldName) &&
+	       !metaDataFields.includes(fieldName) &&
+	       !specialFields.includes(fieldName) ) {
+		output += "VIEWS ERROR: " + views[i].name + ' - invalid field: "' + fieldName + '"<br>\n';
+	    }
+	}
+	    
+	if(views[i].hasOwnProperty("sort")) {
+	    var sort = views[i].sort.split(',');
+	    if(!views[i].field.includes(sort[0])) {
+		output += "VIEWS ERROR: " + views[i].name + ' - unknown sort field: "' + sort[0] + '"<br>\n';
+	    } else {
+		if(!validSorts.includes(sort[1])) {
+		    output += "VIEWS ERROR: " + views[i].name + ' - bad sort order: "' + sort[1] + '"<br>\n';
+		}
+	    }
+	}
+
+	if(views[i].hasOwnProperty("format")) {
+	    for(var j=0; j < views[i].format.length; j++) {
+		var format = views[i].format[j].split(',');
+		if(!validFormats.includes(format[1])) {
+		    output += "VIEWS ERROR: " + views[i].name + ' - bad format op: "' + format[1] + '"<br>\n';
+		}
+		if(!views[i].field.includes(format[0])) {
+		    output += "VIEWS ERROR: " + views[i].name + ' - unknown format field: "' + format[0] + '"<br>\n';
+		}
+	    }
+	}
+    }
+
+    return(output);
+}
+    
