@@ -896,6 +896,20 @@
     </view>
 
     <view>
+      <name>Robot Competition Points Trend</name>
+      <label>Point Score of robot(s) over a given competition.</label>
+      <type>trend</type>
+      <perspective>match</perspective>
+      <constraint>year</constraint>
+      <constraint>robot</constraint>
+      <constraint>competition</constraint>
+      <field>date</field>
+      <field>robot</field>
+      <field>pointsAAR</field>
+      <sort>date,ASC</sort>
+    </view>
+
+    <view>
       <name>Robot Competitions</name>
       <label>Lists all of the competitions for a given robot - along with summary data.</label>
       <type>table</type>
@@ -928,25 +942,26 @@
       <field>competition</field>
       <field>cargoScoredTotalAverage</field>
       <field>panelScoredTotalAverage</field>
+      <field>objectsScoredTotalAverage</field>
+      <field>pointsAAR</field>
       <field>HABEndPos3Percent</field>
       <field>HABEndPos2Percent</field>
+      <field>HABEndPos1Percent</field>
       <field>climbTimeAverage</field>
       <field>startingPos2SuccessPercent</field>
       <field>startingPos1SuccessPercent</field>
       <field>defensePercent</field>
-      <field>panelScoredTimeAverageComp</field>
-      <field>cargoScoredTimeAverageComp</field>
       <sort>robot,DESC</sort>
       <format>cargoScoredTotalAverage,toFixed,2</format>
       <format>panelScoredTotalAverage,toFixed,2</format>
+      <format>objectsScoredTotalAverage,toFixed,2</format>
       <format>HABEndPos3Percent,toFixed,0</format>
       <format>HABEndPos2Percent,toFixed,0</format>
+      <format>HABEndPos1Percent,toFixed,0</format>
       <format>climbTimeAverage,toFixed,2</format>
-      <format>startingPos2SuccessPercent,toFixed,0</format>
-      <format>startingPos1SuccessPercent,toFixed,0</format>
       <format>defensePercent,toFixed,0</format>
-      <format>cargoScoredTimeAverageComp,toFixed,2</format>
-      <format>panelScoredTimeAverageComp,toFixed,2</format>
+      <format>startingPos2SuccessPercent,toFixed,2</format>
+      <format>startingPos1SuccessPercent,toFixed,2</format>      
     </view>        
 
     <view>
@@ -1378,6 +1393,29 @@
       <op>count</op>
       <target>cargoScoredRocketLvl3</target>
     </field>
+
+    <field>
+      <name>trappedCargoSandstorm</name>
+      <label>Cargo trapped during Sandstorm</label>
+      <perspective>match</perspective>
+      <op>containsAny</op>
+      <target>panelScoredCargoMiddle</target>
+      <targetVal>0</targetVal>
+      <targetVal>1</targetVal>
+      <targetVal>2</targetVal>
+      <targetVal>3</targetVal>
+      <targetVal>4</targetVal>
+      <targetVal>5</targetVal>
+      <targetVal>6</targetVal>
+      <targetVal>7</targetVal>
+      <targetVal>8</targetVal>
+      <targetVal>9</targetVal>
+      <targetVal>10</targetVal>
+      <targetVal>11</targetVal>
+      <targetVal>12</targetVal>
+      <targetVal>13</targetVal>
+      <targetVal>14</targetVal>
+    </field>
     
 
     <!-- ###################### END Cargo SCORING EVENTS ##################### -->
@@ -1638,7 +1676,26 @@
       <perspective>competition</perspective>      
       <op>average</op>
       <target>cargoScoredTotal</target>
-    </field>    
+    </field>
+
+    <field>
+      <name>objectsScoredTotal</name>
+      <type>int</type>
+      <label>Total Objects Scored</label>
+      <perspective>match</perspective>
+      <op>sum</op>
+      <target>cargoScoredTotal</target>
+      <target>panelScoredTotal</target>
+    </field>
+
+    <field>
+      <name>objectsScoredTotalAverage</name>
+      <type>int</type>
+      <label>Average Objects Scored</label>
+      <perspective>competition</perspective>
+      <op>average</op>
+      <target>objectsScoredTotal</target>
+    </field>
 
     <field>
       <name>climbStopped</name>
@@ -1836,8 +1893,6 @@
       <low>0</low> <high>30</high> <multiplier>54</multiplier>
       <target>HABAAR</target>
       <low>0</low> <high>43</high> <multiplier>32.25</multiplier>
-      <target>cycleTimeAAR</target>
-      <low>0</low> <high>55.8</high> <multiplier>6.975</multiplier>
     </field>
 
     <field>
@@ -1857,25 +1912,27 @@
       <perspective>match</perspective>
       <op>weight</op>
       <target>cargoScoredTotal</target>
-      <low>0</low> <high>20</high> <multiplier>3</multiplier>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
       <target>panelScoredTotal</target>
-      <low>0</low> <high>20</high> <multiplier>2</multiplier>
+      <low>0</low> <high>1</high> <multiplier>2</multiplier>
       <target>HABEndPos3</target>
-      <low>0</low> <high>100</high> <multiplier>12</multiplier>
+      <low>0</low> <high>1</high> <multiplier>12</multiplier>
       <target>HABEndPos2</target>
-      <low>0</low> <high>100</high> <multiplier>6</multiplier>
+      <low>0</low> <high>1</high> <multiplier>6</multiplier>
       <target>HABEndPos1</target>
-      <low>0</low> <high>100</high> <multiplier>3</multiplier>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
       <target>HABAssist3</target>
-      <low>0</low> <high>3</high> <multiplier>12</multiplier>
+      <low>0</low> <high>1</high> <multiplier>12</multiplier>
       <target>HABAssist2</target>
-      <low>0</low> <high>3</high> <multiplier>6</multiplier>
+      <low>0</low> <high>1</high> <multiplier>6</multiplier>
       <target>HABAssist1</target>
-      <low>0</low> <high>3</high> <multiplier>3</multiplier>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
       <target>startingPos2Success</target>
-      <low>0</low> <high>100</high> <multiplier>6</multiplier>
+      <low>0</low> <high>1</high> <multiplier>6</multiplier>
       <target>startingPos1Success</target>
-      <low>0</low> <high>100</high> <multiplier>3</multiplier>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
+      <target>trappedCargoSandstorm</target>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
     </field>    
 
     <field>
@@ -1885,25 +1942,25 @@
       <perspective>Competition</perspective>
       <op>weight</op>
       <target>cargoScoredTotalAverage</target>
-      <low>0</low> <high>20</high> <multiplier>3</multiplier>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
       <target>panelScoredTotalAverage</target>
-      <low>0</low> <high>20</high> <multiplier>2</multiplier>
+      <low>0</low> <high>1</high> <multiplier>2</multiplier>
       <target>HABEndPos3Percent</target>
-      <low>0</low> <high>100</high> <multiplier>0.12</multiplier>
+      <low>0</low> <high>1</high> <multiplier>0.12</multiplier>
       <target>HABEndPos2Percent</target>
-      <low>0</low> <high>100</high> <multiplier>0.06</multiplier>
+      <low>0</low> <high>1</high> <multiplier>0.06</multiplier>
       <target>HABEndPos1Percent</target>
-      <low>0</low> <high>100</high> <multiplier>0.03</multiplier>
+      <low>0</low> <high>1</high> <multiplier>0.03</multiplier>
       <target>avgHABAssistLvl3</target>
-      <low>0</low> <high>3</high> <multiplier>12</multiplier>
+      <low>0</low> <high>1</high> <multiplier>12</multiplier>
       <target>avgHABAssistLvl2</target>
-      <low>0</low> <high>3</high> <multiplier>6</multiplier>
+      <low>0</low> <high>1</high> <multiplier>6</multiplier>
       <target>avgHABAssistLvl1</target>
-      <low>0</low> <high>3</high> <multiplier>3</multiplier>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
       <target>startingPos2SuccessPercent</target>
-      <low>0</low> <high>100</high> <multiplier>0.06</multiplier>
+      <low>0</low> <high>1</high> <multiplier>0.06</multiplier>
       <target>startingPos1SuccessPercent</target>
-      <low>0</low> <high>100</high> <multiplier>0.03</multiplier>
+      <low>0</low> <high>1</high> <multiplier>0.03</multiplier>
     </field>    
 
 
