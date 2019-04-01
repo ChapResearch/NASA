@@ -772,6 +772,42 @@
   <views>
 
     <view>
+      <name>Alliance Planner (points)</name>
+      <type>table</type>
+      <label>Compares point scoring performance for selected competitions for projected alliances.</label>
+      <perspective>competition</perspective>
+      <constraint>year</constraint>
+      <constraint>robot</constraint>
+      <constraint>competition</constraint>
+      <field>robot</field>
+      <field>pointsAAR</field>
+      <field>cargoScoredTotalAverage</field>
+      <field>panelScoredTotalAverage</field>
+      <field>objectsScoredTotalAverage</field>
+      <field>HABEndPos3Percent</field>
+      <field>HABEndPos2Percent</field>
+      <field>startingPos2SuccessPercent</field>
+      <field>startingPos1SuccessPercent</field>
+      <field>defensePercent</field>
+      <format>pointsAAR,toFixed,1</format>
+      <format>cargoScoredTotalAverage,toFixed,2</format>
+      <format>panelScoredTotalAverage,toFixed,2</format>
+      <format>objectsScoredTotalAverage,toFixed,2</format>
+      <format>HABEndPos3Percent,toFixed,2</format>
+      <format>HABEndPos2Percent,toFixed,2</format>
+      <format>startingPos2SuccessPercent,toFixed,2</format>
+      <format>startingPos1SuccessPercent,toFixed,2</format>
+      <format>defensePercent,toFixed,2</format>
+      <average>pointsAAR</average>
+      <total>pointsAAR</total>
+      <total>cargoScoredTotalAverage</total>
+      <total>panelScoredTotalAverage</total>
+      <total>objectsScoredTotalAverage</total>      
+      <option>robotGroup</option>
+    </view>
+      
+
+    <view>
       <name>Robot Ranking</name>
       <label>Shows Master AAR rankings for all robots in a year.</label>
       <type>table</type>
@@ -869,15 +905,16 @@
     </view>    
 
     <view>
-      <name>Robot Performance Trend</name>
-      <label>Performance of robot(s) over all competitions.</label>
+      <name>Robot Total Items Scored Trend</name>
+      <label>Trend of total items scored</label>
       <type>trend</type>
       <perspective>match</perspective>
       <constraint>year</constraint>
       <constraint>robot</constraint>
+      <constraint>competition</constraint>
       <field>date</field>
       <field>robot</field>
-      <field>masterAAR</field>
+      <field>objectsScoredTotal</field>
       <sort>date,ASC</sort>
     </view>
     
@@ -910,6 +947,23 @@
     </view>
 
     <view>
+<<<<<<< HEAD
+      <name>Robot Competition HAB Points Trend</name>
+      <label>HAB Scoring for robot(s) over a given competition.</label>
+      <type>trend</type>
+      <perspective>match</perspective>
+      <constraint>year</constraint>
+      <constraint>robot</constraint>
+      <constraint>competition</constraint>
+      <field>date</field>
+      <field>robot</field>
+      <field>HABScoring</field>
+      <sort>date,ASC</sort>
+    </view>    
+
+    <view>
+=======
+>>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
       <name>Robot Competitions</name>
       <label>Lists all of the competitions for a given robot - along with summary data.</label>
       <type>table</type>
@@ -944,6 +998,7 @@
       <field>panelScoredTotalAverage</field>
       <field>objectsScoredTotalAverage</field>
       <field>pointsAAR</field>
+<<<<<<< HEAD
       <field>HABEndPos3Percent</field>
       <field>HABEndPos2Percent</field>
       <field>HABEndPos1Percent</field>
@@ -955,6 +1010,7 @@
       <format>cargoScoredTotalAverage,toFixed,2</format>
       <format>panelScoredTotalAverage,toFixed,2</format>
       <format>objectsScoredTotalAverage,toFixed,2</format>
+      <format>pointsAAR,toFixed,2</format>      
       <format>HABEndPos3Percent,toFixed,0</format>
       <format>HABEndPos2Percent,toFixed,0</format>
       <format>HABEndPos1Percent,toFixed,0</format>
@@ -962,8 +1018,68 @@
       <format>defensePercent,toFixed,0</format>
       <format>startingPos2SuccessPercent,toFixed,2</format>
       <format>startingPos1SuccessPercent,toFixed,2</format>      
-    </view>        
+    </view>
 
+    <view>
+      <name>Robot Competition List</name>
+      <label>
+	Lists all of the robots at a particular competition - along with summary data.
+      </label>
+      <type>table</type>
+      <perspective>competition</perspective>
+      <constraint>competition</constraint>
+      <constraint>robot</constraint>
+      <constraint>year</constraint>
+      <field>robot</field>
+      <field>competition</field>
+      <field>cargoScoredTotalAverage</field>
+      <field>panelScoredTotalAverage</field>
+      <field>objectsScoredTotalAverage</field>
+      <field>pointsAAR</field>
+=======
+>>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
+      <field>HABEndPos3Percent</field>
+      <field>HABEndPos2Percent</field>
+      <field>HABEndPos1Percent</field>
+      <field>climbTimeAverage</field>
+      <field>startingPos2SuccessPercent</field>
+      <field>startingPos1SuccessPercent</field>
+      <field>defensePercent</field>
+      <sort>robot,DESC</sort>
+      <format>cargoScoredTotalAverage,toFixed,2</format>
+      <format>panelScoredTotalAverage,toFixed,2</format>
+      <format>objectsScoredTotalAverage,toFixed,2</format>
+<<<<<<< HEAD
+      <format>pointsAAR,toFixed,2</format>      
+=======
+>>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
+      <format>HABEndPos3Percent,toFixed,0</format>
+      <format>HABEndPos2Percent,toFixed,0</format>
+      <format>HABEndPos1Percent,toFixed,0</format>
+      <format>climbTimeAverage,toFixed,2</format>
+      <format>defensePercent,toFixed,0</format>
+      <format>startingPos2SuccessPercent,toFixed,2</format>
+      <format>startingPos1SuccessPercent,toFixed,2</format>      
+<<<<<<< HEAD
+    </view>
+=======
+    </view>        
+>>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
+
+    <view>
+      <name>Robot Defense List</name>
+      <type>table</type>
+      <label>to be done later</label>
+      <perspective>match</perspective>
+      <constraint>robot</constraint>
+      <constraint>year</constraint>
+      <constraint>competition</constraint>
+      <field>defenseTeamNum1</field>
+      <field>defenseTeamNum2</field>
+      <field>defenseTeamNum3</field>
+      <sort>robot,DESC</sort>
+    </view>
+      
     <view>
       <name>Robot Match Performance</name>
       <label>Shows the performance of a particular robot at a particular competition for a particular match.</label>
@@ -1915,6 +2031,7 @@
       <low>0</low> <high>1</high> <multiplier>3</multiplier>
       <target>panelScoredTotal</target>
       <low>0</low> <high>1</high> <multiplier>2</multiplier>
+<<<<<<< HEAD
       <target>HABEndPos3</target>
       <low>0</low> <high>1</high> <multiplier>12</multiplier>
       <target>HABEndPos2</target>
@@ -1933,13 +2050,44 @@
       <low>0</low> <high>1</high> <multiplier>3</multiplier>
       <target>trappedCargoSandstorm</target>
       <low>0</low> <high>1</high> <multiplier>3</multiplier>
+    </field>
+
+    <field>
+      <name>HABScoring</name>
+      <type>number</type>
+      <label>Points AAR</label>
+      <perspective>match</perspective>
+      <op>weight</op>
+=======
+>>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
+      <target>HABEndPos3</target>
+      <low>0</low> <high>1</high> <multiplier>12</multiplier>
+      <target>HABEndPos2</target>
+      <low>0</low> <high>1</high> <multiplier>6</multiplier>
+      <target>HABEndPos1</target>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
+      <target>HABAssist3</target>
+      <low>0</low> <high>1</high> <multiplier>12</multiplier>
+      <target>HABAssist2</target>
+      <low>0</low> <high>1</high> <multiplier>6</multiplier>
+      <target>HABAssist1</target>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
+      <target>startingPos2Success</target>
+      <low>0</low> <high>1</high> <multiplier>6</multiplier>
+      <target>startingPos1Success</target>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
+<<<<<<< HEAD
+=======
+      <target>trappedCargoSandstorm</target>
+      <low>0</low> <high>1</high> <multiplier>3</multiplier>
+>>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
     </field>    
 
     <field>
       <name>pointsAAR</name>
       <type>number</type>
       <label>Points AAR</label>
-      <perspective>Competition</perspective>
+      <perspective>competition</perspective>
       <op>weight</op>
       <target>cargoScoredTotalAverage</target>
       <low>0</low> <high>1</high> <multiplier>3</multiplier>
