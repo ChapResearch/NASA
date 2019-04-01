@@ -72,6 +72,9 @@ combinetest:
 combinetest2:
 	curl --header "Content-Type: application/json" -d @combineTest.json -XPOST  https://nasa.chapresearch.com/catcher
 
+weightTest:
+	curl --header "Content-Type: application/json" -d @weightTest.json -XPOST  https://nasa.chapresearch.com/catcher
+
 sumtest2:
 	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"5628","competition":"ElPaso","match":"1","record":{"one":"47","two":"2","three":"3"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
 

@@ -56,7 +56,7 @@ function calcMetaDataUpper(data,metaDataSpec,ref)
 			if(competition != METADATA) {
 			    data[year][robot][competition][METADATA] =
 				upperMetaData(metaDataSpec,"competition",data[year][robot][competition]);
-			    console.log(data[year][robot][competition][METADATA]);
+//			    console.log(data[year][robot][competition][METADATA]);
 			    ref.child(year).child(robot).child(competition).child(METADATA)
 				.set(data[year][robot][competition][METADATA]);
 			}
@@ -153,14 +153,15 @@ function calcMetaDataField(data,params,field)
     var operation = field.op;
 
     switch(operation) {
-    case 'count':    return(calcMetaDataField_count(data,params,field));
-    case 'average':  return(calcMetaDataField_average(data,params,field));
-    case 'combine':  return(calcMetaDataField_combine(data,params,field));
-    case 'delta':    return(calcMetaDataField_delta(data,params,field));
-    case 'sum':      return(calcMetaDataField_sum(data,params,field));
-    case 'percent':  return(calcMetaDataField_percent(data,params,field));
-    case 'weight':   return(calcMetaDataField_weight(data,params,field));
-    case 'contains': return(calcMetaDataField_contains(data,params,field));
+    case 'count':       return(calcMetaDataField_count(data,params,field));
+    case 'average':     return(calcMetaDataField_average(data,params,field));
+    case 'combine':     return(calcMetaDataField_combine(data,params,field));
+    case 'delta':       return(calcMetaDataField_delta(data,params,field));
+    case 'sum':         return(calcMetaDataField_sum(data,params,field));
+    case 'percent':     return(calcMetaDataField_percent(data,params,field));
+    case 'weight':      return(calcMetaDataField_weight(data,params,field));
+    case 'contains':    return(calcMetaDataField_contains(data,params,field));
+    case 'containsAny': return(calcMetaDataField_containsAny(data,params,field));
     default:         console.log("BAD OP: " + operation); return(false);
     }
 
@@ -183,8 +184,27 @@ function calcMetaDataField_weight(data,params,field)
 {
     var targets = field.target;
     var multipliers = field.multiplier;
-    var lows = field.low;
-    var highs = field.high;
+
+    // high/low are optional for weights - if not specified, then they
+    // default to low=0 and high=1 - which causes the multiplier to be
+    // the only factor
+
+    // BIG NOTE - due to the current organization of the XML, the high/low
+    //  is array that is "normally" positionally connected to the fields
+    //  that are specified.  HOWEVER, if one of the fields doesn't use a
+    //  high/low then the positions are off, and this doesn't work well.
+    //  The BEST thing to do is to either don't specify ANY highs/lows
+    //  or to specify a high and low for everything.
+
+    var lows = [];
+    if(field.hasOwnProperty("low")) {
+	lows = field.low;
+    }
+
+    var highs = [];
+    if(field.hasOwnProperty("high")) {
+	highs = field.high;
+    }
 
     // targets/targetVals should always be arrays, but just in case...
 
@@ -487,8 +507,9 @@ function calcMetaDataField_percent(data,params,field)
 //
 // _contains() - used to see if a data element (array) contains a particular
 //               value. Returns 1 if so, 0 otherwise. If there are multiple values
-//               all must be contained for the contains to be true.  Comparison is
+//               ALL must be contained for the contains to be true.  Comparison is
 //               done by string.
+//     This could really be called "containsAll"
 //
 function calcMetaDataField_contains(data,params,field)
 {
@@ -504,4 +525,28 @@ function calcMetaDataField_contains(data,params,field)
     }
 
     return(1);
+}
+
+//
+// _containsAny() - used to see if a data element (array) contains a particular
+//                  value. Returns 1 if so, 0 otherwise. If there are multiple values
+//                  all must be contained for the contains to be true.  Comparison is
+//                  done by string.
+//
+function calcMetaDataField_containsAny(data,params,field)
+{
+    var target = field.target[0];          // these are always arrays coming in
+    var targetVals = field.targetVal;
+
+    var dataTarget = normalizeDataItem(data,target);
+
+    var found = false;
+    for(var i=0; i < targetVals.length; i++) {
+	if(dataTarget.includes(targetVals[i])) {
+	    found = true;                        // if ANY match, we're done
+	    break;
+	}
+    }
+
+    return(found?1:0);
 }
