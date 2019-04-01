@@ -33,7 +33,7 @@
 #
 
 .firebaserc: firebaserc-template
-	cp firebaserc-template $@
+	cp ../FirebaseConfig/firebaserc-template $@
 
 firebase.json: firebasejson-template
 	cp firebasejson-template $@
