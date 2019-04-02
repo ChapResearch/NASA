@@ -24,8 +24,6 @@ function matchChange(match)
 //
 function resetChange()
 {
-    console.log("reset requested");
-
     keypadReset();       // clear robot number
     teamColorReset();    // clear the color
 
@@ -44,8 +42,10 @@ function connectionChange(conn)
 
     if(conn) {
 	con.addClass("connected");
+	$('button.send').prop('disabled',false);	
     } else {
 	con.removeClass("connected");
+	$('button.send').prop('disabled',true);	
 	nameChange("");
     }
     
@@ -103,6 +103,7 @@ function timerStart()
     timerCurrentTime = timerStartTime;
     timerDisplay();
 
+    $('button.reset').prop('disabled',true);
     $('button.start').prop('disabled',true);
     $('button.send').prop('disabled',true);
     $('button.stop').prop('disabled',false);
@@ -114,6 +115,7 @@ function timerStop()
 {
     clearInterval(timerInterval);
     timerDisplay();
+    $('button.reset').prop('disabled',false);
     $('button.start').prop('disabled',false);
     $('button.send').prop('disabled',false);
     $('button.stop').prop('disabled',true);
@@ -212,6 +214,10 @@ function connectBoxStatusReport(status)
 	                  return;
     case 'slot-fail':     box.find('.checking-slot .fail').show();
 	                  box.find('.failed').show();
+	                  box.find('button').show();
+	                  return;
+
+    default:              box.find('.failed').show();
 	                  box.find('button').show();
 	                  return;
     }
@@ -366,6 +372,8 @@ $( window ).on( "load", function() {
 
     target.append(output);
 
+    resetChange();
+    
     numSpinner_initAll();
 });
 
@@ -391,12 +399,15 @@ $( document ).ready(function() {
     myNASA.startMonitor(function(start) { if(start) {timerStart();} else { timerStop(); } });
     
     $('div.connect-indicator').click(function() {
-	console.log("clicky clicky");
 	if(myNASA.connected) {
 	    myNASA.disconnect();
 	} else {
-	    connectBox(true);
-	    myNASA.connect(connectBoxStatusReport);
+	    if($('div.myname-name span').text() == "") {
+		alert("You must enter a NAME before connecting. Click on \"My Name\" at the top of the screen.");
+	    } else {
+		connectBox(true);
+		myNASA.connect(connectBoxStatusReport);
+	    }
 	}
     });
 
@@ -414,11 +425,7 @@ $( document ).ready(function() {
     });
 
     $('div.myname-name, div.myname-prompt').click(function() {
-	if(myNASA.connected) {
-	    alert("You can't change name or password while connected!");
-	} else {
-	    settingsForm(true);
-	}
+	settingsForm(true);
     });
 
     $('div.connecting-dialog button').click(function() {
@@ -430,6 +437,11 @@ $( document ).ready(function() {
 	myNASA.setPassword($('div.settings-form .password-input input').val());
 
 	$('div.myname-name span').text(myNASA.getUserName());
+
+	if(myNASA.connected) {
+	    myNASA.sendUserName();
+	}
+	
 	settingsForm(false);
     });
 
@@ -442,7 +454,11 @@ $( document ).ready(function() {
     });
 
     $('button.send').click(function() {
-	dataSend();
+	if($('div.myname-name span').text() == "") {
+	    alert("You must enter a NAME before sending data. Click on \"My Name\" at the top of the screen.");
+	} else {
+	    dataSend();
+	}
     });
 
     $('button.reset').click(function() {

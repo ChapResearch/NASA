@@ -1,5 +1,6 @@
-<html>
+<html manifest="contributor.appcache">
   <head>
+    <link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" type="text/css" href="NASA.css">
     <link rel="stylesheet" type="text/css" href="Season/season.css">
     <link rel="stylesheet" type="text/css" href="numSpinner.css">
@@ -13,7 +14,9 @@
     <script src="Season/generateHTML2.js"></script>
     <script src="Season/season.js"></script>
     <script src="Season/seasonDataGather.js"></script>    
-    
+
+    <meta name="mobile-web-app-capable" content="yes">
+
   </head>
   <body>
     <object data="../season.xml" id="seasonXML" height="0px" width="0px"></object>
@@ -88,7 +91,7 @@
       </div>
       <div class="password-input">
 	<div class="title">Controller Password:</div>
-	<input type="text" name="password" maxlength="10"><br>
+	<input type="text" name="password" maxlength="10" autocapitalize="off"><br>
       </div>
       <button>Save</button>
     </div>
@@ -121,9 +124,9 @@
       <div class="team-color none"><div>(color)</div></div>
       <canvas id="time-display" width="150" height="50"></canvas>
       <button class="start">START</button>
-      <button class="stop" disabled>STOP</button>
-      <button class="send">SEND</button>
-      <button class="reset">Reset</button>      
+      <button class="stop" >STOP</button>
+      <button class="send" disabled>SEND</button>
+      <button class="reset">RESET</button>      
     </div>
 
     <div class="content">

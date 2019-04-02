@@ -377,9 +377,9 @@ div.bottom-bar button.reset {
 div.bottom-bar button.stop {
     left: 535px;
     background-color: #ff3333;
-    disable: true;
 }
 
+div.bottom-bar button.reset:disabled,
 div.bottom-bar button.stop:disabled,
 div.bottom-bar button.send:disabled,
 div.bottom-bar button.start:disabled {

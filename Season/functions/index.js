@@ -306,7 +306,7 @@ function metaFieldData(xmlObj)
 
 	var newObject = {};
 
-	var baseFields = [ "name","type","label","op" ];
+	var baseFields = [ "name","type","label","op",'eqVal','ltVal','gtVal'];
 
 	baseFields.forEach(function(field) {
 	    if(incomingFieldObj.hasOwnProperty(field)) {	    
@@ -456,7 +456,7 @@ function viewsData(xmlObj)
 	    }
 	});
 
-	var listFields = [ "field","constraint","format" ];
+	var listFields = [ "field","constraint","format","total","average","option" ];
 	
 	listFields.forEach(function(field) {
 	    if(viewObject.hasOwnProperty(field)) {
@@ -532,11 +532,16 @@ function checkData(xmlobject)
 		      sum:     ["target"],
 		      percent: ["target","targetVal"],
 		      weight:  ["target","multiplier"],
-		      contains:["target","targetVal"]
-		      containsAny:["target","targetVal"]
+		      contains:["target","targetVal"],
+		      containsAny:["target","targetVal"],
+		      max:     ["target"],
+		      min:     ["target"],
+		      compare: ["target"]
 		    };
 
-    var optFields = { weight: ["high","low"] };
+    var optFields = { weight: ["high","low"],
+		      compare: ['ltVal','gtVal','eqVal']
+		    };
 	
 	
     // TODO - should check that all of the right things are there for the ops
@@ -616,9 +621,25 @@ function checkViews(views,rawDataFields,metaDataFields)
     var output = "";
     
     var viewReqSections = [ 'name','label','type','perspective','field' ];
+
     var validConstraints = [ 'year','robot','competition','match'];
     var validFormats = [ 'toFixed','percent' ];
     var validSorts = [ 'ASC','DESC' ];
+    var validOptions = [ 'robotGroup' ];
+
+    // this little array set's up validation of optional sections, the array is as follows:
+    //    [0] = name of section
+    //    [1] = true if an array, false if single value
+    //    [2] = array of valid values, or null to indicate a valid view field must be specified
+    //    [3] = array of valid modifiers which will follow by a comma, or null if no modifiers valid
+    
+    var viewOptSections = [ ['average',null,        null],
+			    ['option', validOptions,null],
+			    ['total',  null,        null],
+			    ['sort',   null,        validSorts],
+			    ['format', null,        validFormats ]
+			  ];
+
 
     // fields added automatically by the system
     var specialFields = [ 'year','robot','competition','match', 'date'];
@@ -655,26 +676,39 @@ function checkViews(views,rawDataFields,metaDataFields)
 		output += "VIEWS ERROR: " + views[i].name + ' - invalid field: "' + fieldName + '"<br>\n';
 	    }
 	}
-	    
-	if(views[i].hasOwnProperty("sort")) {
-	    var sort = views[i].sort.split(',');
-	    if(!views[i].field.includes(sort[0])) {
-		output += "VIEWS ERROR: " + views[i].name + ' - unknown sort field: "' + sort[0] + '"<br>\n';
-	    } else {
-		if(!validSorts.includes(sort[1])) {
-		    output += "VIEWS ERROR: " + views[i].name + ' - bad sort order: "' + sort[1] + '"<br>\n';
-		}
-	    }
-	}
 
-	if(views[i].hasOwnProperty("format")) {
-	    for(var j=0; j < views[i].format.length; j++) {
-		var format = views[i].format[j].split(',');
-		if(!validFormats.includes(format[1])) {
-		    output += "VIEWS ERROR: " + views[i].name + ' - bad format op: "' + format[1] + '"<br>\n';
+	// process the optional sections
+
+	for(var j=0; j < viewOptSections.length; j++) {
+
+	    var sectName = viewOptSections[j][0];        // name of optional section
+	    var sectValues = viewOptSections[j][1];      // array of valid values, if null, a valid view field req'd
+	    var sectModifiers = viewOptSections[j][2];   // null if no modifiers, array of valid mods otherwise
+
+	    if(views[i].hasOwnProperty(sectName)) {
+		var values = views[i][sectName];
+		if(!Array.isArray(values)) {             // treat all sections like arrays here
+		    values = [values];
 		}
-		if(!views[i].field.includes(format[0])) {
-		    output += "VIEWS ERROR: " + views[i].name + ' - unknown format field: "' + format[0] + '"<br>\n';
+		for(var k=0; k < values.length; k++) {
+		    var valueSplit = values[k].split(',');
+
+		    if(!sectValues && !views[i].field.includes(valueSplit[0])) {
+			output += "VIEWS ERROR: " + views[i].name +
+			    ' - unknown ' + sectName + ' field: "' + valueSplit[0] + '"<br>\n';
+		    } else if(sectValues && !sectValues.includes(valueSplit[0])) {
+			output += "VIEWS ERROR: " + views[i].name +
+			    ' - unknown ' + sectName + ' value: "' + valueSplit[0] + '"<br>\n';
+		    } else if(sectModifiers) {
+			if(!valueSplit[1]) {
+			    output += "VIEWS ERROR: " + views[i].name +
+				' - missing modifier for ' + sectName + ': "' + valueSplit[0] + '"<br>\n';
+			} else if(!sectModifiers.includes(valueSplit[1])) {
+			    output += "VIEWS ERROR: " + views[i].name +
+				' - bad modifier "' + valueSplit[1] + '" for ' +
+				sectName + ': "' + valueSplit[0] + '"<br>\n';
+			}
+		    }
 		}
 	    }
 	}
