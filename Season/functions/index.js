@@ -693,7 +693,9 @@ function checkViews(views,rawDataFields,metaDataFields)
 		for(var k=0; k < values.length; k++) {
 		    var valueSplit = values[k].split(',');
 
-		    if(!sectValues && !views[i].field.includes(valueSplit[0])) {
+		    if(!sectValues &&
+		       !views[i].field.includes(valueSplit[0]) &&
+		       !specialFields.includes(valueSplit[0])) {
 			output += "VIEWS ERROR: " + views[i].name +
 			    ' - unknown ' + sectName + ' field: "' + valueSplit[0] + '"<br>\n';
 		    } else if(sectValues && !sectValues.includes(valueSplit[0])) {
