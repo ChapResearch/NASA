@@ -425,11 +425,7 @@ $( document ).ready(function() {
     });
 
     $('div.myname-name, div.myname-prompt').click(function() {
-	if(myNASA.connected) {
-	    alert("You can't change name or password while connected!");
-	} else {
-	    settingsForm(true);
-	}
+	settingsForm(true);
     });
 
     $('div.connecting-dialog button').click(function() {
@@ -441,6 +437,11 @@ $( document ).ready(function() {
 	myNASA.setPassword($('div.settings-form .password-input input').val());
 
 	$('div.myname-name span').text(myNASA.getUserName());
+
+	if(myNASA.connected) {
+	    myNASA.sendUserName();
+	}
+	
 	settingsForm(false);
     });
 
