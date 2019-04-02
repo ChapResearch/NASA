@@ -591,21 +591,21 @@
 
     <field>
       <name>defenseTeamNum1</name>
-      <type>textInput</type>
+      <type>numberInput</type>
       <size>20,3</size>
       <location>5,45</location>
     </field>
 
     <field>
       <name>defenseTeamNum2</name>
-      <type>textInput</type>
+      <type>numberInput</type>
       <size>20,3</size>
       <location>5,53</location>
     </field>
 
     <field>
       <name>defenseTeamNum3</name>
-      <type>textInput</type>
+      <type>numberInput</type>
       <size>20,3</size>
       <location>5,59</location>
     </field>    
@@ -947,7 +947,6 @@
     </view>
 
     <view>
-<<<<<<< HEAD
       <name>Robot Competition HAB Points Trend</name>
       <label>HAB Scoring for robot(s) over a given competition.</label>
       <type>trend</type>
@@ -962,8 +961,6 @@
     </view>    
 
     <view>
-=======
->>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
       <name>Robot Competitions</name>
       <label>Lists all of the competitions for a given robot - along with summary data.</label>
       <type>table</type>
@@ -998,7 +995,6 @@
       <field>panelScoredTotalAverage</field>
       <field>objectsScoredTotalAverage</field>
       <field>pointsAAR</field>
-<<<<<<< HEAD
       <field>HABEndPos3Percent</field>
       <field>HABEndPos2Percent</field>
       <field>HABEndPos1Percent</field>
@@ -1036,8 +1032,6 @@
       <field>panelScoredTotalAverage</field>
       <field>objectsScoredTotalAverage</field>
       <field>pointsAAR</field>
-=======
->>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
       <field>HABEndPos3Percent</field>
       <field>HABEndPos2Percent</field>
       <field>HABEndPos1Percent</field>
@@ -1049,10 +1043,7 @@
       <format>cargoScoredTotalAverage,toFixed,2</format>
       <format>panelScoredTotalAverage,toFixed,2</format>
       <format>objectsScoredTotalAverage,toFixed,2</format>
-<<<<<<< HEAD
       <format>pointsAAR,toFixed,2</format>      
-=======
->>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
       <format>HABEndPos3Percent,toFixed,0</format>
       <format>HABEndPos2Percent,toFixed,0</format>
       <format>HABEndPos1Percent,toFixed,0</format>
@@ -1060,11 +1051,7 @@
       <format>defensePercent,toFixed,0</format>
       <format>startingPos2SuccessPercent,toFixed,2</format>
       <format>startingPos1SuccessPercent,toFixed,2</format>      
-<<<<<<< HEAD
     </view>
-=======
-    </view>        
->>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
 
     <view>
       <name>Robot Defense List</name>
@@ -2031,7 +2018,6 @@
       <low>0</low> <high>1</high> <multiplier>3</multiplier>
       <target>panelScoredTotal</target>
       <low>0</low> <high>1</high> <multiplier>2</multiplier>
-<<<<<<< HEAD
       <target>HABEndPos3</target>
       <low>0</low> <high>1</high> <multiplier>12</multiplier>
       <target>HABEndPos2</target>
@@ -2058,8 +2044,6 @@
       <label>Points AAR</label>
       <perspective>match</perspective>
       <op>weight</op>
-=======
->>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
       <target>HABEndPos3</target>
       <low>0</low> <high>1</high> <multiplier>12</multiplier>
       <target>HABEndPos2</target>
@@ -2076,11 +2060,6 @@
       <low>0</low> <high>1</high> <multiplier>6</multiplier>
       <target>startingPos1Success</target>
       <low>0</low> <high>1</high> <multiplier>3</multiplier>
-<<<<<<< HEAD
-=======
-      <target>trappedCargoSandstorm</target>
-      <low>0</low> <high>1</high> <multiplier>3</multiplier>
->>>>>>> 97b27082fe05b8b0e500735da2500230bdb55608
     </field>    
 
     <field>
