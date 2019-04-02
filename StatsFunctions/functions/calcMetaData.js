@@ -162,6 +162,11 @@ function calcMetaDataField(data,params,field)
     case 'weight':      return(calcMetaDataField_weight(data,params,field));
     case 'contains':    return(calcMetaDataField_contains(data,params,field));
     case 'containsAny': return(calcMetaDataField_containsAny(data,params,field));
+    case 'min':         return(calcMetaDataField_min(data,params,field));
+    case 'max':         return(calcMetaDataField_max(data,params,field));
+
+	// All these cases combine into a call to the compare function
+    case 'compare':      return(calcMetaDataField_compare(data,params,field));	
     default:         console.log("BAD OP: " + operation); return(false);
     }
 
@@ -549,4 +554,85 @@ function calcMetaDataField_containsAny(data,params,field)
     }
 
     return(found?1:0);
+}
+
+//
+// _min() - Loops through every value of the given field
+//          and returns the lowest value.
+//
+function calcMetaDataField_min(data,params,field)
+{
+    var target = field.target[0];          // these are always arrays coming in
+
+    var dataTarget = normalizeDataItem(data,target);
+    var min = null;
+
+    for(var i=0; i < dataTarget.length; i++) {
+	if(min===null || dataTarget[i] < min){
+	    min = dataTarget[i];
+	} 
+    }
+
+    return(min);
+}
+
+//
+// _max() - Loops through every value of the given field
+//          and returns the highest value.
+//
+function calcMetaDataField_max(data,params,field)
+{
+    var target = field.target[0];          // these are always arrays coming in
+
+    var dataTarget = normalizeDataItem(data,target);
+    var max = null;
+
+    for(var i=0; i < dataTarget.length; i++) {
+	if(max===null || dataTarget[i] > max){
+	    max = dataTarget[i];
+	} 
+    }
+
+    return(max);
+}
+
+//
+// _compare() - Compare 2 field values using a given
+//              operation.
+//
+function calcMetaDataField_compare(data,params,field)
+{
+    var returnVal;
+    var target = field.target[0];          // these are always arrays coming in
+    var target2 = field.target[1];
+    var ltVal = "Less Than";              // These are the default values for when no value is entered
+    var gtVal = "Greater Than";
+    var eqVal = "Equal";
+
+    var dataTarget = normalizeDataItem(data,target);
+    var dataTarget2 = normalizeDataItem(data,target2);
+
+    if(field.hasOwnProperty('ltVal')){
+	ltVal = field.ltVal;
+    }
+    
+    if(field.hasOwnProperty('gtVal')){
+	gtVal = field.gtVal;
+    }
+    
+    if(field.hasOwnProperty('eqVal')){
+	eqVal = field.eqVal;
+    }
+    
+    if(target<target2){
+	returnVal = ltVal;
+    } else if(target>target2){
+	returnVal = gtVal;
+    } else if(target==target2){
+	returnVal = eqVal;
+    } else{
+	returnVal = null;
+    }
+
+    return (returnVal);
 }
