@@ -11,13 +11,22 @@ div.top-bar {
     font-size: 20px;
 }
 
+/***** by doing this to body, it causes child 100% to refer to body as ***/
+/**** opposed to default behavior where child 100% refers to the height */
+/**** of the html element, which is the height of window ***/
+
+body {
+    position: relative;
+}
+		  
 body > div.content {
     position: absolute;
     top: 110px;
     left: 0px;
     width: calc(100% - 16px);
     height: calc(100% - 126px );
-    border: 8px solid #7777ff;
+    /*    border: 8px solid #7777ff;    */
+    border: 8px solid white;
     min-width: 1175px;
     min-height: 650px;
 }
@@ -171,11 +180,8 @@ body > div.content {
     margin: 20px;
 }
 
-.results-box {
-}
-
 .constraint-input {
-    width: 125px;
+    width: 150px;
     border: 3px solid grey;
     margin-left: 20px;
     float: left;
@@ -186,13 +192,23 @@ body > div.content {
     position: relative;   /* necessary for lower level positioning */
 }
 
-.constraint-input.constraint-input-competition {
-    width: 175px;
-}
+/** decided to go ahead and set the widths of everything explicity **/
+/**   because we're starting to use floats and/or positioning      **/
 
-.constraint-input.constraint-input-match {
-    width: 75px;
-}
+/* first the outside boxes */
+
+.constraint-input.constraint-input-year {        width: 140px; }
+.constraint-input.constraint-input-robot {       width: 150px; }
+.constraint-input.constraint-input-competition { width: 190px; }
+.constraint-input.constraint-input-match {       width: 130px; }
+
+/* then the select containter */
+
+.constraint-input.constraint-input-year > div.content {        width: 90px; }
+.constraint-input.constraint-input-robot > div.content {       width: 100px; }
+.constraint-input.constraint-input-competition > div.content { width: 145px; }
+.constraint-input.constraint-input-match > div.content {       width: 80px; }
+
 
 .constraint-input select {
     background: url("select-arrow-22x30.png") no-repeat 97% 0;
@@ -213,9 +229,9 @@ body > div.content {
     margin: 0px;
     padding: 0px;
     box-shadow: 5px 5px 10px #777777;
-    width: 90%;
     backgound-color: transparent;
     border-radius: 5px;
+    float: left;
 }
 
 .constraint-input > div.content.single {
@@ -272,7 +288,7 @@ body > div.content {
     margin-left: 20px;
     margin-top: 20px;
     margin-bottom: 20px;
-    font-size: 16px;
+    font-size: 15px;
     font-family: sans-serif;
     height: 50px;
     border: 3px solid grey;
@@ -281,7 +297,7 @@ body > div.content {
     padding-left: 10px;
     padding-bottom: 10px;
     border-radius: 5px;
-    max-width: 400px;
+    max-width: 300px;
 }
 
 .viewtitle-box .title {
@@ -292,7 +308,7 @@ body > div.content {
     padding-left: 5px;
     padding-right: 5px;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .viewtitle-box .description {
@@ -314,14 +330,16 @@ body > div.content {
 .results-box {
     clear: both;
     position: absolute;
-    top: 100px;
+    top: 130px;
     left: 20px;
     height: calc(100% - 150px);
     width: calc(100% - 30px);
+
     background-color: transparent;
+    --table-background-color: #3b8ec2;
 }
 
-.results-box > table {
+.results-box table.viewTable {
     border: 2px solid blue;
     font-family: sans-serif;
     font-size: 15px;
@@ -330,65 +348,100 @@ body > div.content {
     border-collapse: collapse;
 }
 
-.results-box > table > thead > tr > th {
+.results-box table.viewTable > thead > tr > th {
     font-size: 18px;
     font-weight: bold;
     color: white;
-    background-color: #3b8ec2;
+    background-color: var(--table-background-color);
     padding-right: 5px;
     padding-left: 5px;
     text-align: center;
     cursor: pointer;
 }
 
-.results-box > table > thead > tr > th + th {
+.results-box table.viewTable > thead > tr > th + th {
     border-left: 1px solid #cccccc;
 }
 
-.results-box > table > thead > tr {
+.results-box table.viewTable > thead > tr {
     border-bottom: 2px solid black;
 }
 
-.results-box > table > tbody > tr > td {
+.results-box table.viewTable > tbody > tr > td {
     padding-top: 2px;
     padding-bottom: 2px;
     border-left: 2px solid blue;
     border-bottom: 2px solid white;
 }
 
-.results-box > table > tbody > tr > td:last-child {
+.results-box table.viewTable > tbody > tr > td:last-child {
+    /* this line is important due to border collapse - makes the right side solid */
     border-right: 2px solid blue;
 }
 
     
-.results-box > table > tbody > tr > td + td {
+.results-box table.viewTable > tbody > tr > td + td {
     border-left: 1px solid #aaaaaa;
 }
 
-.results-box > table > tbody > tr {
+.results-box table.viewTable > tbody > tr {
     background-color: #eeeeee;
 }
 
-.results-box > table > tbody > tr:nth-child(odd) {
+.results-box table.viewTable > tbody > tr:nth-child(odd) {
     background-color: #bcdaeb;
 }
 
-.results-box > table > tbody > tr:hover {
+.results-box table.viewTable > tbody > tr:hover:not(.specialRow-row) {
     background-color: #3b8ec2;
     color: white;
 }
 
-.results-box > table > tfoot > tr {
+.results-box table.viewTable > tfoot > tr {
     font-size: 10px;
     font-weight: bold;
     color: white;
-    background-color: #3b8ec2;
+    background-color: var(--table-background-color);
 }
-.results-box > table > tfoot > tr > td {
+.results-box table.viewTable > tfoot > tr > td {
     padding-top: 2px;
     padding-bottom: 2px;
     padding-left: 5px;
 }
+
+/******** grouped table floating ********/
+.results-box .groupTable {
+    float: left;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+.results-box .groupTable.red {
+    --table-background-color: #ff6864;
+}
+
+.results-box table.viewTable tr.specialRow-row td:last-child {
+    border: 2px solid blue;
+}
+
+.results-box table.viewTable td.specialRow-label {
+    background-color: white;
+    border-right: 0px !IMPORTANT;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.results-box table.viewTable td.specialRow-data {
+    text-align: center;
+}
+
+.results-box table.viewTable td.totalRow-data {
+    background-color: lightsalmon;
+}
+
+.results-box table.viewTable td.averageRow-data {
+    background-color: lightgreen;
+}
+
 
 /******** sorting header symbols **********/
 
@@ -425,14 +478,46 @@ body > div.content {
 
 /******** multi selection ********/
 
-div.multi-on {
-    position: absolute;
-    top: -20px;
-    right: 5px;
-    font-size: 35px;
-    font-family: sans-serif;
-    cursor: pointer;
+div.multi-on-button {
+    background-color: #3b8ec2;
+    box-shadow: 5px 5px 10px #777777;
+    border-radius: 100%;    /* circle */
+    float: left;
+    width: 28px;
+    height: 28px;
+    margin-left: 10px;
+    position: relative;
+    top: 1px;
 }
+
+/* the special "-multi-" choice is presented specially, **/
+/*   so it needs to be tightly controlled               **/
+
+.option-multi,
+.constraint-input > .content > select.is-multi {       /* the specific option for multi in the select list */
+    font-size: 14px;   /*   I'm hoping this works in all browsers...       */
+    font-style: italic;
+    font-weight: bold;
+}
+
+.option-non-multi {
+    font-size: 24px;
+    font-style: normal;
+    font-weight: normal;
+}
+
+div.multi-on-button.disabled {
+    background-color: #aaaaaa;
+}
+
+.constraint-input > div.multi-on-button:active,
+.constraint-input > div.multi-on-button.active {
+    top: 3;
+    left: 3;
+    box-shadow: 2px 2px 5px #777777;
+    
+}
+
 
 div.constraint-box-multi {
     margin-left: 500px;
@@ -462,8 +547,15 @@ div.multi-selection {
     float: left;
     background-color: #aaaaaa;
     cursor: pointer;
+    user-select: none;
+    ms-user-select:none;
 }
 
-div.multi-selection.selected {
+div.multi-selection.selected:not(.group),
+div.multi-selection.selected.group.blue {
     background-color: #3b8ec2;
+}
+
+div.multi-selection.selected.group.red {
+    background-color: red;
 }

@@ -31,6 +31,10 @@
 #			the process a bit, instead of running "firebase init"
 #			it configures the configuration files directly.
 #
+# ** Thu Feb 28 10:43:03 2019 **
+# clean bring-up notes
+#  - run "firebase init functions" (need to explore everything this does)
+#  - run "npm install firebase --save" in functions directory (explore this too)
 
 .firebaserc: firebaserc-template
 	cp firebaserc-template $@
@@ -75,7 +79,7 @@ deployPanelCargo:
 	firebase deploy --only functions:sumPanelCargo
 
 test:
-	curl -d "password=floopy" -X POST https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+	curl --header "Content-Type: application/json" -d @testData.json -XPOST  https://nasa.chapresearch.com/catcher
 
 badtest:
 	curl -d "password=floopyx" -X POST https://us-central1-nasa-7a363.cloudfunctions.net/catcher
@@ -83,7 +87,7 @@ badtest:
 refresh:
 
 newtest:
-	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"2468","competition":"ElPaso","match":"1","record":{"one":"1","two":"2","three":"3"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2020","team_number":"2468","competition":"ElPaso","match":"1","record":{"one":"1","two":"2","three":"3"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
 
 
 newtest2:

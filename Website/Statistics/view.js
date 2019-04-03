@@ -28,6 +28,15 @@ var ALL_CONSTRAINTS = [{constraint:'year',indicator:'Y'},
 		       {constraint:'match',indicator:'M'}];
 
 //
+// isOptionGroup() - returns true if the given viewname has the "robotGroup" option.
+//
+function isOptionGroup(viewData)
+{
+    return(viewData.constraint.includes("robot") &&
+	   viewData.hasOwnProperty('option') && viewData.option.includes("robotGroup"));
+}
+
+//
 // viewData() - downloads all of the view data from the XML file (actually, the computed
 //              JSON file). Note that the data is reorganized to have the name of the view
 //              be in the VIEW_DATA object to make retrieval easier.
@@ -122,7 +131,7 @@ function viewListRefresh_load(target,data)
 {
     $('.listbox .throbber').hide();
 
-    $('div.multi-on').hide();                // hide the turn-on-multi indicator
+    $('div.multi-on-button').hide();         // hide the turn-on-multi indicator
     $('div.constraint-input-multi').hide();  // hide the multi-selector lists
 
     var output = "";
@@ -137,6 +146,7 @@ function viewListRefresh_load(target,data)
 	case 'pie':    output += '<img src="pie-512-512.png">'; break;
 	case 'bar':    output += '<img src="bar-512-512.png">'; break;
 	case 'trend':  output += '<img src="trend-512-512.png">'; break;
+	case 'stacked':output += '<img src="bar-512-512.png">'; break;
 	}
 	output += '</div>';
 
@@ -146,8 +156,15 @@ function viewListRefresh_load(target,data)
 	    // this keeps the constraint indicators in order - indepedent upon the xml file order
 	    ALL_CONSTRAINTS.forEach((element) => {
 		if(data[viewname].constraint.includes(element.constraint)) {
+		    var modifier = "";
+		    if(element.constraint == 'robot') {          // special treatment of robot groups
+			if(isOptionGroup(data[viewname])) {
+			    modifier += '<span style="color:black">|</span>';
+			    modifier += '<span style="color:red">R</span>';
+			}
+		    }
 		    output += '<span class="list-constraint constraint-' + element.constraint + '">' +
-			element.indicator + '</span>';
+			element.indicator + modifier + '</span>';
 		}
 	    });
 	}
@@ -172,9 +189,6 @@ function viewListRefresh_load(target,data)
 function viewDisplay(name)
 {
     var view = VIEW_DATA[CURRENT_VIEW.name];
-
-    console.log("ready to display " + CURRENT_VIEW.name);
-    console.log(view);
 
     viewTitleSet(view.name,view.label);
 
@@ -201,7 +215,7 @@ function viewDisplay(name)
     selectorEnable("competition",false);
     selectorEnable("match",false);
 
-    constraintPopulateAll();
+    constraintPopulateAll({});
     
     $('.results-box').empty();
 
@@ -209,7 +223,6 @@ function viewDisplay(name)
     //   UI time to catch-up
     
     setTimeout(function() {
-	console.log("floopy");
 	selectorGoEnable(checkConstraints());
     },1000);
 }
@@ -232,6 +245,7 @@ function viewGoLoad()
     case 'report': display = viewReportHTML.bind(null,target); break;
     case 'pie':    display = viewPie.bind(null,target); break;
     case 'trend':  display = viewTrend.bind(null,target); break;
+    case 'stacked':display = viewStacked.bind(null,target); break;
     }
 	
     viewPopulate(display);
@@ -270,9 +284,7 @@ function viewPopulate(callback)
 	    var currentRow = [];
 	    for(var j=0; j < fields.length; j++) {
 		var fieldName = fields[j].name; 
-		console.log("trying to populate " +fieldName);
 		if(!fields[j].hasOwnProperty("perspective") || fields[j].perspective == "match") {
-		    console.log("match data or match metaData");
 		    currentRow.push(filtered[i][fieldName]);
 		} else {
 		    var meta = fields[j].perspective + "_metaData";
@@ -292,8 +304,6 @@ function viewPopulate(callback)
 
 	    CURRENT_VIEW.data.push(currentRow);
 	}
-
-	console.log(filtered);
 
 	// sort comes in as a single field setting in the view
 
@@ -346,8 +356,6 @@ function viewPopulate(callback)
 	    }
 	}
 
-	console.log(CURRENT_VIEW.format);
-	
 	if(callback) callback();
     });
 }
@@ -627,9 +635,226 @@ function viewPie_FN(target)
     chart.draw(dataTable, options);
 }
 
+//
+// viewStacked() - spit out a pretty stacked chart
+//
+function viewStacked(target)
+{
+    var data = CURRENT_VIEW.data;
+
+    target.empty();
+
+    google.charts.load('visualization','1.1', {packages: ['bar']});
+
+    if(isOptionGroup(VIEW_DATA[CURRENT_VIEW.name])) {
+	var split = multiSelected('robot');
+	var splitData = groupSplitData(data,split.red,split.blue);
+	google.charts.setOnLoadCallback(viewStacked_FN_Group.bind(null,target,splitData.blue,splitData.red));
+    } else {
+	viewStacked_FN(target);
+    }
+
+//    $(window).resize(viewStacked_FN.bind(null,target));
+    
+}
+
+//
+// viewStacked_FN_Group() - this function is specified for showing robotGroup style data. It
+//                          creates a side-by-side comparision of the given data for the given
+//                          robots.
+//
+//                     Data format for a stacked chart is as follows:
+//                     row[0] = the ID that is used to form segments of an individual bar
+//                     row[1..] = each attribute that will be a separate bar
+//
+//         For example:
+//                       robot   points   panels   cargo
+//                       -----   ------   ------   -----
+//                       2468      10       20       30
+//                        624       5       10       40
+//                       4610      22        5       24
+//
+//         With this data, there will be 3 bars "points", "panels", "cargo"
+//         and each bar will have three segments named "2468", "624", and "4610"
+//         The vertical axis will be labeled with the row[1..] labels and the overall
+//         axis
+//
+
+function viewStacked_FN_Group(target,blueData,redData)
+{
+    var name = CURRENT_VIEW.name;
+    var label = VIEW_DATA[name].label;
+    var headers = CURRENT_VIEW.headers;
+    var data = CURRENT_VIEW.data;
+    var dataTypes = CURRENT_VIEW.dataTypes;
+    var sort = CURRENT_VIEW.sort;
+    var sortType = CURRENT_VIEW.sortType;
+    var format = CURRENT_VIEW.format;
+
+    viewTableSort(data,dataTypes,sort);         // replaces the data by a sorted version
+
+    var data = new google.visualization.DataTable();
+
+    var dataTable = new google.visualization.DataTable();
+
+    dataTable.addColumn("string","Red/Blue Comparison");
+    
+    for(var i=0; i < blueData.length; i++) {
+	dataTable.addColumn("number",blueData[i][0]);  // robot MUST be [0] for this to all work!
+    }
+    for(var i=0; i < redData.length; i++) {
+	dataTable.addColumn("number",redData[i][0]);   // robot MUST be [0] for this to all work!
+    }
+
+    // now we create a set of data that is really the rotation of the incoming data
+    //   where the columns are the robot scores and the rows are the attributes.
+
+    var rows = [];
+    for(var i=1; i < headers.length; i++) {
+	var row = [headers[i]];
+	rows.push(row);
+    }
+
+    for(var i=0; i < rows.length; i++) {
+	for(var j=0; j < blueData.length; j++) {
+	    rows[i].push(Number(blueData[j][i+1]));
+	}
+	for(var j=0; j < redData.length; j++) {
+	    rows[i].push(Number(redData[j][i+1]));
+	}
+    }
+
+    // need to figure out the maximum on the y-axis to make things work well
+    var maxTotal = 0;
+    
+    for(var i=1; i < headers.length; i++) {
+	var total = 0;
+	for(var j=0; j < blueData.length; j++) {
+	    total += blueData[j][i];
+	}
+	if(total > maxTotal) {
+	    maxTotal = total;
+	}
+    }
+
+    for(var i=1; i < headers.length; i++) {
+	var total = 0;
+	for(var j=0; j < redData.length; j++) {
+	    total += redData[j][i];
+	}
+	if(total > maxTotal) {
+	    maxTotal = total;
+	}
+    }
+
+    dataTable.addRows(rows);
+
+    var options = {
+        isStacked: true,
+        width: 800,
+//        height: 600,
+        chart: {
+            title: name,
+            subtitle: label,
+        },
+        vAxis: {
+            viewWindow: {
+                min: 0,
+                max: maxTotal*1.1
+            }
+	},
+	series: {}
+    };
+
+    // now, we use a google charts trick to put the second set of data (red)
+    //   on the "second" axis
+
+    for(var i=0; i < redData.length; i++) {
+	options.series[i+blueData.length] = { targetAxisIndex: 1 };
+    }
+
+    console.log(target.get[0]);
+    var chart = new google.charts.Bar(target.get(0));
+    chart.draw(dataTable, google.charts.Bar.convertOptions(options));
+}
 
 
-		       
+function viewStacked_FN(target)
+{
+}
+
+//
+// multiSelected() - returns an object with the things that are selected in the multi-
+//                   select box specified. { all:[], blue:[], red:[] }
+//
+//                      all - all selected
+//                     blue - selected marked as blue
+//                      red - selected marked as red
+//
+function multiSelected(selector)
+{
+    var all = [];
+    var blue = [];
+    var red = [];
+    
+    var selected = $('.multi-selection-' + selector + '.selected').each(function() {
+	var value = "" + $(this).data("value");       // TODO - should this ALWAYS be a string?
+	all.push(value);
+
+	if($(this).hasClass('blue')) {
+	    blue.push(value);
+	} else if($(this).hasClass('red')) {
+	    red.push(value);
+	}
+    });
+
+    return({all:all,blue:blue,red:red});
+}
+
+//
+// findFieldIndex() - Return the index of the given field in the current view.
+//                    -1 is returned if field not found.
+//
+function findFieldIndex(fieldName)
+{
+    var fields = VIEW_DATA[CURRENT_VIEW.name].field;
+
+    for(var i=0; i < fields.length; i++) {
+	if(fields[i].name == fieldName) {
+	    return(i);
+	}
+    }
+
+    return(-1);
+}
+
+//
+// groupSplitData() - split the given data up into two groups, returning them as separate
+//                arrays. The data is ASSUMED to have "robot" column, as the data will
+//                be split by robot, according to the multi-select blue/red.
+//
+function groupSplitData(data,red,blue)
+{
+    var rindex = findFieldIndex('robot');
+    if(rindex < 0) {
+	console.log("ERROR: robotGroup option view doesn't have 'robot' column");
+	return({});
+    }
+    
+    var redData = [];
+    var blueData = [];
+
+    for(var i=0; i < data.length; i++) {
+	if(red.includes(data[i][rindex])) {
+	    redData.push(data[i]);
+	} else if(blue.includes(data[i][rindex])) {
+	    blueData.push(data[i]);
+	}
+    }
+
+    return({red:redData,blue:blueData});
+}
+
 
 //
 // viewTableHTML() - Refreshes the current view to the table area. It is normally
@@ -637,56 +862,39 @@ function viewPie_FN(target)
 //                   at the CURRENT_VIEW, assuming that its data has been updated
 //                   appropriately.
 //
+//                   This call can handle "robotGroup" reports, too. It will create
+//                   two floating divs within the target with two different tables.
 //
 function viewTableHTML(target)
 {
-    var output = "";
-
-    var headers = CURRENT_VIEW.headers;
     var data = CURRENT_VIEW.data;
-    var dataTypes = CURRENT_VIEW.dataTypes;
-    var sort = CURRENT_VIEW.sort;
-    var format = CURRENT_VIEW.format;
 
-    viewTableSort(data,dataTypes,sort);         // replaces the data by a sorted version
-    
-    output += '<table class="viewTable">';
-    output += '<thead><tr>';
-
-    for(var col=0; col < headers.length; col++) {
-	output += '<th align="center" data-col="' + col + '">';
-
-	output += '<span class="sortsymbol down ' + ((sort[col]=='DESC')?"selected":"") + '">&#x25bc;</span>';
-	output += '<span class="sortsymbol up ' + ((sort[col]=='ASC')?"selected":"") + '">&#x25b2;</span>';
-	output += headers[col];
-	output += '<span class="headersymbol x">&#x2716;</span>';
-	output += '</th>';
+    if(isOptionGroup(VIEW_DATA[CURRENT_VIEW.name])) {
+	var split = multiSelected('robot');
+	var splitData = groupSplitData(data,split.red,split.blue);
 	
-    }
-    
-    output += '</tr></thead>';
-    output += '<tbody>';
-    for(var row=0; row < data.length; row++) {
-	output += '<tr>';
-	for(var col=0; col < data[row].length; col++) {
-	    //	    output += '<td align="' + (dataTypes[col]=='number'?'center':'left') + '">';
-	    output += '<td align="center">';
-	    output += viewDataFormat(data[row][col],format[col]);
-	    output += '</td>';
-	}
-	output += '</tr>';
-    }
-    output += '</tbody>';
-    output += '<tfoot>';
-    output += '<tr><td colspan="' + headers.length + '">';
-    output += data.length.toString() + " record" + ((data.length==1)?"":"s");
-    output += '</td></tr>';
-    output += '</tfoot>';
-    output += '</table>';
+	var redDiv = $('<div class="groupTable red"></div>');
+	var blueDiv = $('<div class="groupTable blue"></div>');
 
-    // add the html to the right spot
-    target.empty();
-    target.append(output);
+	var redAverageRow = specialRow(splitData.red,'average');
+	var redTotalRow = specialRow(splitData.red,'total');
+	var blueAverageRow = specialRow(splitData.blue,'average');
+	var blueTotalRow = specialRow(splitData.blue,'total');
+
+	console.log(redAverageRow);
+	console.log(redTotalRow);
+	console.log(blueAverageRow);
+	console.log(blueTotalRow);
+
+	viewTableHTML_table(splitData.red,redDiv,redTotalRow,redAverageRow);
+	viewTableHTML_table(splitData.blue,blueDiv,blueTotalRow,blueAverageRow);
+
+	target.empty();
+	target.append(redDiv);
+	target.append(blueDiv);
+    } else {
+	viewTableHTML_table(data,target,null,null);
+    }
 
     // now, light-up the controls
 
@@ -729,6 +937,106 @@ function viewTableHTML(target)
 	CURRENT_VIEW.sort[col] = 'DESC';
 	viewTableHTML(target);
     });
+    
+}
+    
+function viewTableHTML_table(data,target,totalRow,averageRow)
+{
+    var output = "";
+
+    var headers = CURRENT_VIEW.headers;
+    var dataTypes = CURRENT_VIEW.dataTypes;
+    var sort = CURRENT_VIEW.sort;
+    var format = CURRENT_VIEW.format;
+
+    // will stay as empty string if there are no special rows
+
+    var specialRows = "";
+    specialRows += specialRow_HTML(totalRow,"totalRow","TOT");
+    specialRows += specialRow_HTML(averageRow,"averageRow","AVG");
+
+    viewTableSort(data,dataTypes,sort);         // replaces the data by a sorted version
+
+    output += '<table class="viewTable">';
+    output += '<thead><tr>';
+
+    for(var col=0; col < headers.length; col++) {
+	output += '<th align="center" data-col="' + col + '">';
+
+	output += '<span class="sortsymbol down ' + ((sort[col]=='DESC')?"selected":"") + '">&#x25bc;</span>';
+	output += '<span class="sortsymbol up ' + ((sort[col]=='ASC')?"selected":"") + '">&#x25b2;</span>';
+	output += headers[col];
+	output += '<span class="headersymbol x">&#x2716;</span>';
+	output += '</th>';
+	
+    }
+
+    output += '</tr></thead>';
+    output += '<tbody>';
+    for(var row=0; row < data.length; row++) {
+	output += '<tr>';
+	for(var col=0; col < data[row].length; col++) {
+	    //	    output += '<td align="' + (dataTypes[col]=='number'?'center':'left') + '">';
+	    output += '<td align="center">';
+	    output += viewDataFormat(data[row][col],format[col]);
+	    output += '</td>';
+	}
+	output += '</tr>';
+    }
+
+    output += specialRows;
+    output += '</tbody>';
+    output += '<tfoot>';
+    output += '<tr><td colspan="' + headers.length + '">';
+    output += data.length.toString() + " record" + ((data.length==1)?"":"s");
+    output += '</td></tr>';
+    output += '</tfoot>';
+    output += '</table>';
+
+    // add the html to the right spot
+    target.empty();
+    target.append(output);
+
+}
+
+//
+// specialRow_HTML() - return the HTML for the special rows to fit right in
+//                      the "current" table.  Will return empty string if there
+//                      are no special rows. So the caller doesn't have to special
+//                      case the special rows.
+//
+function specialRow_HTML(row,classText,label)
+{
+    var output = "";
+    var hasData = false;
+
+    if(row) {
+	for(var i=0; i < row.length; i++) {
+	    if(row[i] !== null) {
+		hasData = true;
+		break;
+	    }
+	}
+    }
+
+    if(hasData) {
+	output += '<tr class="specialRow-row ' + classText + '-row">';
+	for(var i=0; i < row.length; i++) {
+	    output += '<td class="specialRow-data ' + classText + '-data';
+	    if(row[i] === null) {
+		output += ' empty';
+	    }
+	    output += '">';
+	    if(row[i] !== null) {
+		output += viewDataFormat(row[i],CURRENT_VIEW.format[i]);
+	    }
+	    output += '</td>';
+	}
+	output += '<td class="specialRow-label ' + classText + '-label">' + label + '</td>';
+	output += '</tr>';
+    }
+
+    return(output);
 }
 
 //
@@ -813,84 +1121,145 @@ function viewTitleSet(name,description)
 
 function constraintPopulateAll(previousValues)
 {
+    constraintPopulateDown("year",previousValues);
+
+//    var c = VIEW_DATA[CURRENT_VIEW.name].constraint;
+////
+//    if(!previousValues) {
+//	previousValues = {};
+//    }
+//
+//    constraintPopulate(c,"year",previousValues,
+//       (values) => constraintPopulate(c,"robot",values,
+//	      (values) => constraintPopulate(c,"competition",values,
+//					     (values) => constraintPopulate(c,"match",values,null))));
+}
+
+//
+// constraintPopulateDown() - given a level, and current values for constraints, populate
+//                            the lower constraints appropriately. Note that the currentValues
+//                            may (should) have values for upper levels.
+//      currentValues = { year:[<values>], robot:[<values>], competition:[<values>], match[<values>] }
+//
+function constraintPopulateDown(level,currentValues)
+{
     var c = VIEW_DATA[CURRENT_VIEW.name].constraint;
 
-    if(!previousValues) {
-	previousValues = {};
+    if(!currentValues) {
+	currentValues = {};
     }
 
-    constraintPopulate(c,"year",previousValues,
-       (values) => constraintPopulate(c,"robot",values,
-	      (values) => constraintPopulate(c,"competition",values,
-					     (values) => constraintPopulate(c,"match",values,null))));
+    var callbacks = { };
+
+    callbacks["match"] = constraintPopulate.bind(null,c,"match",null);
+    callbacks["competition"] = constraintPopulate.bind(null,c,"competition",callbacks["match"]);
+    callbacks["robot"] = constraintPopulate.bind(null,c,"robot",callbacks["competition"]);
+    callbacks["year"] = constraintPopulate.bind(null,c,"year",callbacks["robot"]);
+
+    callbacks[level](currentValues);
 }
     
+//
+// constraintPopulate() - the idea here is to populate the given level with values based
+//                        upon the upper levels. But there are two meanings of the term
+//                        "populate" in this context, either populate a selector with an
+//                        array of choices or set the selector to the only value. If there
+//                        is only one possible choice for a given constraint, then set it
+//                        and move on to the next constraint.
+//
+//        constraints - always given and complete with constraint names
+//              level - year||robot||competition||match
+//           callback - routine to callback after this level has been processed
+//            cvalues - constraint "values" - actual values that have either been selected
+//                      or defaulted (if only one) for each level. A level may not be in
+//                      the object.
+//
+//                Rules:
+//                   - if the current level isn't a constraint, then it should be ignored
+//                     and lower levels processed.
+//                   - otherwise, if the current level is given, and has a value(s) that means that
+//                     a value has been selected by the user, so process lower levels
+//                   - if the current level DOESN'T have a value or is length of zero, then
+//                     the level should be populated by constraining data based upon the upper-level
+//                     constraints.
+//
 
-function constraintPopulate(constraints,selector,cvalues,callback)
+function constraintPopulate(constraints,level,callback,cvalues)
 {
-    console.log("constraintPopulate with selector: " + selector);
-    console.log(constraints);
-    console.log(cvalues);
-    
-    // first check to see if this one is a constraint,
-    //   if not, then just call the next one
-    //
-    //   Also, if the value is already there, then skip it, too.
-    
-    if(!constraints.includes(selector)) {            // not a constraint for this view
-	cvalues[selector] = [];
+    // not a constraint for this view - so skip it, but call the callback if given
+
+    if(!constraints.includes(level)) {
+	cvalues[level] = [];
 	if(callback) {
 	    callback(cvalues);
 	}
-    } else if(cvalues.hasOwnProperty(selector) && cvalues[selector].length > 0) {    // value already given
+	return;
+    }
+
+    // if this level has values already, then don't populate it.
+    
+    if(cvalues.hasOwnProperty(level) && cvalues[level].length > 0) {    // value already given
 	if(callback) {
 	    callback(cvalues);
 	}
+	return;
+    }
 
-    } else {
+    // we know the currentlevel is a constraint, and it has zero length (no values)
+    //   so go get the data for the level, IF the upper levels are specified.
 
-	switch(selector) {	// at this point, the selector IS a constraint
+    // the concept of "specified enuf" means that the "above" level is either NOT a constraint
+    //   or has a specified value(s)
 
-	case 'year':
-	    databaseGetYears((values) => {
-		selectorSet("year",values);
+    var specifiedEnuf = (otherLevel) => !constraints.includes(otherLevel) || cvalues[otherLevel].length > 0;
+
+    switch(level) {
+
+    case 'year':
+	databaseGetYears((values) => {
+	    selectorSet("year",values);        // sets the values to the drop-down/multi selector
+	    if(values.length == 1) {
 		cvalues.year = values;
-		if(callback) callback(cvalues);
-	    });
-	    break;
+		if(callback) callback(cvalues);   // only do callbacks if this level is a single
+	    }
+	});
+	break;
 	
-	case 'robot':
-	    if(cvalues.year.length < 2) {
-		databaseGetRobots(cvalues.year,(values) => {
-		    selectorSet("robot",values);
+    case 'robot':
+	if(specifiedEnuf('year')) {
+	    databaseGetRobots(cvalues.year,(values) => {
+		selectorSet("robot",values);
+		if(values.length == 1) {
 		    cvalues.robot = values;
 		    if(callback) callback(cvalues);
-		});
-	    }
-	    console.log("just got robots");
-	    console.log(cvalues);
-	    break;
+		}
+	    });
+	}
+	break;
 
-	case 'competition':
-	    if(cvalues.year.length < 2 && cvalues.robot.length < 2) {
-		databaseGetCompetitions(cvalues.year,cvalues.robot,(values) => {
-		    selectorSet("competition",values);
+    case 'competition':
+	if(specifiedEnuf('year') && specifiedEnuf('robot')) {
+	    databaseGetCompetitions(cvalues.year,cvalues.robot,(values) => {
+		selectorSet("competition",values);
+		if(values.length == 1) {
 		    cvalues.competition = values;
 		    if(callback) callback(cvalues);
-		});
-	    }
-	    break;
+		}
+	    });
+	}
+	break;
 
-	case 'match':
-	    if(cvalues.year.length < 2 && cvalues.robot.length < 2 && cvalues.competition.length < 2) {
-		databaseGetMatches(cvalues.year,cvalues.robot,cvalues.competition,(values) => {
-		    selectorSet("match",values);
+    case 'match':
+	if(specifiedEnuf('year') && specifiedEnuf('robot') && specifiedEnuf('competition')) {
+	    databaseGetMatches(cvalues.year,cvalues.robot,cvalues.competition,(values) => {
+		selectorSet("match",values);
+		if(values.length == 1) {
 		    cvalues.match = values;
 		    if(callback) callback(cvalues);
-		});
-	    }
-	    break;
+		}
+	    });
 	}
+	break;
     }
 }
 
@@ -943,9 +1312,6 @@ function checkConstraints()
     var viewConstraints = VIEW_DATA[CURRENT_VIEW.name].constraint;
 
     for(var i=0; i < viewConstraints.length; i++) {
-	console.log("checkConstraints: looking at " + viewConstraints[i]);
-	console.log('selector value: ');
-	console.log(selectorValue(viewConstraints[i]));
 	if(selectorValue(viewConstraints[i]).length == 0) {
 	    return(false);
 	}
@@ -968,16 +1334,62 @@ function selectorValue(name)
     } else {
 	var returnVal = [];
 	var dropDownVal = selection.find('select').val();   // gets the current value of the <select> (the #)
-	var multi = [];
-	$('.multi-selection-' + name + ".selected").each(function() {
-	    multi.push($(this).data("value"));
-	});
-	//	console.log(multi);
+
+	// the "---" has an empty string value - everything else has a value
 	if(dropDownVal) {
-	    returnVal.push(dropDownVal);
+	    var value;
+	    if(dropDownVal == -1) {   // magical constant for -MULTI- selected
+		returnVal = multiSelected(name).all;
+	    } else {
+		returnVal.push(""+dropDownVal);   // ensure string
+	    }
 	}
-	return(arrayUnion(returnVal,multi));
+
+	console.log("returning:");
+	console.log(returnVal);
+	
+	return(returnVal);
     }
+}
+
+//
+// selectorChangeFN() - call this when a selector changes - it will recompute constraints
+//                      and enable the GO button if appropriate.
+//
+function selectorChangeFN(level)
+{
+    var values = {};
+
+    // gather all of the current values
+    
+    values.year = selectorValue('year');
+    values.robot = selectorValue('robot');
+    values.competition = selectorValue('competition');
+    values.match = selectorValue('match');
+
+    console.log("selectorChangeFN at level " + level);
+    console.log(values);
+
+    // tricky cascade switch - removes the values that need to be re-prompted
+    // TODO - decide - should this happen or not
+    if(false) {
+	switch(level) {
+	case 'year':	delete values.robot;
+	case 'robot':	delete values.competition;
+	case 'competition':	delete values.match
+	case 'match':
+	    break;
+	}
+    }
+
+    switch(level) {
+    case 'year':	constraintPopulateDown("robot",values); break;
+    case 'robot':       constraintPopulateDown("competition",values); break;
+    case 'competition': constraintPopulateDown("match",values); break;
+    case 'match':       break;
+    }
+
+    selectorGoEnable(checkConstraints());
 }
 
 //
@@ -1000,56 +1412,35 @@ function selectorSet(name,values)
 
     var html = "";
 
-    if(Array.isArray(values)) {
-	html += '<select data-selector="' + name + '">';
-	if(values.length != 1) {
-	    html += '<option value="">&nbsp;---&nbsp;</option>';
-	}
-	for(var i=0; i < values.length; i++) {
-	    html += '<option value="' + values[i] + '">' + values[i] + '</option>';
-	}
-	html += '</select>';
-	selection.removeClass("single");
-    } else {
+    // take care of the simple case with just a single value (normally words or blank)
+    
+    if(!Array.isArray(values)) {
 	selection.addClass("single");
 	html += '<div>' + values + '</div>';
+	selection.append(html);
+	return;
     }
+
+    // this is the "normal" case where there is one or more values that are used
+    
+    html += '<select data-selector="' + name + '">';
+    if(values.length != 1) {
+	html += '<option value="" class="option-non-multi option-none">&nbsp;---&nbsp;</option>';
+    }
+    if(values.length > 1) {
+	html += '<option value="-1" class="option-multi">-MULTI-</option>';
+    }
+    for(var i=0; i < values.length; i++) {
+	html += '<option class="option-non-multi" value="' + values[i] + '">' + values[i] + '</option>';
+    }
+    html += '</select>';
+    selection.removeClass("single");
+
     selection.append(html);
 
     if(Array.isArray(values) && values.length > 1) {
-	selection.change(function() {
-
-// causes duplicate values for year because one is int, the other string
-//
-//	    var targetSelect = $(this).find("select");
-//	    if(targetSelect.val()) {
-//		var selector = targetSelect.data("selector");
-//		$('.multi-selection-' + selector + '[data-value="' + targetSelect.val() + '"]').addClass("selected");
-//	    }
-
-	    var values = {};
-	    year = selectorValue('year');
-	    robot = selectorValue('robot');
-	    competition = selectorValue('competition');
-	    match = selectorValue('match');
-
-	    if(year.length) values.year = year;
-	    if(robot.length) values.robot = robot;
-	    if(competition.length) values.competition = competition;
-	    if(match.length) values.match = match;
-	    
-	    // tricky cascade switch - removes the values that need to be re-prompted
-	    switch(name) {
-	    case 'year':	delete values.robot;
-	    case 'robot':	delete values.competition;
-	    case 'competition':	delete values.match
-	    case 'match':
-		break;
-	    }
-
-	    constraintPopulateAll(values);
-	    selectorGoEnable(checkConstraints());
-	});
+	console.log("binding to " + name);
+	selection.change(selectorChangeFN.bind(null,name));
     }
 
     // populate the multi-selection box for each selector
@@ -1059,8 +1450,13 @@ function selectorSet(name,values)
     if(!Array.isArray(values)) {
 	multiValues = [values];
     }
+
     for(var i=0; i < multiValues.length; i++) {
-	multiHTML += '<div class="multi-selection multi-selection-' + name + '" '
+	multiHTML += '<div class="multi-selection multi-selection-' + name;
+	if(isOptionGroup(VIEW_DATA[CURRENT_VIEW.name])) {
+	    multiHTML += ' group ';
+	}
+	multiHTML +=       '"';
 	multiHTML +=       'data-constraint="' + name + '" ';
 	multiHTML +=       'data-value="' + multiValues[i] + '">';
 	multiHTML += multiValues[i];
@@ -1110,4 +1506,76 @@ function arrayUnion(a1,a2)
     }
 
     return(both);
+}
+
+//
+// specialRow() - return a row representing the "special requested (currently
+//                this is either "average" or "total"). 
+//                The current view is used to determine which columns need to
+//                be averaged based upon the special indicies.
+//
+function specialRow(rows,special)
+{
+    var view = VIEW_DATA[CURRENT_VIEW.name];
+
+    var specialRow = [];
+
+    // initialize the specialRow to nulls - so it always exists
+
+    for(var i=0; i < view.field.length; i++) {
+	specialRow.push(null);
+    }
+
+    if(view.hasOwnProperty(special)) {
+
+	var indicies = [];
+
+	for(var i=0; i < view[special].length; i++) {
+	    var index = findFieldIndex(view[special][i]);
+	    if(index < 0) {
+		console.log('ERROR: bad ' + special + ' field "' + view[special][i] + '"');
+	    } else {
+		indicies.push(index);
+	    }
+	}
+
+	// initialize target fields in row to zero
+	
+	for(var i=0; i < indicies.length; i++) {
+	    var index = indicies[i];
+	    specialRow[index] = 0;
+	}
+
+	// now calculate the value of the special row, given the data
+	
+	for(var row=0; row < rows.length; row++) {
+	    for(var i=0; i < indicies.length; i++) {
+		var index = indicies[i];
+		switch(special) {
+		case 'average':	specialRow[index] += Number(rows[row][index]); break;
+		case 'total':	specialRow[index] += Number(rows[row][index]); break;
+		}
+	    }
+	}
+
+	// finish up for things like "average"
+	
+	switch(special) {
+	case 'average':
+	    if(rows.length) {
+		for(var i=0; i < indicies.length; i++) {
+		    var index = indicies[i];
+		    if(specialRow[index] !== null) {
+			specialRow[index] /= rows.length;
+		    }
+		}
+	    }
+	    break;
+
+	case 'total':
+	    break;
+	}
+    }
+
+    return(specialRow);
 }

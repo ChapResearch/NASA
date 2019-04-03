@@ -27,7 +27,7 @@ function numSpinner_initAll()
 
     // first, add the simulation
     
-    $('input[type="number"]').each(function() {
+    $('.numSpinner input[type="number"]').each(function() {
 	var target = $(this);                    // this is the associated <input> field
 	var parent = target.parent();
 
@@ -40,7 +40,7 @@ function numSpinner_initAll()
 
     // then add the clicks on the simulated buttons
     
-    $('input[type="number"]').parent().each(function() {
+    $('.numSpinner input[type="number"]').parent().each(function() {
 	var parent = $(this);
 	var target = parent.find('input');
 
@@ -79,7 +79,7 @@ function numSpinner_initAll()
     //  the number spinners.
     
     setTimeout(function() {
-	$('input[type="number"]').change(function() {
+	$('.numSpinner input[type="number"]').change(function() {
 	    var target = $(this);
 	    var parent = target.parent();
 	    var spinnerValue = parent.find('.numSpinner_value');
@@ -87,5 +87,3 @@ function numSpinner_initAll()
 	});
     },0);
 }
-
-	
