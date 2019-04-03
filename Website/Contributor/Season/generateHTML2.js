@@ -26,6 +26,7 @@ function seasonLoad_generateHTML(seasonXML)
 			  {
 			      case "text":        output += generateTextField($(this)); break;
 			      case "textInput":   output += generateTextInputField($(this),targetElementField);break;
+			      case "numberInput": output += generateNumberInputField($(this),targetElementField);break;
 			      case "radio":       output += generateRadioField($(this),targetElementField); break;
 			      case "intChoice":   output += generateIntChoiceField($(this),targetElementField); break;
 			      case "dropdown":    output += generateDropField($(this),targetElementField); break;
@@ -255,6 +256,23 @@ function generateTextInputField(layoutField,elementField)
     var name = layoutField.find("name").text();
     output += '<div>' + label;
     output += '</div><div style="height: 100%; width: 100%;"><textarea name="' + name + '" style="width:100%;height:100%;"></textarea>';
+    output += '</div>';
+    output += '</div>';    
+    
+    return output;
+}
+
+function generateNumberInputField(layoutField,elementField)
+{
+    var output = "";
+
+    // reuse the text input function fieldStyleTextInput() - no reason to create a new one
+    
+    output += '<div class="NASA-field-numberInput" ' + fieldStyleTextInput(layoutField) + '>';
+    var label = elementField.find("label").text();
+    var name = layoutField.find("name").text();
+    output += '<div>' + label;
+    output += '</div><div style="height: 100%; width: 100%;"><input type="number" name="' + name + '" style="width:100%;height:100%;" value="1"></input>';
     output += '</div>';
     output += '</div>';    
     

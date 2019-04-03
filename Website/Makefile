@@ -37,6 +37,8 @@ FBCONFIG = $(ROOT)/FirebaseConfig
 DEPLOYDIR = deployment
 #DEPLOYDIR = /media/sf_Virtual_Machine_Shares/deployment
 
+HIDDENURL = "ThisIsAScoutingApp"
+
 .firebaserc: $(FBCONFIG)/firebaserc-template
 	cp $(FBCONFIG)/firebaserc-template $@
 
@@ -59,6 +61,9 @@ fb-deploy:
 
 favicon.ico: nasa-birdy-logo.ico
 	cp nasa-birdy-logo.ico favicon.ico
+	cp nasa-birdy-logo.ico Contributor/favicon.ico
+	cp nasa-birdy-logo.ico Statistics/favicon.ico
+	cp nasa-birdy-logo.ico Tools/favicon.ico
 
 clean: 
 	rm -fr node_modules
@@ -73,6 +78,11 @@ $(DEPLOYDIR):
 deploycopy: $(DEPLOYDIR) favicon.ico 
 	cp -R Main/* $(DEPLOYDIR)
 	cp -R Contributor $(DEPLOYDIR)
+	cp -R Statistics $(DEPLOYDIR)
+	cp -R Tools $(DEPLOYDIR)
+	cp -R Fixit $(DEPLOYDIR)
+	rm -fr $(DEPLOYDIR)/$(HIDDENURL)
+	mv $(DEPLOYDIR)/Fixit $(DEPLOYDIR)/$(HIDDENURL)
 	[ -d $(DEPLOYDIR)/Season ] || mkdir $(DEPLOYDIR)/Season
 	cp -R ../Season/*.xml $(DEPLOYDIR)
 	cp -R Contributor/Season/* $(DEPLOYDIR)/Season
@@ -82,7 +92,9 @@ deploy:	.firebaserc firebase.json deploycopy
 	firebase deploy --only hosting
 
 testdeploy: deploycopy
+	rm $(DEPLOYDIR)/Contributor/contributor.appcache
 	cp ../Season/DeepSpace2019.xml $(DEPLOYDIR)/season.xml
+	curl -L https://nasa.chapresearch.com/season.json > $(DEPLOYDIR)/season.json
 	cd $(DEPLOYDIR); python -m SimpleHTTPServer
 
 refresh:

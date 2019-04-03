@@ -79,6 +79,21 @@ function timerGetSecs()
 {
     return(Math.floor((timerCurrentTime - (timerGetMins() * 60)) - timerStartTime));
 }
+
+//
+// timerTick() - this is the function that is called once a second to update
+//               the timer.  It is called on an setInterval() every second.
+//               This routine automatically stops the clock after a set time.
+//
+function timerTick()
+{
+    timerDisplay();
+    
+    if(timerGetMins() == 5) {     // protective hard-coded stop just in case
+	timerStop();
+    }
+}
+
     
 function timerDisplay()
 {
@@ -108,7 +123,7 @@ function timerStart()
     $('button.send').prop('disabled',true);
     $('button.stop').prop('disabled',false);
     
-    timerInterval = setInterval(timerDisplay,1000);
+    timerInterval = setInterval(timerTick,1000);
 }
 
 function timerStop()

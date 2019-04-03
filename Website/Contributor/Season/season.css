@@ -75,10 +75,23 @@ div.NASA-field-text {
     font-size: 26px;
 }
 
-div.NASA-field-textInput {
+div.NASA-field-textInput,
+div.NASA-field-numberInput {
     font-weight: bold;
     font-size: 20px;
 }
+
+/* for chrome to remove spinner buttons on number input */
+div.NASA-field-numberInput input[type=number]::-webkit-inner-spin-button,
+div.NASA-field-numberInput input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* for firefox */
+div.NASA-field-numberInput input[type=number] {
+    -moz-appearance:textfield;
+}
+
 
 div.NASA-field-textInput form{
     margin-bottom: 0;
