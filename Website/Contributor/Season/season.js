@@ -39,11 +39,9 @@ function eventTagTime(id, event, eventName)
     element.appendChild(close);
     
     var scoring = document.getElementById(id);
-    console.log(id);
-    console.log(scoring);
-    scoring.scrollTop = scoring.scrollHeight;    
     
-    scoring.appendChild(element);    
+    scoring.appendChild(element);
+    scoring.scrollTop = scoring.scrollHeight;
 }
 
 function remove()
