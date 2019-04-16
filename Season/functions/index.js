@@ -536,6 +536,7 @@ function checkData(xmlobject)
 		      containsAny:["target","targetVal"],
 		      max:     ["target"],
 		      min:     ["target"],
+		      defEffect: ["target"],
 		      compare: ["target"]
 		    };
 
