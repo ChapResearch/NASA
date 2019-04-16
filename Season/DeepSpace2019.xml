@@ -1213,7 +1213,7 @@
       <target>cargoScoredTotal</target>
     </field>
 
-<!--    <field>
+    <field>
       <name>defenseValue</name>
       <label>How Effective Was Defense</label>
       <perspective>match</perspective>
@@ -1221,7 +1221,7 @@
       <target>defenseTeamNum1</target>
       <target>objectsScoredTotalAverage</target>
       <target>objectsScoredTotal</target>
-    </field> -->
+    </field>
     
     <field>
       <name>totalPenalties</name>
