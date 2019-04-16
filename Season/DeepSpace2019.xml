@@ -591,21 +591,21 @@
 
     <field>
       <name>defenseTeamNum1</name>
-      <type>numberInput</type>
+      <type>textInput</type>
       <size>20,3</size>
       <location>5,45</location>
     </field>
 
     <field>
       <name>defenseTeamNum2</name>
-      <type>numberInput</type>
+      <type>textInput</type>
       <size>20,3</size>
       <location>5,53</location>
     </field>
 
     <field>
       <name>defenseTeamNum3</name>
-      <type>numberInput</type>
+      <type>textInput</type>
       <size>20,3</size>
       <location>5,59</location>
     </field>    
@@ -788,7 +788,10 @@
       <field>HABEndPos2Percent</field>
       <field>startingPos2SuccessPercent</field>
       <field>startingPos1SuccessPercent</field>
+      <field>trappedCargoPercent</field>
       <field>defensePercent</field>
+      <field>maxPanelsScored</field>
+      <field>maxCargoScored</field>            
       <format>pointsAAR,toFixed,1</format>
       <format>cargoScoredTotalAverage,toFixed,2</format>
       <format>panelScoredTotalAverage,toFixed,2</format>
@@ -798,6 +801,7 @@
       <format>startingPos2SuccessPercent,toFixed,2</format>
       <format>startingPos1SuccessPercent,toFixed,2</format>
       <format>defensePercent,toFixed,2</format>
+      <format>trappedCargoPercent,toFixed,0</format>
       <average>pointsAAR</average>
       <total>pointsAAR</total>
       <total>cargoScoredTotalAverage</total>
@@ -805,7 +809,6 @@
       <total>objectsScoredTotalAverage</total>      
       <option>robotGroup</option>
     </view>
-      
 
     <view>
       <name>Robot Ranking</name>
@@ -1002,6 +1005,10 @@
       <field>startingPos2SuccessPercent</field>
       <field>startingPos1SuccessPercent</field>
       <field>defensePercent</field>
+      <field>maxPanelsScored</field>
+      <field>minPanelsScored</field>            
+      <field>maxCargoScored</field>
+      <field>minCargoScored</field>                  
       <sort>robot,DESC</sort>
       <format>cargoScoredTotalAverage,toFixed,2</format>
       <format>panelScoredTotalAverage,toFixed,2</format>
@@ -1139,6 +1146,83 @@
     
   <metaData>
 
+    <field>
+      <name>preferredItem</name>
+      <type>int</type>
+      <label>Preferred Item</label>
+      <perspective>match</perspective>
+      <op>compare</op>
+      <target>panelScoredTotal</target>
+      <target>cargoScoredTotal</target>
+      <ltVal>Cargo</ltVal>
+      <gtVal>Panel</gtVal>
+      <eqVal>Both</eqVal>
+    </field>
+
+    <field>
+      <name>minCycleTimePanels</name>
+      <type>int</type>
+      <label>Min Cycle</label>
+      <perspective>match</perspective>
+      <op>min</op>
+      <target>panelScoredTimes</target>
+    </field>
+
+    <field>
+      <name>maxCycleTimePanels</name>
+      <type>int</type>
+      <label>Max Cycle</label>
+      <perspective>match</perspective>
+      <op>max</op>
+      <target>panelScoredTimes</target>
+    </field>
+
+    <field><!-- Min Panels -->
+      <name>minPanelsScored</name>
+      <type>int</type>
+      <label>Min Panels Scored</label>
+      <perspective>competition</perspective>
+      <op>min</op>
+      <target>panelScoredTotal</target>
+    </field>
+
+    <field><!-- Min Cargo -->
+      <name>minCargoScored</name>
+      <type>int</type>
+      <label>Min Cargo Scored</label>
+      <perspective>competition</perspective>
+      <op>min</op>
+      <target>cargoScoredTotal</target>
+    </field>
+    
+    <field><!-- Max panels-->
+      <name>maxPanelsScored</name>
+      <type>int</type>
+      <label>Max Panels Scored</label>
+      <perspective>competition</perspective>
+      <op>max</op>
+      <target>panelScoredTotal</target>
+    </field>
+
+    <field><!-- Max Cargos-->
+      <name>maxCargoScored</name>
+      <type>int</type>
+      <label>Max Cargo Scored</label>
+      <perspective>competition</perspective>
+      <op>max</op>
+      <target>cargoScoredTotal</target>
+    </field>
+
+<!--    <field>
+      <name>defenseValue</name>
+      <label>How Effective Was Defense</label>
+      <perspective>match</perspective>
+      <op>defEffect</op>
+      <target>defenseTeamNum1</target>
+      <target>objectsScoredTotalAverage</target>
+      <target>objectsScoredTotal</target>
+    </field> -->
+    
     <field>
       <name>totalPenalties</name>
       <type>int</type>
@@ -1868,7 +1952,20 @@
       <target>HABEndPos</target>
       <targetVal>1</targetVal>
     </field>
-    
+
+    <field>
+      <name>trappedCargoPercent</name>
+      <type>int</type>
+      <label>Trapped Cargo Percent</label>
+      <perspective>competition</perspective>
+      <op>percent</op>
+      <target>trappedCargoSandstorm</target>
+      <targetVal>1</targetVal>
+    </field>
+
+    <!-- RoBot stats -->
+
+    <!-- see DeepSpace2019.xml.robotBroke for the broken stuff that went here -->
     
     <!-- AAR Calculations -->
 
@@ -1993,9 +2090,9 @@
       <perspective>match</perspective>
       <op>weight</op>
       <target>scoringAAR</target>
-      <low>0</low> <high>30</high> <multiplier>54</multiplier>
+      <low>0</low> <high>1</high> <multiplier>1.8</multiplier>
       <target>HABAAR</target>
-      <low>0</low> <high>43</high> <multiplier>32.25</multiplier>
+      <low>0</low> <high>1</high> <multiplier>0.75</multiplier>
     </field>
 
     <field>
