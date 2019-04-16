@@ -4,6 +4,11 @@
 //   This file implements all of the statistics calculations.
 //
 
+const functions = require('firebase-functions');
+var firebase = require('firebase');
+require('firebase/storage');            // extremely important! (firebase must exist)
+
+
 var combineDelta = require('./combineDelta');
 
 var METADATA = "_metaData";
@@ -164,8 +169,7 @@ function calcMetaDataField(data,params,field)
     case 'containsAny': return(calcMetaDataField_containsAny(data,params,field));
     case 'min':         return(calcMetaDataField_min(data,params,field));
     case 'max':         return(calcMetaDataField_max(data,params,field));
-
-	// All these cases combine into a call to the compare function
+    case 'defEffect':   return(calcMetaDataField_defEffect(data,params,field));
     case 'compare':      return(calcMetaDataField_compare(data,params,field));	
     default:         console.log("BAD OP: " + operation); return(false);
     }
@@ -635,4 +639,102 @@ function calcMetaDataField_compare(data,params,field)
     }
 
     return (returnVal);
+}
+
+
+//
+// _defEffect() - calculates the difference between a target robot's data value
+//                in a match at the competition level and the current match's data value. The
+//                current match has both the target robot and the robot whose defense effect is being 
+//                being measured.
+//
+// ex: Measuring the defensive effect that 2468 has on team 1234 (defensiveTeamNum1) in match 1 for number of objects scored
+//   <metaData>
+//       <name>defensiveTeamNum1Effect</name>              <-- (-): 2468 bad at defense (+):2468 good at defense (0):2468 has no effect on 1234 scoring
+//       <op>defEffect</op>
+//       <target>defensiveTeamNum1</target>                <--robot who defense was played against
+//       <target2>objectsScoredTotalAverage</target2>      <--competition level average total objects scored for 1234
+//       <target3>objectsScoredTotal</target3>             <--match 1 total objects scored for 1234
+//       ...
+//   </metaData>    
+//
+function calcMetaDataField_defEffect(data,params,field)
+{
+    console.log('hello');
+
+    var targetRobot = field.target[0];
+    var compLevelValue = field.target[1];
+    var matchLevelValue = field.target[2];
+
+    var dataTargetRobot = normalizeDataItem(data,targetRobot);
+
+    //if there is no data in the field, we can't do anything
+    if (dataTargetRobot.length == 0) {
+	return null;
+    }
+
+    console.log('We are still here');
+
+    // gets the first value of the target field
+    dataTargetRobot = dataTargetRobot[0].trim();
+
+
+    var targetRef = '/' + params.year +
+	'/' + dataTargetRobot + 
+	'/' + params.competition + 
+	'/' + params.match;
+
+    var compLevelValueDataGlobal;
+    
+    var retVal = 0;
+    firebase.database().ref(targetRef).once("value")
+	
+	// if this reference doesn't exist, then the named robot wasn't in this match
+
+	// gets the field value named by the second target from the named robot's competition metaData 
+        .then((snapshot) => {
+
+		console.log('after first database access');
+	   var compLevelValueRef = '/' + params.year + 
+	   '/' + dataTargetRobot + 
+	   '/' + params.competition + 
+	   '/' + '_metaData' + 
+	   '/' + compLevelValue;
+	
+	   return firebase.database().ref(compLevelValueRef).once("value");
+	 })	
+	    
+	.then((snapshot) => {
+		return snapshot.val();
+	    })
+
+	// gets the field value named by the second target from the named robot's match data		
+	.then((compLevelValueData) => {
+
+		console.log('after second database access');
+
+		compLevelValueDataGlobal = compLevelValueData;
+		var matchLevelValueRef = targetRef + '/' + matchLevelValue;
+	
+		return firebase.database().ref(matchLevelValueRef).once("value");
+	    })
+
+	.then((snapshot) => {
+		return snapshot.val();
+	    })
+
+	.then((matchLevelValueData) => {
+
+		console.log('after third database access');
+		var v = compLevelValueDataGlobal - matchLevelValueData;
+		console.log(v);
+		retVal = v;
+	    })
+		    
+        .catch((error) => {
+		console.log('in the catch');
+		retVal = null;
+	    });
+
+    return retVal;
 }
