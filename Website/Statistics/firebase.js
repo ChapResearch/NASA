@@ -247,14 +247,15 @@ function databaseGetCompetitions(years,robots,callback)
 {
     databaseLoad(false,
 		 (snapshot) => {
+		     var data = snapshot.val();
 		     var competitions = [];
-		     for(var year in snapshot.val()) {
+		     for(var year in data) {
 			 if(year != METADATA) {
 			     if(years.length == 0 || years.includes(year)) {
-				 for(var robot in snapshot.val()[year]) {
+				 for(var robot in data[year]) {
 				     if(robot != METADATA) {
 					 if(robots.length == 0 || robots.includes(robot)) {
-					     for(var competition in snapshot.val()[year][robot]) {
+					     for(var competition in data[year][robot]) {
 						 if(competition != METADATA) {
 						     if(!competitions.includes(competition)) {
 							 competitions.push(competition);
@@ -279,17 +280,18 @@ function databaseGetMatches(years,robots,competitions,callback)
 {
     databaseLoad(false,
 		 (snapshot) => {
+		     var data = snapshot.val();
 		     var matches = [];
-		     for(var year in snapshot.val()) {
+		     for(var year in data) {
 			 if(years.length == 0 || years.includes(year)) {
 			     if(year != METADATA) {
-				 for(var robot in snapshot.val()[year]) {
+				 for(var robot in data[year]) {
 				     if(robot != METADATA) {
 					 if(robots.length == 0 || robots.includes(robot)) {
-					     for(var competition in snapshot.val()[year][robot]) {
+					     for(var competition in data[year][robot]) {
 						 if(competition != METADATA) {
 						     if(competitions.length == 0 || competitions.includes(competition)) {
-							 for(var match in snapshot.val()[year][robot][competition]) {
+							 for(var match in data[year][robot][competition]) {
 							     if(match != METADATA) {
 								 if(!matches.includes(match)) {
 								     matches.push(match);
