@@ -1212,16 +1212,6 @@
       <op>max</op>
       <target>cargoScoredTotal</target>
     </field>
-
-    <field>
-      <name>defenseValue</name>
-      <label>How Effective Was Defense</label>
-      <perspective>match</perspective>
-      <op>defEffect</op>
-      <target>defenseTeamNum1</target>
-      <target>objectsScoredTotalAverage</target>
-      <target>objectsScoredTotal</target>
-    </field>
     
     <field>
       <name>totalPenalties</name>

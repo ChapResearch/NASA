@@ -687,7 +687,7 @@ function calcMetaDataField_defEffect(data,params,field)
     var compLevelValueDataGlobal;
     
     var retVal = 0;
-    firebase.database().ref(targetRef).once("value")
+    retVal = firebase.database().ref(targetRef).once("value")
 	
 	// if this reference doesn't exist, then the named robot wasn't in this match
 
@@ -725,15 +725,14 @@ function calcMetaDataField_defEffect(data,params,field)
 
 	.then((matchLevelValueData) => {
 
-		console.log('after third database access');
-		var v = compLevelValueDataGlobal - matchLevelValueData;
-		console.log(v);
-		retVal = v;
+	    console.log('after third database access');
+	    var v = compLevelValueDataGlobal - matchLevelValueData;
+	    return(v);
 	    })
 		    
         .catch((error) => {
-		console.log('in the catch');
-		retVal = null;
+	    console.log('in the catch');
+	    return(null);
 	    });
 
     return retVal;

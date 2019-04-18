@@ -115,6 +115,8 @@ exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match
 	    return null;
 	}
 
+	var newRecord = false;
+	
 	if(change.before.exists()) {  // updating an existing record
 	    if(change.after.val().hasOwnProperty('updated')) {
 		// it's already been updated, don't do it again
@@ -123,6 +125,8 @@ exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match
 	    } else {
 		console.log("re-computing existing record");
 	    }
+	} else {                      // brand-spanking new record
+	    newRecord = true;
 	}
 	
 	// otherwise we have either a create or a change, in any event
@@ -131,6 +135,9 @@ exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match
 	getNASAdataJSON()
 	    .then((nasaData) => metaData.calcMetaData(change.after.val(),context.params,nasaData.metaData.match))
 	    .then((newvalue) => {
+		if(newRecord) {
+		    newvalue.date = firebase.database.ServerValue.TIMESTAMP;
+		}
 		newvalue.updated = firebase.database.ServerValue.TIMESTAMP;
 		change.after.ref.set(newvalue);
 	    })

@@ -913,6 +913,7 @@ function viewTableHTML(target)
 	    CURRENT_VIEW.headers.splice(col,1);
 	    CURRENT_VIEW.dataTypes.splice(col,1);
 	    CURRENT_VIEW.sort.splice(col,1);
+	    CURRENT_VIEW.format.splice(col,1);
 	    for(var i=0; i < CURRENT_VIEW.data.length; i++) {
 		CURRENT_VIEW.data[i].splice(col,1);
 	    }
