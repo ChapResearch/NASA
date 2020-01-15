@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <div class="tool">
+      <div class="title">Validate XML File</div>
+      <form action="https://nasa.chapresearch.com/validate"
+	    method="post"
+	    enctype="multipart/form-data">
+
+	Select XML file to validate:
+	<input type="file" name="fileToUpload" id="fileToUpload">
+	<input type="submit" value="Validate XML" name="submit">
+      </form>
+    </div>
+
+    <div class="tool">
+      <div class="title">Recalculate ALL Match MetaData</div>
+      <button onclick="window.location.href='/recalculate';">Click Here</button>
+    </div>
+    
+    <div class="tool">
+      <div class="title">Recalculate Superior MetaData</div>
+      <button onclick="window.location.href='/superior';">Click Here</button>
+    </div>
+  </body>
+</html>
+
+    
