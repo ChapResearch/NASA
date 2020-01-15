@@ -8,8 +8,9 @@
 //                   the Contributor app can just go to one spot and get the
 //                   right file for painting the screen.  It is normally connected to the
 //                   website through a rewrite.
+//                   NOTE - the firebase storage file NASA/Season/SEASONFILE is
+//                   where the name of the *actual* season XML file.
 //
-//                   CURRENTLY it is hardwired to the 2019 season. 
 //
 //   seasonJSON() - returns a JSON representation of the XML file. Not only
 //                   is it a representation of the XML file, it has also been
@@ -20,7 +21,6 @@
 //                   offline operation. NOTE that the JSON file doesn't even HAVE
 //                   the layout information in it.
 //
-//                   CURRENTLY it is hardwired to the 2019 season. 
 //                   CURRENTLY it does a redirection return, it should really just
 //                   do it like the season() above.
 //
@@ -45,6 +45,11 @@ global.XMLHttpRequest = require("xhr2");   // necessary for the getDownloadURL()
 
 var toposort = require("toposort");
 const Busboy = require('busboy');
+
+const SeasonDir = "NASA/Season/";      // firebase storage dir where the season files are kept
+const SeasonFile = "SEASONFILE";       // name of the file (in the above) where the *actual*
+                                       //   XML file name is stored. Change this to point to the
+                                       //   right one.
 
 //
 // firebaseInit() - inits if necessary.
@@ -74,6 +79,32 @@ function firebaseInit()
 }
 
 //
+// seasonFile() - returns a promise that provides a ref to the appropriate
+//                season XML or JSON file that was generated from the season XML file.
+//                By default, the XML file ref is returned.  If true is given, then
+//                the JSON file is returned.
+//
+function seasonFile(json = false)
+{
+    var storage = firebase.storage();
+    var ref = storage.ref(SeasonDir + SeasonFile);
+
+    return ref.getDownloadURL()
+	.then((url) => reqGet(url))
+	.then((body) => {
+	    var xmlFile = body.trim();
+	    var baseName = xmlFile.split(".")[0];
+	    var jsonFile = baseName + ".json";
+	    var target = json?jsonFile:xmlFile;
+	    return(storage.ref(SeasonDir + target));
+	})
+	.catch((err) => {
+	    console.log("error getting SEASONFILE pointer - it must point to the appropriate XML file: " + err);
+	});
+}
+
+
+//
 // season() - return the XML for the "current" season, or for the
 //            season specified in the parameters of the GET request.
 //            The seasons are kept in the firebase storage (as opposed
@@ -84,11 +115,8 @@ exports.season = functions.https.onRequest((request, response) => {
 
     firebaseInit();
 
-    var storage = firebase.storage();
-    //    var ref = storage.ref("NASA/Season/powerUp.xml");
-    var ref = storage.ref("NASA/Season/DeepSpace2019.xml");
-
-    ref.getDownloadURL()
+    seasonFile()
+	.then((ref) => ref.getDownloadURL())
     	.then((url) => reqGet(url))
 	.then((body) => response.send(body))
 //	.then((url) => response.redirect(url))
@@ -110,13 +138,8 @@ exports.seasonJSON = functions.https.onRequest((request, response) => {
 
     firebaseInit();
 
-    var storage = firebase.storage();
-    //    var ref = storage.ref("NASA/Season/powerUp.xml");
-    var ref = storage.ref("NASA/Season/DeepSpace2019.json");
-
-    // TODO - allow specifying the JSON
-    
-    ref.getDownloadURL()
+    seasonFile(true)
+	.then((ref) => ref.getDownloadURL())
     	.then((url) => reqGet(url))
 	.then((body) => response.send(body))
 	.catch(function(error) {
@@ -160,7 +183,7 @@ exports.seasonJSONgenerate = functions.storage.object().onFinalize((object) => {
     var fromRef = storage.ref(object.name);
     var toRef = storage.ref("NASA/Season/" + basename + ".json");
     
-    fromRef.getDownloadURL()
+    return fromRef.getDownloadURL()
 	.then((url) => reqGet(url))
 	.then((body) => XMLparse(body,{trim: true}))
 	.catch((err) => {
