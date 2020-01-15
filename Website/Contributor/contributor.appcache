@@ -1,0 +1,21 @@
+CACHE MANIFEST
+index.html
+NASA.css
+Season/season.css
+numSpinner.css
+https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
+Season/season.js
+NASA.js
+main.js
+numSpinner.js
+SegmentDisplay/excanvas.js
+SegmentDisplay/segment-display.js
+Season/generateHTML2.js
+Season/season.js
+Season/seasonDataGather.js
+../season.xml
+birdy.png
+nasa-logo-250x110.png
+SegmentDisplay/plexiglas.png
+favicon.ico
+
