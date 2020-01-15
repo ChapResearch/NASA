@@ -1,0 +1,38 @@
+
+div.content {
+    margin-left: 50px;
+    float: left;
+    color: white;
+    font-family: sans-serif;
+    width: 900px;
+}
+.images{
+    display: block;
+    margin-left: auto;
+    margin-top: 20px;
+    margin-bottom:20px;
+    margin-right: auto;
+    width: 200px;
+    height: 355px;
+    border: 3px solid #1b5dc6;
+}
+.logo{
+  display: block;
+  margin-left: auto;
+  margin-top: 20px;
+  margin-bottom:20px;
+  margin-right: auto;
+  width: 50%;
+}
+
+h2{
+   margin-top: 0px;
+   font-size: 36px;
+   font-weight: bold;
+    text-align: center;
+}
+p{
+    text-align: left;
+    line-height: 1.5;
+    font-size: 20px;
+}
