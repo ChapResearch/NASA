@@ -1,0 +1,23 @@
+################################################################################
+# Not Another Scouting App (NASA) - ** Thu Feb 21 10:56:39 2019 **
+#    _  __ __  _____ 
+#   | |/ //  |/  / / 
+#   |   // /|_/ / /  
+#  /   |/ /  / / /___
+# /_/|_/_/  /_/_____/
+#                    
+#   (XML)
+################################################################################
+
+Describes the (massive) XML file that describes a Season for NASA.
+
+1. Overview
+
+The purpose of the season XML file is to fully describe the data that is relavent
+for the season. In addition, it describes the layout of the Contributor input screen
+along with the Views of the data that are possible for the season.
+...
+
+2. XML Format
+
+<will mention to see "Views.txt" etc. for particular information>

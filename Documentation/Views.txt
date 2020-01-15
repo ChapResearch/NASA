@@ -1,0 +1,196 @@
+################################################################################
+# Not Another Scouting App (NASA) - ** Thu Feb 21 10:56:39 2019 **
+#  _    ___                  
+# | |  / (_)__ _      _______
+# | | / / / _ \ | /| / / ___/
+# | |/ / /  __/ |/ |/ (__  ) 
+# |___/_/\___/|__/|__/____/  
+#                            
+#   (Views)
+################################################################################
+
+Describes how views work in NASA.
+
+1. Overview
+
+A "View" is the term given for the definition of statistic data
+presented to the user, given a particular set of data, with a
+particular layout of the data on the screen. For example, one View
+could be "a list of robots participating in the El Paso competition in
+2019, along with their performance data."  In this case, the layout is
+a "list" with the target data being the robots and their performance,
+but only for a particular competition.  The View infrastructure makes
+this possible.
+
+2. View Formats
+
+Views can (currently) be displayed in 4 different formats:
+
+  -list - the target data is presented in a simple tabular format
+  	  (list) with the data items for the columns, and rows being
+  	  differing categories such as robots or competitions. The
+  	  list has controls for sorting.
+
+  - record - the target data is shown on the screen in a "one data
+    	     item" format.  For example, the performance data for a
+    	     single robot for a single match in a competition can be
+    	     shown.  Multiple selectors are also present to select the
+    	     different attributes to show in the chart.
+
+  - bar - the target data is presented with one bar for each "record"
+    	  of data, with one or more data items driving the height of
+    	  the bar.
+
+  - pie - the target data is presented with one pie piece for each
+    	  record, with the percentage of the pie related to one data
+    	  item. Multiple selectors are also present to select the
+    	  different attributes to show in the pie.
+
+2. Data Organization
+
+The data is the statistical database is stored in a tree format with
+the following structure:
+
+  year
+  year
+   |- robot
+   |- robot
+   '- robot
+       |- competition
+       |- competition
+       '- competition
+           |- match
+           '- match
+
+Each level of the tree is called a perspective. That is, the robot
+perspective refers to the level where all of the robots are
+listed. The competition perspective refers to the level where all of
+the competitions are listed.
+
+In case it's not obvious, each robot has a set of competitions below
+it. The set of competitions under one robot is often the same set as
+under another robot (particularly given that only one team is using
+NASA).  Each competition has a set of matches under it, which lists
+all of the matches for that competition for that robot.  For example:
+
+  2019
+   |- 118
+   |   |- El Paso
+   |   |   |- 10
+   |   |   |- 32
+   |   |   '- 45
+   |   '- Greenville
+   |       |- 7
+   |       '- 15
+   '- 2468
+       |- El Paso
+       |   |- 10
+       |   |- 32
+       |   '- 45
+       '- Greenville
+           |- 7
+           '- 15
+
+3. Data and Meta Data
+
+Data lives at each level of the tree. At the "leaves" (the matches)
+the raw data from each match is stored. Also at the leaves, "metaData"
+(computed data based upon the raw data) is also stored.
+
+Above the leaves, metaData is stored at each level and represents data
+that was computed based upon the lower level data. For example, at the
+2019/2468/Greenville level in the diagram above, there will be data
+representing certain averages of data from all of the matches
+combined. Note that the "key" for metaData in each level of the tree
+(except leaves) is "_metaData" and looks like this:
+
+  2019
+   |- 118
+   |   |- El Paso
+   |   |   |- 10
+   |   |   |- 32
+   |   |   |- 45
+   |   |   '- _metaData
+   |   |- Greenville
+   |   |   |- 7
+   |   |   |- 15
+   |   |   '- _metaData
+   |   '- _metaData
+   |- 2468
+   |   |- El Paso
+   |   |   |- 10
+   |   |   |- 32
+   |   |   |- 45
+   |   |   '- _metaData
+   |   |- Greenville
+   |   |   |- 7
+   |   |   |- 15
+   |   |   '- _metaData
+   |   '- _metaData
+   '- _metaData
+
+An important rule that the system follows is that no year, robot, or competition can
+be named "_metaData".
+
+4. Selecting Data for a View
+
+When selecting the data that will be part of a view, you must
+understand the concept of a "record" of data. A record refers to a
+chunk of raw data that was captured by the scouting system. In
+particular, this means MATCH DATA that was captured during a
+competition. Each record includes all of the raw data that was
+captured, along with the metaData that was computed at the match
+level. Further, each record 'logically' includes the metaData that is
+part of each level of the tree above the match. There are many
+matches, therefore, that logically include the metaData for a
+particular competition for a particular robot.
+
+In addition to the view format (described above) each view has three
+specifications that define it:
+
+  - Constraints - Constraints are represented by a combination of one
+    or more of the following things: year, robot, competition, and
+    match. Each one represents a piece of USER INPUT that is required
+    before a particular view can be shown. For example, for a view
+    that shows "all competitions for a particular robot", the user
+    must select the robot that the user wants to see. In this case,
+    the robot is a constraint. Often, the view would include multiple
+    constraints, such as the robot and year for "all competitions in a
+    particular year for a particular robot".
+
+    An important way to think about constraints is to understand that
+    all of the data that is found and presented MUST CONFORM to all of
+    the constraints. So if, for example, 100 rows of data are
+    returned, then each one of those rows will adhere to all of the
+    associated constraints.
+
+  - Perspective - 
+
+  - Data
+
+The target task for presenting a view is to select the appropriate
+data for the view you are creating. A couple examples will make
+this task clear.
+
+  4.1. Best Scoring Robots
+
+  4.2. All Robots in a Particular Competition
+
+  4.3. Highest Score for Every Robot in a Year
+
+  This view takes advantage of the sorting capability of the views when
+  presented to the user. This view actually shows all matches for all
+  robots in a year, and the score for that match. So the "unique" part
+  of the list goes down to the MATCH level, so every match is being
+  shown.
+
+
+
+
+2. Defining a View
+
+The simplest view is the "record" format. It is defined by providing constraints
+significant enought to select a single instance of data
+
+X. XML Format
+   

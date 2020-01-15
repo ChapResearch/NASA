@@ -1,0 +1,55 @@
+################################################################################
+# Not Another Scouting App (NASA) - ** Thu Feb 21 10:56:39 2019 **
+#    _____                      _ __       
+#   / ___/___  _______  _______(_) /___  __
+#   \__ \/ _ \/ ___/ / / / ___/ / __/ / / /
+#  ___/ /  __/ /__/ /_/ / /  / / /_/ /_/ / 
+# /____/\___/\___/\__,_/_/  /_/\__/\__, /  
+#                                 /____/   
+#   (Security)
+################################################################################
+
+Describes all things security related in NASA. This is a big topic.
+
+1. Overview
+
+Security in NASA is a concern in every part of the system, and has
+different attributes in each. Overall, security in NASA is related to:
+
+  Contributor - The Contributor Web App that collects data and transmits it
+  to the Controller mobile phone.
+
+  Controller
+
+  Controller App
+
+  Firebase
+
+  Statistic Viewer
+
+2. Contributor
+
+The Contributor Web App is a set of files (html, css, javascript) that
+presents an interface to the user. All of the files, except one, are
+local static files with no security information contained within. The
+one non-static file is the .json file associated with the description
+of the current season for scouting.  The app doesn't interface to the
+Firebase database, it only communicates through BLE to the Controller.
+
+(app password and data)
+(password isn't secure - isn't really meant to be)
+
+(BLE security)
+
+3. Controller
+
+(password isn't secure)
+
+4. Controller App
+
+(anyone can download)
+(hard coded for our catcher)
+
+5. Firebase
+
+6. Statistics Viewer

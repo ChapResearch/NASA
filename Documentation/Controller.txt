@@ -1,0 +1,35 @@
+################################################################################
+# Not Another Scouting App (NASA) - ** Thu Feb 21 10:56:39 2019 **
+#    ______            __             ____         
+#   / ____/___  ____  / /__________  / / /__  _____
+#  / /   / __ \/ __ \/ __/ ___/ __ \/ / / _ \/ ___/
+# / /___/ /_/ / / / / /_/ /  / /_/ / / /  __/ /    
+# \____/\____/_/ /_/\__/_/   \____/_/_/\___/_/     
+#                                                  
+#   (Controller)
+################################################################################
+
+Describes the Android Controller app for NASA.
+
+1. Overview
+
+<what the controller does>
+<Why Android, why not apple>
+
+2. Android App
+
+3. Controller Interface
+
+<parts will say "see BLE">
+
+4. Transmitting to Firebase
+
+5. Low-level BLE Module
+
+
+X. Caveats
+
+The Controller is designed to be able to manage a compete match (6 Contributors)
+for a single mobile phone. However, in tests, and although the Android OS supports
+more, only 4 simultaenous connections were possible with many mobile phones. We
+have yet to test a phone that supports more.

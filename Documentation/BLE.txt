@@ -1,0 +1,58 @@
+################################################################################
+# Not Another Scouting App (NASA) - ** Thu Feb 21 10:56:39 2019 **
+#     ____  __    ______
+#    / __ )/ /   / ____/
+#   / __  / /   / __/   
+#  / /_/ / /___/ /___   
+# /_____/_____/_____/   
+#                       
+#   (BLE - Bluetooth Low Energy)
+################################################################################
+
+Describes the use of BLE within NASA, along with the specification of the
+characteristics used and their UUIDs.
+
+1. Overview
+
+BLE was chosen as the protocol to communicate between the Contributors and
+Controllers for a number of reasons:
+
+- Foremost, the scouting app is meant to be operated near a competition field
+  where Wi-Fi is not allowed, as it may interfere with robot control. So an
+  alternative communication mechanism(s) was needed to both collect data from
+  the 6 individuals watching the match and to transmit that data to Firebase.
+
+- The only conceived mechanism for dynamically transmitting data to Firebase
+  was the cellular network provided by the mobile phone. So we settled on using
+  a mobile phone for sending data to Firebase. We named this phone the "Controller"
+  in that it not only served as the conduit to Firebase, but it also served to
+  allow someone to ensure that the data coming from the Contributors made sense.
+  The mechanism for transmitting the data from the Contributors to the Controller
+  necessarily was different. 
+
+- Note that we discounted the possibility that each Contributor would transmit
+  data to Firebase individually for two reasons: (1) we didn't want to require
+  a cellular data connection for each Contributor as it would be cost prohibitive,
+  and (2) we liked the idea of having a Controller help shepherd the process along,
+  noting issues while data was collected and coordinating the activities among
+  the Contributors.
+
+- Bluetooh in general seemed like a good choice for communication between the
+  Contributors and Controller primarily because the Controller and Contributors
+  would always be within a few feet of each other. Further, all of the devices
+  contemplated for both Controllers and Contributors normally include Bluetooth
+  support.
+  
+- BLE (Bluetooth Low Energy) was a particular option that provided many benefits
+  for both the Contributors and Controller:
+    1 - BLE consumes far less energy than either "standard" Bluetooth or Wi-Fi
+        or other forms of NFC (near field communication)
+    2 - While Bluetooth is already designed to co-exist with Wi-Fi by avoiding
+      	it, BLE goes one step further by taking advantage of the standard
+	spacing of Wi-Fi channels to "advertise" services between them.
+    3 - Software libraries for both Android (Controller) and Web (Contributor)
+      	are now available...(need more here)
+
+2. Controller/Contributor Interaction
+
+3. UUIDs
