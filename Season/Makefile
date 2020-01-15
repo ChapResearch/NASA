@@ -24,11 +24,9 @@ deploy-validate:
 test-validate:
 	curl -F 'data=@DeepSpace2019.xml' https://us-central1-nasa-7a363.cloudfunctions.net/seasonXMLvalidate
 
-clean:	node-clean
-
-
-node-clean:
+clean:	
 	rm -fr functions/node_modules
+	rm -fr functions/package.json
 
 #
 # checks to see if the node_modules are there, and will install them if not
@@ -39,10 +37,3 @@ node:
 	[ -d functions/node_modules ] || (cd functions; \
 						cp packagejson-template package.json; \
 						npm install $(NPM_PACKAGES) --save)
-
-functions/package.json:
-	cd functions; cp packagejson-template package.json
-
-package-install: functions/package.json
-	cd functions; npm install $(NPM_PACKAGES) --save
-
