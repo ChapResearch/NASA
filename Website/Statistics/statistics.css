@@ -60,6 +60,22 @@ body > div.content {
     background-color: #8888ff;
 }
 
+.menu-button.refresh.refreshing {
+    color: red;
+    -webkit-animation: flash linear 1s infinite;
+    animation: flash linear 1s infinite;
+}
+@-webkit-keyframes flash {
+	0% { opacity: 1; } 
+	50% { opacity: .1; } 
+	100% { opacity: 1; }
+}
+@keyframes flash {
+	0% { opacity: 1; } 
+	50% { opacity: .1; } 
+	100% { opacity: 1; }
+}
+
 .listbox {
     position: absolute;
     top: 10px;
@@ -122,6 +138,7 @@ body > div.content {
     padding-top: 10px;
     padding-bottom: 10px;
     width: calc(100% - 5px);
+    min-height: 70px;
     font-size: 20px;
     font-family: sans-serif;
     text-align: left;

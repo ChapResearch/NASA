@@ -1322,6 +1322,20 @@ function checkConstraints()
 }
 
 //
+// selectorIsMulti() - returns true if the named selector is set at --MULTI--
+//
+function selectorIsMulti(name)
+{
+    var selection = $('.constraint-input-' + name).find('div.content');
+
+    if(selection.hasClass('single')) {
+	return(false);
+    }
+	
+    return selection.find('select').val() == -1;     // -1 is magical --MULTI-- value
+}
+
+//
 // selectorValue() - return the value of a given selector. Note that this
 //                   can now return an array of values with multi.
 //
@@ -1372,8 +1386,10 @@ function selectorChangeFN(level)
     console.log(values);
 
     // tricky cascade switch - removes the values that need to be re-prompted
-    // TODO - decide - should this happen or not
-    if(false) {
+    // BUT - this only happens if this field is NOT a multi-select field. If it
+    //   is multi select, then leave the lower selections where they are.
+
+    if(!selectorIsMulti(level)) {
 	switch(level) {
 	case 'year':	delete values.robot;
 	case 'robot':	delete values.competition;

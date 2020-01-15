@@ -7,13 +7,17 @@ $( document ).ready(function() {
 
     // reset the current view
     $('.menu-button.reset').click(function() {
-	viewPopulate();
-	viewTableHTML();
+	viewGoLoad();
     });
 
     $('.menu-button.refresh').click(function() {
 	// reload the database, and refresh the current view
-	databaseLoad(true,viewGoLoad);
+	var thisButton = $(this);
+	thisButton.addClass("refreshing");
+	databaseLoad(true,function() {
+	    thisButton.removeClass("refreshing");
+	    viewGoLoad();
+	});
     });
 
     $('.menu-button.back').click(function() {
