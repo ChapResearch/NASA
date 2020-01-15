@@ -37,7 +37,11 @@ FBCONFIG = $(ROOT)/FirebaseConfig
 DEPLOYDIR = deployment
 #DEPLOYDIR = /media/sf_Virtual_Machine_Shares/deployment
 
-HIDDENURL = "ThisIsAScoutingApp"
+# Hidden URL for running Fixit stuff
+HIDDENURL = ThisIsAScoutingApp
+
+# FMS testing URL
+FMSTESTURL = FMSTEST
 
 .firebaserc: $(FBCONFIG)/firebaserc-template
 	cp $(FBCONFIG)/firebaserc-template $@
@@ -83,6 +87,9 @@ deploycopy: $(DEPLOYDIR) favicon.ico
 	cp -R Fixit $(DEPLOYDIR)
 	rm -fr $(DEPLOYDIR)/$(HIDDENURL)
 	mv $(DEPLOYDIR)/Fixit $(DEPLOYDIR)/$(HIDDENURL)
+	cp -R FMS $(DEPLOYDIR)
+	rm -fr $(DEPLOYDIR)/$(FMSTESTURL)
+	mv $(DEPLOYDIR)/FMS $(DEPLOYDIR)/$(FMSTESTURL)
 	[ -d $(DEPLOYDIR)/Season ] || mkdir $(DEPLOYDIR)/Season
 	cp -R ../Season/*.xml $(DEPLOYDIR)
 	cp -R Contributor/Season/* $(DEPLOYDIR)/Season
