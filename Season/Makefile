@@ -11,12 +11,21 @@
 #   XML file is found in the target dir.
 #
 
+FUNCTIONS := seasonJSONgenerate seasonJSON season seasonXMLvalidate
+
+# this variable gets set to the list of functions each prefaced by "functions:"
+#   and separated by commas - this involves replacing the spaces with commas
+#   forgive the ugly code, but that's how you can define spaces and commas in make
+
+space := $() $()
+comma := ,
+FUNCTIONONLY := $(subst $(space),$(comma),$(patsubst %,functions:%,$(FUNCTIONS)))
 
 NPM_PACKAGES = firebase firebase-admin firebase-functions request request-promise \
                xml2js xml2js-es6-promise xhr2 toposort busboy
 
 deploy:	node
-	cd functions; firebase deploy --only functions:seasonJSONgenerate,functions:seasonJSON,functions:season,functions:seasonXMLvalidate
+	cd functions; firebase deploy --only $(FUNCTIONONLY)
 
 deploy-validate:
 	cd functions; firebase deploy --only functions:seasonXMLvalidate
