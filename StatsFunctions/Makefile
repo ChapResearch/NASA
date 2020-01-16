@@ -30,6 +30,7 @@ deploy:	node
 clean:	
 	rm -fr functions/node_modules
 	rm -fr functions/package.json
+	rm -fr .firebaserc
 
 #
 # checks to see if the node_modules are there, and will install them if not
@@ -37,7 +38,8 @@ clean:
 #
 
 node: 
-	[ -d functions/node_modules ] || (cd functions; \
+	[ -d functions/node_modules ] || (cp ../FirebaseConfig/firebaserc-template .firebaserc; \
+						cd functions; \
 						cp packagejson-template package.json; \
 						npm install $(NPM_PACKAGES) --save)
 

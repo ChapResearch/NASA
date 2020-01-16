@@ -1,106 +1,38 @@
 #
-# NASA Website Makefile
+# Note that the attachments from URLs to these functions is done
+#   in the ../Website/firebasejson-template.  The connections as of this
+#   writing ** Mon Jan 13 18:32:52 2020 ** are:
 #
-#   The targets in this Makefile include:
+#     catcher => catcher()
 #
-#	deploy - assemble and send the website to Google Firebase Hosting
-#	push - push back up to github
-#	refresh - get all github stuff back down
+
+FUNCTIONS := catcher
+
+# this variable gets set to the list of functions each prefaced by "functions:"
+#   and separated by commas - this involves replacing the spaces with commas
+#   forgive the ugly code, but that's how you can define spaces and commas in make
+
+space := $() $()
+comma := ,
+FUNCTIONONLY := $(subst $(space),$(comma),$(patsubst %,functions:%,$(FUNCTIONS)))
+
+NPM_PACKAGES = firebase firebase-admin firebase-functions
+
+deploy:	node
+	cd functions; firebase deploy --only $(FUNCTIONONLY)
+
+clean:	
+	rm -fr functions/node_modules
+	rm -fr functions/package.json
+	rm -fr .firebaserc
+
 #
-#	fb-init - initialize firebase in the current directory (this is because
-#		  the firebase files aren't stored in github).
+# checks to see if the node_modules are there, and will install them if not
+# Note that this causes the package.json file to be built too
 #
-#	fb-install-tools - ONLY NEEDS TO BE DONE ONCE PER MACHINE
-#			   MUST BE DONE "sudo" because it installs globally
-#			   Rerun the command (sudo) ti update the tools
-#			   NOTE - running this command in an emacs buffer is
-#				pretty ugly because of the color/cursor control
-#				that the install script uses.
-#
-#	fb-login - simple/stupid target to login to firebase. YOU ONY NEED TO DO
-#			this once. It is here to remind you what you need to do.
-#			firebase-tools must be installed for this to work.
-#			This command uses the --no-localhost options of login
-#			so it doesn't try to launch a browser. You can, instead,
-#			copy the link generated and put it into the browser yourself.
-#
-#	fb-logout - another simple/stupid target to log OUT of firebase.
-#			firebase-tools must be installed for this to work.
-#
-#	fb-init - initialize firebase for this website. This short-circuits
-#			the process a bit, instead of running "firebase init"
-#			it configures the configuration files directly.
-#
-# ** Thu Feb 28 10:43:03 2019 **
-# clean bring-up notes
-#  - run "firebase init functions" (need to explore everything this does)
-#  - run "npm install firebase --save" in functions directory (explore this too)
 
-.firebaserc: firebaserc-template
-	cp firebaserc-template $@
-
-firebase.json: firebasejson-template
-	cp firebasejson-template $@
-
-fb-install-tools:
-	sudo npm install -g firebase-tools
-
-fb-login:
-	firebase login --no-localhost
-
-fb-logout:
-	firebase logout
-
-fb-init: .firebaserc firebase.json
-
-fb-deploy:
-	firebase deploy
-
-clean: 
-	rm -fr node_modules
-	rm -fr firebase.json .firebaserc
-	rm -fr .firebase
-	rm -fr deployment
-	rm *~
-
-deployment:
-	mkdir deployment
-
-deploy:
-	firebase deploy --only functions:catcher
-
-deploy2:
-	firebase deploy --only functions:sum
-
-deployPanelRocket:
-	firebase deploy --only functions:sumPanelRocket
-
-deployPanelCargo:
-	firebase deploy --only functions:sumPanelCargo
-
-test:
-	curl --header "Content-Type: application/json" -d @testData.json -XPOST  https://nasa.chapresearch.com/catcher
-
-badtest:
-	curl -d "password=floopyx" -X POST https://us-central1-nasa-7a363.cloudfunctions.net/catcher
-
-refresh:
-
-newtest:
-	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2020","team_number":"2468","competition":"ElPaso","match":"1","record":{"one":"1","two":"2","three":"3"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
-
-
-newtest2:
-	curl --header "Content-Type: application/json" -d '{"password":"floopy","moredata2":{"hello":"there"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
-
-sumtest:
-	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"2468","competition":"ElPaso","match":"1","record":{"one":"1","two":"2","three":"3"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
-
-sumtest2:
-	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"5628","competition":"ElPaso","match":"1","record":{"one":"47","two":"2","three":"3"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
-
-sumPanelRocket:
-	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"5628","competition":"ElPaso","match":"1","record":{"panelScoredRocketLvl1":"2", "panelScoredRocketLvl2":"1", "panelScoredRocketLvl3":"1"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
-
-countCargoRocket:
-	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"5628","competition":"ElPaso","match":"1","record":{"cargoScoredRocketLvl1":["100","150","200"]}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+node: 
+	[ -d functions/node_modules ] || (cp ../FirebaseConfig/firebaserc-template .firebaserc; \
+						cd functions; \
+						cp packagejson-template package.json; \
+						npm install $(NPM_PACKAGES) --save)
