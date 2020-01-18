@@ -32,7 +32,6 @@ function seasonFile(firebase,json)
     return ref.getDownloadURL()
 	.then((url) => reqGet(url))
 	.then((body) => {
-	    console.log("figuring it out");
 	    var xmlFile = body.trim();
 	    var baseName = xmlFile.split(".")[0];
 	    var jsonFile = baseName + ".json";
