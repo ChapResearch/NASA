@@ -535,7 +535,10 @@ function checkData(xmlobject)
 		      max:     ["target"],
 		      min:     ["target"],
 		      defEffect: ["target"],
-		      compare: ["target"]
+		      compare: ["target"],
+		      divide:  ["target"],
+		      multiply:["target"],
+		      subtract:["target"]
 		    };
 
     var optFields = { weight: ["high","low"],
