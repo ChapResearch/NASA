@@ -79,3 +79,9 @@ sumPanelRocket:
 
 countCargoRocket:
 	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2019","team_number":"5628","competition":"ElPaso","match":"1","record":{"cargoScoredRocketLvl1":["100","150","200"]}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+
+divideTest:
+	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2025","team_number":"5628","competition":"ElPaso","match":"5","record":{"one":"4","two":"2"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher
+
+divideTest2:
+	curl --header "Content-Type: application/json" -d '{"password":"floopy","year":"2025","team_number":"5628","competition":"ElPaso","match":"4","record":{"one":"3","two":"2"}}' -X POST  https://us-central1-nasa-7a363.cloudfunctions.net/catcher

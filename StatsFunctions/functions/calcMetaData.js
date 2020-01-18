@@ -163,14 +163,17 @@ function calcMetaDataField(data,params,field)
     case 'combine':     return(calcMetaDataField_combine(data,params,field));
     case 'delta':       return(calcMetaDataField_delta(data,params,field));
     case 'sum':         return(calcMetaDataField_sum(data,params,field));
+    case 'subtract':    return(calcMetaDataField_subtract(data,params,field));	
     case 'percent':     return(calcMetaDataField_percent(data,params,field));
+    case 'divide':      return(calcMetaDataField_divide(data,params,field));
+    case 'multiply':    return(calcMetaDataField_multiply(data,params,field));	
     case 'weight':      return(calcMetaDataField_weight(data,params,field));
     case 'contains':    return(calcMetaDataField_contains(data,params,field));
     case 'containsAny': return(calcMetaDataField_containsAny(data,params,field));
     case 'min':         return(calcMetaDataField_min(data,params,field));
     case 'max':         return(calcMetaDataField_max(data,params,field));
     case 'defEffect':   return(calcMetaDataField_defEffect(data,params,field));
-    case 'compare':      return(calcMetaDataField_compare(data,params,field));	
+    case 'compare':     return(calcMetaDataField_compare(data,params,field));	
     default:         console.log("BAD OP: " + operation); return(false);
     }
 
@@ -298,7 +301,7 @@ function calcMetaDataField_weight(data,params,field)
 
 //
 // normalizeDataItem() - Given a particular data item (from Firebase), normalize it
-//                        into an array of values. This deals with things like
+//                       into an array of values. This deals with things like
 //                        hasOwnProperty() and null values.
 //
 //     RETURNS - an array is ALWAYS returned - if the data item had one item, then the array
@@ -388,6 +391,32 @@ function calcMetaDataField_sum(data,params,field)
 	return(sum);
 
 }
+
+//
+// _subtract() -Calculate a number based off subtracting right from left
+//              NOTE: you can only have 2 values, one left which
+//                    will be subtracted by the right
+//
+function calcMetaDataField_subtract(data,params,field)
+{
+    // only use the first numerator & denominator
+
+    var left = field.target[0];          // these are always arrays coming in
+    var right = field.target[1];
+
+    var dataL = normalizeDataItem(data,left);
+    var dataR = normalizeDataItem(data,right);
+
+    if(dataL.length == 0 || dataR.length == 0){
+	console.log("One of your targets had no data in it")
+	return null;
+    }
+    
+    var value = dataL[0]-dataR[0];
+
+    return(value);
+}
+
 
 function calcMetaDataField_combine(data,params,field)
 {
@@ -511,6 +540,80 @@ function calcMetaDataField_percent(data,params,field)
     }
 
     return(percent);
+}
+
+//
+// _divide() -  Calculate a float based on the two inputted targets:
+//              <Numerator> and <Denominator>.
+//              NOTE: you can only have 2 values, one numerator which
+//                    will be divided by one denominator
+//
+function calcMetaDataField_divide(data,params,field)
+{
+    if(field.target.length < 2){
+	console.log("You must have atleast 2 targets to divide");
+	return null;
+    }
+    
+    // only use the first numerator & denominator
+
+    var numerator = field.target[0];
+    var denominator = field.target[1];
+
+    var dataNum = normalizeDataItem(data,numerator);
+    var dataDenom = normalizeDataItem(data,denominator);
+
+    if(dataNum.length == 0 || dataDenom.length == 0){
+	console.log("Your Denominator and or Numerator had no data in it")
+	return null;
+    }
+
+    if(dataDenom == 0){
+	console.log("denominator was 0");
+	return(dataNum[0]);
+    }
+    
+    var value = dataNum[0]/dataDenom[0];
+
+    return(value);
+}
+
+//
+// _multiply() -Calculate a number by multiplying the two targetstted targets:
+//              NOTE: you can have as many targets as you want
+//
+function calcMetaDataField_multiply(data,params,field)
+{
+    if(field.target.length == 0){
+	console.log("no fields were given to multiply by");
+	return(0);
+    }
+    
+    // grab the first element (because i could set this to 1 or 0, but then either
+    // the product would always be 0, or a return of 1 would come back on an unseccessful multiplication)
+    var product = normalizeDataItem(data,field.target[0]);
+
+    // now we need to check if the product we start with is an array with a length greater than 1, we will also do this in the loop
+    if(product.length > 1){
+	console.log("Cannot multiply by an array (this is likely a list of events)");
+	return null;
+    }
+    
+    var nextNum;
+
+    // for each target multiply the current product by the next target field
+    for(var i = 1; i < field.target.length; i++){
+	nextNum = normalizeDataItem(data,field.target[i]);
+	// if our next num is an array with length greater than 1 we can't multiply, return null
+	if(nextNum.length > 1){
+	    console.log("Cannot multiply by an array (this is likely a list of events)");
+	    return null;
+	}
+
+	product = product * nextNum;
+    }
+    
+    return(product);
 }
 
 //
