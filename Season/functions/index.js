@@ -46,10 +46,7 @@ global.XMLHttpRequest = require("xhr2");   // necessary for the getDownloadURL()
 var toposort = require("toposort");
 const Busboy = require('busboy');
 
-const SeasonDir = "NASA/Season/";      // firebase storage dir where the season files are kept
-const SeasonFile = "SEASONFILE";       // name of the file (in the above) where the *actual*
-                                       //   XML file name is stored. Change this to point to the
-                                       //   right one.
+var seasonFile = require('./seasonFile');
 
 //
 // firebaseInit() - inits if necessary.
@@ -79,32 +76,6 @@ function firebaseInit()
 }
 
 //
-// seasonFile() - returns a promise that provides a ref to the appropriate
-//                season XML or JSON file that was generated from the season XML file.
-//                By default, the XML file ref is returned.  If true is given, then
-//                the JSON file is returned.
-//
-function seasonFile(json = false)
-{
-    var storage = firebase.storage();
-    var ref = storage.ref(SeasonDir + SeasonFile);
-
-    return ref.getDownloadURL()
-	.then((url) => reqGet(url))
-	.then((body) => {
-	    var xmlFile = body.trim();
-	    var baseName = xmlFile.split(".")[0];
-	    var jsonFile = baseName + ".json";
-	    var target = json?jsonFile:xmlFile;
-	    return(storage.ref(SeasonDir + target));
-	})
-	.catch((err) => {
-	    console.log("error getting SEASONFILE pointer - it must point to the appropriate XML file: " + err);
-	});
-}
-
-
-//
 // season() - return the XML for the "current" season, or for the
 //            season specified in the parameters of the GET request.
 //            The seasons are kept in the firebase storage (as opposed
@@ -115,7 +86,7 @@ exports.season = functions.https.onRequest((request, response) => {
 
     firebaseInit();
 
-    seasonFile()
+    seasonFile.seasonFile(firebase)
 	.then((ref) => ref.getDownloadURL())
     	.then((url) => reqGet(url))
 	.then((body) => response.send(body))
@@ -138,7 +109,7 @@ exports.seasonJSON = functions.https.onRequest((request, response) => {
 
     firebaseInit();
 
-    seasonFile(true)
+    seasonFile.seasonFile(firebase,true)
 	.then((ref) => ref.getDownloadURL())
     	.then((url) => reqGet(url))
 	.then((body) => response.send(body))
@@ -164,6 +135,7 @@ exports.seasonJSONgenerate = functions.storage.object().onFinalize((object) => {
 
     // we only look at files in "NASA/Season" that end in ".xml"
 
+    // TODO - this should call seasonFile.seasonDir()
     var filename = object.name.split("/");
     if(filename.length != 3 || filename[0] != "NASA" || filename[1] != "Season") {
 	console.log("write in the wrong place");
@@ -181,8 +153,8 @@ exports.seasonJSONgenerate = functions.storage.object().onFinalize((object) => {
     console.log("working on " + basename);
 
     var fromRef = storage.ref(object.name);
-    var toRef = storage.ref("NASA/Season/" + basename + ".json");
-    
+    var toRef = storage.ref(seasonFile.seasonDir() + basename + ".json");
+
     return fromRef.getDownloadURL()
 	.then((url) => reqGet(url))
 	.then((body) => XMLparse(body,{trim: true}))
@@ -315,6 +287,9 @@ function fieldClone(field)
 function metaFieldData(xmlObj)
 {
     var app = xmlObj.app;                     // top level is the app
+
+    console.log(app);
+    
     var metaFields = app.metaData[0].field;    // array of field objects
 
     var fields = [];

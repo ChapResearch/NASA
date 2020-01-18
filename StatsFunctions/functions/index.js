@@ -22,6 +22,8 @@ var toposort = require("toposort");
 
 var metaData = require('./calcMetaData');
 
+var seasonFile = require('./seasonFile');
+
 var METADATA = "_metaData";
 
 //
@@ -236,12 +238,12 @@ exports.statistics = functions.database.ref('{year}/{robot}/{competition}/{match
 //
 function getNASAdataJSON()
 {
-    var storage = firebase.storage();
-    var ref = storage.ref("NASA/Season/DeepSpace2019.json");
+    return(
+	seasonFile.seasonFile(firebase,true)
+	    .then((ref) => ref.getDownloadURL())
+	    .then((url) => reqGet(url))
+            .then((body) => JSON.parse(body)));
 
-    return(ref.getDownloadURL()
-	   .then((url) => reqGet(url))
-           .then((body) => JSON.parse(body)));
 }    
 
 //
@@ -253,15 +255,12 @@ function getNASAdataJSON()
 //
 function getNASAdataXML()
 {
-    var storage = firebase.storage();
-    var ref = storage.ref("NASA/Season/DeepSpace2019.xml");
-
-    console.log("returning long promise chain");
-    
-    return(ref.getDownloadURL()
-	           .then((url) => reqGet(url))
-                   .then((body) => XMLparse(body,{trim: true}))
-	           .then((xmlresult) => organizeFieldData(xmlresult)));
+    return(
+	seasonFile.seasonFile(firebase)
+	    .then((ref) => ref.getDownloadURL())
+	    .then((url) => reqGet(url))
+            .then((body) => XMLparse(body,{trim: true}))
+	    .then((xmlresult) => organizeFieldData(xmlresult)));
 }
 
 //
@@ -290,10 +289,9 @@ exports.xmlTest = functions.https.onRequest((request, response) =>
 	console.log("didn't initialize");
     }
 
-    var storage = firebase.storage();
-    var ref = storage.ref("NASA/Season/DeepSpace2019.xml");
-
-    ref.getDownloadURL().then(function(url) {
+    seasonFile.seasonFile(firebase)
+	.then((ref) => ref.getDownloadURL())
+	.then(function(url) {
 
 	var origResponse = response;
 	requestMod.get(url,

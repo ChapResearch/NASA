@@ -9,6 +9,11 @@
 #   The matchStats() function is connected to a change in the database, getting
 #   kicked off when a new match result is written.
 #
+#   BIG NOTE - this makefile copies the seasonFile.js from the Season directory
+#              above this one, so it can be deployed easily (don't know how to
+#              do it any better way unfortunately ** Sat Jan 18 14:57:48 2020 **
+#              EJR
+
 
 FUNCTIONS := superiorStats matchStats recalculate
 
@@ -30,6 +35,7 @@ deploy:	node
 clean:	
 	rm -fr functions/node_modules
 	rm -fr functions/package.json
+	rm -fr functions/seasonFile.js
 	rm -fr .firebaserc
 
 #
@@ -41,6 +47,7 @@ node:
 	[ -d functions/node_modules ] || (cp ../FirebaseConfig/firebaserc-template .firebaserc; \
 						cd functions; \
 						cp packagejson-template package.json; \
+						cp ../../Season/functions/seasonFile.js .; \
 						npm install $(NPM_PACKAGES) --save)
 
 #
