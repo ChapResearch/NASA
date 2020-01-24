@@ -1,0 +1,153 @@
+<html>
+  <head>
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="NASA.css">
+    <link rel="stylesheet" type="text/css" href="Season/season.css">
+    <link rel="stylesheet" type="text/css" href="numSpinner.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="Season/season.js"></script>
+    <script src="NASA.js"></script>
+    <script src="main.js"></script>
+    <script src="numSpinner.js"></script>
+    <script src="SegmentDisplay/excanvas.js"></script>
+    <script src="SegmentDisplay/segment-display.js"></script>
+    <script src="Season/generateHTML2.js"></script>
+    <script src="Season/season.js"></script>
+    <script src="Season/seasonDataGather.js"></script>    
+
+    <meta name="mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+    <object data="../season.xml" id="seasonXML" height="0px" width="0px"></object>
+    <div class="overlay" style="display:none"></div>
+    <div class="about" style="display:none">
+      <div class="birdy" style="display:none">
+	<img src="birdy.png">
+      </div>
+    </div>
+
+    <div class="keypad" style="display:none">
+      <div class="display"><input class="inside"></input></div>
+      <div class="number">1</div>
+      <div class="number">2</div>
+      <div class="number">3</div>
+      <div class="clear control">CE</div>
+      <div class="newrow"></div>
+      <div class="number">4</div>
+      <div class="number">5</div>
+      <div class="number">6</div>
+      <div class="DEL control">DEL</div>
+      <div class="newrow"></div>
+      <div class="number">7</div>
+      <div class="number">8</div>
+      <div class="number">9</div>
+      <div class="blank control"></div>
+      <div class="newrow"></div>
+      <div class="blank number"></div>
+      <div class="number">0</div>
+      <div class="blank number"></div>
+      <div class="enter control">ENTER</div>
+    </div>
+    
+    <div class="connecting-dialog" style="display:none">
+      <div class="logo">
+	<img src="nasa-logo-250x110.png">
+      </div>
+      <div class="contacting-controller">
+	Contacting Controller...
+	<span class="done">Yippie!</span>
+	<span class="fail">Can't find it.</span>
+      </div>
+      <div class="getting-name">
+	Retrieving Controller Name...
+	<span class="done">Got it!</span>
+      </div>
+      <div class="checking-password">
+	Checking password...
+	<span class="done">Good guess!</span>
+	<span class="fail">Wrong password!</span>
+      </div>
+      <div class="checking-slot">
+	Checking your slot...
+	<span class="done">You got it!</span>
+	<span class="fail">Slot taken, pick another.</span>
+      </div>
+      <div class="failed">
+	Connection failed.
+      </div>
+      <div class="connected">
+	Connected!
+      </div>
+      <button>Dismiss</button>
+    </div>
+    <div class="settings-form" style="display:none">
+      <div class="logo">
+	<img src="nasa-logo-250x110.png">
+      </div>
+      <div class="myname-input">
+	<div class="title">Your Name:</div>
+	<input type="text" name="myname" maxlength="7"><br>
+      </div>
+      <div class="password-input">
+	<div class="title">Controller Password:</div>
+	<input type="text" name="password" maxlength="10" autocapitalize="off"><br>
+      </div>
+      <button>Save</button>
+    </div>
+    <div class="top-bar">
+      <div class="logo"></div>
+      <div class="controller-prompt">Controller</div>
+      <div class="controller-name"><span></span></div>
+      <div class="controller-line"></div>
+      <div class="contributor">
+	<div class="letter selected" data-contributor="A">A</div>
+	<div class="letter" data-contributor="B">B</div>
+	<div class="letter" data-contributor="C">C</div>
+	<div class="letter" data-contributor="D">D</div>
+	<div class="letter" data-contributor="E">E</div>
+	<div class="letter" data-contributor="F">F</div>
+      </div>
+      <div class="contributor-prompt"><span>Contributor</span></div>
+      <div class="contributor-sideline"></div> 
+      <div class="connect-indicator"></div>
+      <div class="myname-prompt">My Name</div>
+      <div class="myname-name"><span></span></div>
+      <div class="myname-line"></div>
+      <div class="match-prompt">Match</div>
+      <div class="match-name"><span></span></div>
+      <div class="match-line"></div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="team-number"></div>
+      <div class="team-color none"><div>(color)</div></div>
+      <canvas id="time-display" width="150" height="50"></canvas>
+      <button class="start">START</button>
+      <button class="stop" >STOP</button>
+      <button class="send" disabled>SEND</button>
+      <button class="reset">RESET</button>      
+    </div>
+
+    <div class="content">
+    </div>
+    
+    <script>
+      var display = new SegmentDisplay("time-display");
+      display.pattern         = "#:##";
+      display.displayAngle    = 6;
+      display.digitHeight     = 20;
+      display.digitWidth      = 11;
+      display.digitDistance   = 2.5;
+      display.segmentWidth    = 2;
+      display.segmentDistance = 0.8;
+      display.segmentCount    = 7;
+      display.cornerType      = 3;
+      display.colorOn         = "#eeeeee";
+      display.colorOff        = "#ffffff11";
+      display.draw();
+      display.setValue('4:56');
+    </script>
+
+  </body>
+</html>

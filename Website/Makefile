@@ -69,12 +69,13 @@ favicon.ico: nasa-birdy-logo.ico
 	cp nasa-birdy-logo.ico Statistics/favicon.ico
 	cp nasa-birdy-logo.ico Tools/favicon.ico
 
-clean: 
+clean:
+	rm Contributor/index.html
 	rm -fr node_modules
 	rm -fr firebase.json .firebaserc
 	rm -fr .firebase
 	rm -fr deployment
-	rm *~
+	rm -fr *~
 
 $(DEPLOYDIR):
 	mkdir $(DEPLOYDIR)
@@ -91,11 +92,15 @@ deploycopy: $(DEPLOYDIR) favicon.ico
 	rm -fr $(DEPLOYDIR)/$(FMSTESTURL)
 	mv $(DEPLOYDIR)/FMS $(DEPLOYDIR)/$(FMSTESTURL)
 	[ -d $(DEPLOYDIR)/Season ] || mkdir $(DEPLOYDIR)/Season
-	cp -R ../Season/*.xml $(DEPLOYDIR)
 	cp -R Contributor/Season/* $(DEPLOYDIR)/Season
 	cp favicon.ico $(DEPLOYDIR)
 
 deploy:	.firebaserc firebase.json deploycopy
+	[ -f Contributor/index.html ] || cp Contributor/index-template Contributor/index.html
+	firebase deploy --only hosting
+
+deploy-cached:	.firebaserc firebase.json deploycopy
+	[ -f Contributor/index.html ] || cp Contributor/index-cached-template Contributor/index.html
 	firebase deploy --only hosting
 
 testdeploy: deploycopy
