@@ -77,7 +77,7 @@ function fieldPosition(layoutField)
     var y = pos[1] + 2;
     var x = pos[0];
     
-    output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:230px"';
+    output += 'style="position:absolute;left:' + pos[0] + '%;top:' + pos[1] + '%;width:fit-content"';
     return output;
 }
 
@@ -255,7 +255,7 @@ function generateTextInputField(layoutField,elementField)
     var label = elementField.find("label").text();
     var name = layoutField.find("name").text();
     output += '<div>' + label;
-    output += '</div><div style="height: 100%; width: 100%;"><textarea name="' + name + '" style="width:100%;height:100%;"></textarea>';
+    output += '</div><div style="height: 100%; width: 100%;"><textarea name="' + name + '" style="width:100%;height:100%;font-size:18px;resize:none;"></textarea>';
     output += '</div>';
     output += '</div>';    
     
@@ -414,3 +414,37 @@ function generateDropField(layoutField,targetElementField)
     return("");
 }
 
+
+//
+// THE FOLLOWING SECTION DEALS WITH USING THE DATA SENT BY THE CONTROLLER
+// AND PLUGGING IT INTO THE VARIOUS ELEMENTS IN WHICH IT MAY WANT TO APPEAR
+//
+
+function seasonSetValue(element, value)
+{
+    var target = $('[name="' + element + '"]');
+    var type = target.prop('nodeName').toUpperCase();
+
+    switch(type)
+    {
+	case "TEXTAREA":   plugInTextarea(value, target);break;
+	case "INPUT":      plugInInput(value, target);break;
+    }
+}
+
+
+function plugInTextarea(value, target)
+{
+    target.val(value);
+}
+
+function plugInInput(value, target)
+{
+    var inputType = target.prop('input').toUpperCase();
+    switch(inputType)
+    {
+	case "RADIO":	 target[value].prop('checked', true);break;
+	case "CHECKBOX": target[value].prop('checked', true);break;
+	case "NUMBER":   target.parent().find(".numSpinner_value").text(value);
+    }
+}
