@@ -84,6 +84,7 @@ function NASA()
     this.matchFN = null;
     this.resetFN = null;
     this.startFN = null;
+    this.dataFN = null;
 }
 
 Object.defineProperties(NASA.prototype, {
@@ -181,7 +182,7 @@ NASA.prototype.sendUserName = function()
 //             causes a write to the characteristic. If it fails, then the
 //             connection is deemed as dropped.
 //
-NASA.prototype.setTeam = function(team)
+NASA.prototype.setTeam = function(team,uponCompletion = null)
 {
     if(this.connected) {
 	console.log("attempting to send team number");
@@ -195,14 +196,13 @@ NASA.prototype.setTeam = function(team)
 	message.set(teamNumber,1);
 
 	NASAObj.serviceObj.getCharacteristic(uuid)
-	    .then(characteristic => {
-		characteristic.writeValue(message)
-	            .catch(error => { NASAObj.connected = false; });
-	    });
+	    .then(characteristic => characteristic.writeValue(message))
+	    .then(() => { if(uponCompletion) { uponCompletion(); }})
+	    .catch(error => { NASAObj.connected = false; });
     }
 }
     
-NASA.prototype.setColor = function(color,uiControl)
+NASA.prototype.setColor = function(color,uponCompletion = null)
 {
     switch(color) {
     case 'blue':   color = 1; break;
@@ -211,7 +211,6 @@ NASA.prototype.setColor = function(color,uiControl)
     }
 
     if(this.connected) {
-	uiControl(true);         // disable the associated uiControl
 	console.log("attempting to send color report");
 	var uuid = NASA_UUIDs[NASAObj.slot].transmit;
 
@@ -222,13 +221,81 @@ NASA.prototype.setColor = function(color,uiControl)
 	bufferView[1] = color;
 	
 	NASAObj.serviceObj.getCharacteristic(uuid)
-	    .then(characteristic => {
-		characteristic.writeValue(buffer)
-		    .then(() => { uiControl(false); })
-	            .catch(error => { NASAObj.connected = false; });
-	    });
+	    .then(characteristic => characteristic.writeValue(buffer))
+	    .then(() => { if(uponCompletion) { uponCompletion(); }})
+	    .catch(error => { NASAObj.connected = false; });
     }
 }
+
+//
+// setTeamAndOrColor() - called when either/both of the team and color need
+//                       to be sent to the controller.  It is combined into
+//                       one call, so an appropriate promise can be constructed
+//                       to ensure that the BLE calls are serialized.
+//
+//                       team = either a string team number or null to skip
+//                       color = 0,1,2 or null to skip
+//
+//                       Don't call this if neither team or color are set!
+//
+NASA.prototype.setTeamAndOrColor = function(team,color,uponCompletion = null)
+{
+    if(this.connected) {
+
+	var colorMessage;
+	var teamMessage;
+
+	var colorFN = null
+	var teamFN = null;
+
+	var uuid = NASA_UUIDs[NASAObj.slot].transmit;
+
+	if(team) {
+	    var encoder = new TextEncoder('utf-8');
+	    var teamNumber = encoder.encode(team);
+	    teamMessage = new Uint8Array(teamNumber.length + 1);
+
+	    teamMessage[0] = 2;    // team number
+	    teamMessage.set(teamNumber,1);
+
+	    teamFN = function(uponCompletion) {
+		NASAObj.serviceObj.getCharacteristic(uuid)
+		    .then(characteristic => characteristic.writeValue(teamMessage))
+		    .then(() => { if(uponCompletion) { uponCompletion(); }})
+		    .catch(error => { NASAObj.connected = false; });
+	    }
+	}
+
+	if(color) {
+	    switch(color) {
+	    case 'blue':   color = 1; break;
+	    case 'red':    color = 2; break;
+	    default:       color = 0; break;
+	    }
+	    var buffer = new ArrayBuffer(2);
+	    colorMessage = new Uint8Array(buffer);
+
+	    colorMessage[0] = 3;    // color report
+	    colorMessage[1] = color;
+
+	    colorFN = function(uponCompletion) {
+		NASAObj.serviceObj.getCharacteristic(uuid)
+		    .then(characteristic => characteristic.writeValue(colorMessage))
+		    .then(() => { if(uponCompletion) { uponCompletion(); }})
+		    .catch(error => { NASAObj.connected = false; });
+	    }
+	}
+
+	if(team && !color) {
+	    teamFN(uponCompletion);
+	} else if(team && color) {
+	    teamFN(colorFN.bind(null,uponCompletion));
+	} else if(!team && color) {
+	    colorFN(uponCompletion);
+	}
+    }
+}
+    
 
 //
 // sendData() - sends the given object (data) to the controller.
@@ -318,19 +385,6 @@ NASA.prototype._sendChunks = function(uiControl,chunks,characteristic)
 	uiControl(false);         // enable the associated uiControl
     }
 }    
-
-//
-// _notifySetup() - called to set-up notifications for changes to the match number.
-//
-NASA.prototype._notifySetup = function(matchCharacteristic)
-{
-    return matchCharacteristic.startNotifications()
-	        .then(() => {
-		    matchCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
-			console.log("event");
-		    })
-		});
-}
 
 //
 // _disconnect() - this routine is attached to the bluetooth interface to be called
@@ -528,6 +582,26 @@ NASA.prototype.connect = function(reportFN)
 	    return(characteristic.writeValue(buffer));
 	})
     
+    // we have our slot, set-up to receiving incoming data pushes
+
+    	.then(() => {
+	    console.log("setting up notifications for incoming data");
+	    var uuid = NASA_UUIDs[NASAObj.slot].receive;
+	    return(NASAObj.serviceObj.getCharacteristic(uuid));
+	})
+	.then((dataCharacteristic) => {
+	    return(dataCharacteristic.startNotifications());
+	})
+    	.then((dataCharacteristic) => {
+	    dataCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+		var decoder = new TextDecoder('utf-8');
+		var jsonString = decoder.decode(event.target.value);
+		if(NASAObj.dataFN) {
+		    NASAObj.dataFN(jsonString);    // the jsonString has attribute(s) and value(s)
+		}
+	    })
+	})
+
     // if we get here, then everything went well, and we're connected
     //   we do kick-off the sending of the user name, but it isn't
     //   part of this promise chain.
@@ -611,8 +685,23 @@ NASA.prototype.resetMonitor = function(fn)
 
 //
 // startMonitor() - used to specify the callback when the Controller says "START!"
+//                  Also used for stop.  The fn is called with an arg with "1" saying
+//                  to start, and "0" to stop.
 //
 NASA.prototype.startMonitor = function(fn)
 {
     this.startFN = fn;
+}
+
+//
+// dataMonitor() - used to specify the callback when the Controller sends form data.
+//                 The fn is called with a string which is a json-encoded attr/value.
+//                 This routine doesn't worry about the size of the data - it is called
+//                 after any chunking is done (IF it is done). Generally there are eight
+//                 bytes of overhead for json so there are 12 bytes left for attr name
+//                 and value - like {"team": "12324"}.
+//
+NASA.prototype.dataMonitor = function(fn)
+{
+    this.dataFN = fn;
 }

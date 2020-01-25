@@ -36,6 +36,63 @@ function resetChange()
     timerClear();
 }
 
+// dataIncoming() - incoming data from the controller!  It will be pushed into
+//                the data form.  Note that this routine is passed the data
+//                that comes from the BLE notification in JSON format.  It can
+//                handle two things:  simple attr/value or array of attr/value.
+//
+//                There are two special attributes that can come in: teamNumber
+//                and teamColor. The need to be set but ALSO returned back to
+//                the controller in the "normal" way.  But this has to be staged
+//                appropriately so that two BLE requests can't be in flight at
+//                once. It would NICE if the BLE machinery would handle this.
+//                Maybe next time.
+//
+function dataIncoming(jsonString)
+{
+    try {
+	var data = JSON.parse(jsonString);
+	console.log("got incoming data:",data);
+
+	// at this point, need to catch the TOP fields: teamColor, teamNumber
+	//   and process them locally, everything else is handed to the season
+	//   machinery to handle
+	//   (note that currently "match" isn't in the top data, though it logically
+        //      should/could be)
+
+	var teamNumber = null;
+	var teamColor = null;
+
+	if(data.hasOwnProperty('teamNumber')) {
+	    teamNumber = data.teamNumber;
+	}
+	if(data.hasOwnProperty('teamColor')) {
+	    teamColor = data.teamColor;
+	}
+
+	if(teamNumber || teamColor) {
+	    myNASA.setTeamAndOrColor(teamNumber,teamColor,colorPickerEnable);
+	}
+
+	for(var prop in data) {
+	    switch(prop) {
+	    case 'teamNumber':
+		$('div.team-number').text(data[prop]);
+		break;
+	    case 'teamColor':
+		$('div.team-color').removeClass('red blue none').addClass(data[prop]);
+		break;
+	    default:
+		seasonSetValue(prop,data[prop]);
+		break;
+	    }
+	}
+    } catch(error) {
+	console.log("Error parsing incoming JSON from controller");
+	console.log(error);
+    }
+}
+
 function connectionChange(conn)
 {
     var con = $("div.connect-indicator");
@@ -392,6 +449,19 @@ $( window ).on( "load", function() {
     numSpinner_initAll();
 });
 
+//
+// colorPickerEnable(),colorPickerDisable() - used to enable/disable the color picker.
+//
+function colorPickerEnable()
+{
+    $('div.team-color').removeClass('disabled');
+}
+
+function colorPickerDisable()
+{
+    $('div.team-color').addClass('disabled');
+}
+
 $( document ).ready(function() {
 
     myNASA.slot = $('div.contributor .letter.selected').data('contributor');
@@ -412,6 +482,7 @@ $( document ).ready(function() {
     myNASA.matchMonitor(matchChange);
     myNASA.resetMonitor(resetChange);
     myNASA.startMonitor(function(start) { if(start) {timerStart();} else { timerStop(); } });
+    myNASA.dataMonitor(dataIncoming);
     
     $('div.connect-indicator').click(function() {
 	if(myNASA.connected) {
@@ -483,21 +554,21 @@ $( document ).ready(function() {
     $('div.team-color').click(function() {
 
 	var target = $(this);
-	var control = function(disabled) { if(disabled) {target.addClass('disabled');} else {target.removeClass('disabled');}};
 
 	if(!target.hasClass('disabled')) {
+	    colorPickerDisable();                  // always disable immediately
 	    if(target.hasClass('blue')){
 		target.removeClass('blue');
 		target.addClass('none');
-		myNASA.setColor(null,control);
+		myNASA.setColor(null,colorPickerEnable);
 	    } else if(target.hasClass('none')) {
 		target.removeClass('none');
 		target.addClass('red');
-		myNASA.setColor('red',control);
+		myNASA.setColor('red',colorPickerEnable);
 	    } else {
 		target.removeClass('red');
 		target.addClass('blue');
-		myNASA.setColor('blue',control);
+		myNASA.setColor('blue',colorPickerEnable);
 	    }
 	}
     });
