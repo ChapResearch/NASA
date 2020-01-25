@@ -184,47 +184,12 @@ NASA.prototype.sendUserName = function()
 //
 NASA.prototype.setTeam = function(team,uponCompletion = null)
 {
-    if(this.connected) {
-	console.log("attempting to send team number");
-	var uuid = NASA_UUIDs[NASAObj.slot].transmit;
-
-	var encoder = new TextEncoder('utf-8');
-	var teamNumber = encoder.encode(team);
-
-	var message = new Uint8Array(teamNumber.length + 1);
-	message[0] = 2;    // team number
-	message.set(teamNumber,1);
-
-	NASAObj.serviceObj.getCharacteristic(uuid)
-	    .then(characteristic => characteristic.writeValue(message))
-	    .then(() => { if(uponCompletion) { uponCompletion(); }})
-	    .catch(error => { NASAObj.connected = false; });
-    }
+    this.setTeamAndOrColor(team,null,uponCompletion);
 }
     
 NASA.prototype.setColor = function(color,uponCompletion = null)
 {
-    switch(color) {
-    case 'blue':   color = 1; break;
-    case 'red':    color = 2; break;
-    default:       color = 0; break;
-    }
-
-    if(this.connected) {
-	console.log("attempting to send color report");
-	var uuid = NASA_UUIDs[NASAObj.slot].transmit;
-
-	var buffer = new ArrayBuffer(2);
-	var bufferView = new Uint8Array(buffer);
-
-	bufferView[0] = 3;    // color report
-	bufferView[1] = color;
-	
-	NASAObj.serviceObj.getCharacteristic(uuid)
-	    .then(characteristic => characteristic.writeValue(buffer))
-	    .then(() => { if(uponCompletion) { uponCompletion(); }})
-	    .catch(error => { NASAObj.connected = false; });
-    }
+    this.setTeamAndOrColor(null,color,uponCompletion);
 }
 
 //
@@ -250,7 +215,7 @@ NASA.prototype.setTeamAndOrColor = function(team,color,uponCompletion = null)
 
 	var uuid = NASA_UUIDs[NASAObj.slot].transmit;
 
-	if(team) {
+	if(team !== null) {
 	    var encoder = new TextEncoder('utf-8');
 	    var teamNumber = encoder.encode(team);
 	    teamMessage = new Uint8Array(teamNumber.length + 1);
@@ -266,7 +231,7 @@ NASA.prototype.setTeamAndOrColor = function(team,color,uponCompletion = null)
 	    }
 	}
 
-	if(color) {
+	if(color !== null) {
 	    switch(color) {
 	    case 'blue':   color = 1; break;
 	    case 'red':    color = 2; break;
@@ -286,11 +251,11 @@ NASA.prototype.setTeamAndOrColor = function(team,color,uponCompletion = null)
 	    }
 	}
 
-	if(team && !color) {
+	if(team !== null && color === null) {
 	    teamFN(uponCompletion);
-	} else if(team && color) {
+	} else if(team !== null && color !== null) {
 	    teamFN(colorFN.bind(null,uponCompletion));
-	} else if(!team && color) {
+	} else if(team === null && color !== null) {
 	    colorFN(uponCompletion);
 	}
     }

@@ -454,6 +454,7 @@ $( window ).on( "load", function() {
 //
 function colorPickerEnable()
 {
+    console.log("enable color picker");
     $('div.team-color').removeClass('disabled');
 }
 
@@ -560,7 +561,7 @@ $( document ).ready(function() {
 	    if(target.hasClass('blue')){
 		target.removeClass('blue');
 		target.addClass('none');
-		myNASA.setColor(null,colorPickerEnable);
+		myNASA.setColor('none',colorPickerEnable);
 	    } else if(target.hasClass('none')) {
 		target.removeClass('none');
 		target.addClass('red');
