@@ -244,25 +244,7 @@ function getNASAdataXML()
 //
 exports.xmlTest = functions.https.onRequest((request, response) =>
 {
-    var config = {
-	apiKey: "AIzaSyAJtiy-xB69zjg7VRdBiEDmtupBeoGgS9A",
-	authDomain: "nasa-7a363.firebaseapp.com",
-	databaseURL: "https://nasa-7a363.firebaseio.com",
-	projectId: "nasa-7a363",
-	storageBucket: "nasa-7a363.appspot.com",
-	messagingSenderId: "885889218553"
-    };
-
-    // don't initialize the app if it already appears to be intialized
-    //   note that this only works right if we have 1 app - otherwise,
-    //   this would need to see if THIS app is initialized
-    
-    if(firebase.apps.length == 0) {
-	firebase.initializeApp(config);
-	console.log("initialized");
-    } else {
-	console.log("didn't initialize");
-    }
+    local.firebaseInit(firebase);
 
     seasonFile.seasonFile(firebase)
 	.then((ref) => ref.getDownloadURL())
