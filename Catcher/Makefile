@@ -18,21 +18,41 @@ FUNCTIONONLY := $(subst $(space),$(comma),$(patsubst %,functions:%,$(FUNCTIONS))
 
 NPM_PACKAGES = firebase firebase-admin firebase-functions
 
-deploy:	node
+functions/package.json:
+	cp functions/packagejson-template $@
+
+# the ending touch is necessary because package.json gets updated
+#   by the npm when creating the node_modules directory
+functions/node_modules: functions/package.json
+	cd functions; npm install $(NPM_PACKAGES) --save
+	touch $@
+
+functions/seasonFile.js:
+	cp ../Season/$@ $@
+
+functions/firebaseInit.js:
+	gpg -d ../FirebaseConfig/firebaseInit.js.gpg > $@
+
+.firebaserc:
+	cp ../FirebaseConfig/firebaserc-template $@
+
+build: functions/node_modules functions/package.json functions/seasonFile.js functions/firebaseInit.js .firebaserc
+
+deploy:	build
 	cd functions; firebase deploy --only $(FUNCTIONONLY)
 
 clean:	
 	rm -fr functions/node_modules
 	rm -fr functions/package.json
+	rm -fr functions/seasonFile.js
+	rm -fr functions/firebaseInit.js
 	rm -fr .firebaserc
 
 #
-# checks to see if the node_modules are there, and will install them if not
-# Note that this causes the package.json file to be built too
-#
+# Simple catcher tests go here.  Note that the URL being used is nasa.charpresearch.com one, meaning that
+#   the url must be set-up prior to this running (it always is)
 
-node: 
-	[ -d functions/node_modules ] || (cp ../FirebaseConfig/firebaserc-template .firebaserc; \
-						cd functions; \
-						cp packagejson-template package.json; \
-						npm install $(NPM_PACKAGES) --save)
+test1:
+	curl --header "Content-Type: application/json" -X POST \
+            -d '{"year":"2119","team_number":"5628","competition":"ElPaso","match":"1","record":{"one":"47","two":"2","three":"3"}}' \
+		https://nasa.chapresearch.com/catcher
