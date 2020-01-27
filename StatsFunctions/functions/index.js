@@ -26,7 +26,7 @@ var seasonFile = require('./seasonFile');
 
 var METADATA = "_metaData";
 
-require('./firebaseInit');
+const local = require('./firebaseInit');
 
 //
 // superiorStats() - compute the statistics at all upper levels beyond the match.
@@ -38,7 +38,7 @@ exports.superiorStats = functions.https.onRequest((request, response) => {
     // the request itslef is currently ignored, just calling it causes the computation
     //   of the superior stats.
 
-    firebaseInit(firebase);
+    local.firebaseInit(firebase);
 
     // get the ENTIRE DATABASE (yikes) for doing this computation
     
@@ -78,7 +78,7 @@ exports.superiorStats = functions.https.onRequest((request, response) => {
 exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match}').
     onWrite((change,context) => {
 
-	firebaseInit(firebase);
+	local.firebaseInit(firebase);
 
 	if(context.params.match == METADATA ||
 	   context.params.competition == METADATA ||
@@ -136,7 +136,7 @@ exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match
 //
 exports.recalculate = functions.https.onRequest((request, response) => {
 
-    firebaseInit(firebase);
+    local.firebaseInit(firebase);
 
     // get the ENTIRE DATABASE (yikes) for doing this computation
     
