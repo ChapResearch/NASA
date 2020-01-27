@@ -5,3 +5,11 @@ node_modules
 .firebaserc
 package-lock.json
 
+#
+# The firebaseInit.js file contains the API Key used to access NASA on
+# firebase. It should NEVER be pushed up to github. Instead, there is
+# an encrypted version in FirebaseConfig/ that is decrypted during the
+# build process.  During build, the file is duplicated in each of the
+# directories that need it.
+#
+firebaseInit.js
