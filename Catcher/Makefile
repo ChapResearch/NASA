@@ -52,7 +52,12 @@ clean:
 # Simple catcher tests go here.  Note that the URL being used is nasa.charpresearch.com one, meaning that
 #   the url must be set-up prior to this running (it always is)
 
+#
+# test1 generates a simple record, with a "random" match number.  which is the PID of the sub-shell
+#   for the make action.
+#
 test1:
-	curl --header "Content-Type: application/json" -X POST \
-            -d '{"year":"2119","team_number":"5628","competition":"ElPaso","match":"1","record":{"one":"47","two":"2","three":"3"}}' \
+	@curl --header "Content-Type: application/json" -X POST \
+            -d '{"year":"2119","team_number":"5628","competition":"ElPaso","match":"'$$$$'","record":{"one":"47","two":"2"}}' \
 		https://nasa.chapresearch.com/catcher
+	@echo "Match number is $$$$"
