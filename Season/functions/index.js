@@ -48,32 +48,7 @@ const Busboy = require('busboy');
 
 var seasonFile = require('./seasonFile');
 
-//
-// firebaseInit() - inits if necessary.
-//
-function firebaseInit()
-{
-    var NASA_FBconfig = {
-	    apiKey: "AIzaSyAJtiy-xB69zjg7VRdBiEDmtupBeoGgS9A",
-	    authDomain: "nasa-7a363.firebaseapp.com",
-	    databaseURL: "https://nasa-7a363.firebaseio.com",
-	    projectId: "nasa-7a363",
-	    storageBucket: "nasa-7a363.appspot.com",
-	    messagingSenderId: "885889218553"
-	};
-
-
-    // don't initialize the app if it already appears to be intialized
-    //   note that this only works right if we have 1 app - otherwise,
-    //   this would need to see if THIS app is initialized
-    
-    if(firebase.apps.length == 0) {
-	firebase.initializeApp(NASA_FBconfig);
-//	console.log("initialized");
-    } else {
-//	console.log("didn't initialize");
-    }
-}
+const local = require('./firebaseInit');
 
 //
 // season() - return the XML for the "current" season, or for the
@@ -84,7 +59,7 @@ function firebaseInit()
 
 exports.season = functions.https.onRequest((request, response) => {
 
-    firebaseInit();
+    local.firebaseInit(firebase);
 
     seasonFile.seasonFile(firebase)
 	.then((ref) => ref.getDownloadURL())
@@ -107,7 +82,7 @@ exports.season = functions.https.onRequest((request, response) => {
 
 exports.seasonJSON = functions.https.onRequest((request, response) => {
 
-    firebaseInit();
+    local.firebaseInit(firebase);
 
     seasonFile.seasonFile(firebase,true)
 	.then((ref) => ref.getDownloadURL())
@@ -129,7 +104,7 @@ exports.seasonJSON = functions.https.onRequest((request, response) => {
 //
 exports.seasonJSONgenerate = functions.storage.object().onFinalize((object) => {
 
-    firebaseInit();
+    local.firebaseInit(firebase);
 	
     var storage = firebase.storage();
 
@@ -475,7 +450,7 @@ function viewsData(xmlObj)
 //
 exports.seasonXMLvalidate = functions.https.onRequest((request, response) => {
 
-    firebaseInit();
+    local.firebaseInit(firebase);
 
     // TODO - currently this is written for multipart data ONLY - it should
     //   be smarter.
