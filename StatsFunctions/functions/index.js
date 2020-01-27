@@ -26,32 +26,7 @@ var seasonFile = require('./seasonFile');
 
 var METADATA = "_metaData";
 
-//
-// firebaseInit() - inits if necessary.
-//
-function firebaseInit()
-{
-    var NASA_FBconfig = {
-	    apiKey: "AIzaSyAJtiy-xB69zjg7VRdBiEDmtupBeoGgS9A",
-	    authDomain: "nasa-7a363.firebaseapp.com",
-	    databaseURL: "https://nasa-7a363.firebaseio.com",
-	    projectId: "nasa-7a363",
-	    storageBucket: "nasa-7a363.appspot.com",
-	    messagingSenderId: "885889218553"
-	};
-
-
-    // don't initialize the app if it already appears to be intialized
-    //   note that this only works right if we have 1 app - otherwise,
-    //   this would need to see if THIS app is initialized
-    
-    if(firebase.apps.length == 0) {
-	firebase.initializeApp(NASA_FBconfig);
-//	console.log("initialized");
-    } else {
-//	console.log("didn't initialize");
-    }
-}
+require('./firebaseInit');
 
 //
 // superiorStats() - compute the statistics at all upper levels beyond the match.
@@ -63,7 +38,7 @@ exports.superiorStats = functions.https.onRequest((request, response) => {
     // the request itslef is currently ignored, just calling it causes the computation
     //   of the superior stats.
 
-    firebaseInit();
+    firebaseInit(firebase);
 
     // get the ENTIRE DATABASE (yikes) for doing this computation
     
@@ -103,7 +78,7 @@ exports.superiorStats = functions.https.onRequest((request, response) => {
 exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match}').
     onWrite((change,context) => {
 
-	firebaseInit();
+	firebaseInit(firebase);
 
 	if(context.params.match == METADATA ||
 	   context.params.competition == METADATA ||
@@ -161,7 +136,7 @@ exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match
 //
 exports.recalculate = functions.https.onRequest((request, response) => {
 
-    firebaseInit();
+    firebaseInit(firebase);
 
     // get the ENTIRE DATABASE (yikes) for doing this computation
     

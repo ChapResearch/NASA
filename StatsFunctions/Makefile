@@ -29,26 +29,32 @@ NPM_PACKAGES = firebase firebase-admin firebase-functions \
 		request request-promise \
                 xml2js xml2js-es6-promise xhr2 toposort
 
-deploy:	node
+functions/package.json:
+	cp functions/packagejson-template $@
+
+functions/node_modules: functions/package.json
+	cd functions; npm install $(NPM_PACKAGES) --save
+
+functions/seasonFile.js:
+	cp ../Season/$@ $@
+
+functions/firebaseInit.js:
+	gpg -d ../FirebaseConfig/firebaseInit.js.gpg > $@
+
+.firebaserc:
+	cp ../FirebaseConfig/firebaserc-template $@
+
+build: functions/node_modules functions/package.json functions/seasonFile.js functions/firebaseInit.js .firebaserc
+
+deploy:	build
 	cd functions; firebase deploy --only $(FUNCTIONONLY)
 
 clean:	
 	rm -fr functions/node_modules
 	rm -fr functions/package.json
 	rm -fr functions/seasonFile.js
+	rm -fr functions/firebaseInit.js
 	rm -fr .firebaserc
-
-#
-# checks to see if the node_modules are there, and will install them if not
-# Note that this causes the package.json file to be built too
-#
-
-node: 
-	[ -d functions/node_modules ] || (cp ../FirebaseConfig/firebaserc-template .firebaserc; \
-						cd functions; \
-						cp packagejson-template package.json; \
-						cp ../../Season/functions/seasonFile.js .; \
-						npm install $(NPM_PACKAGES) --save)
 
 #
 # TESTS TESTS TESTS
