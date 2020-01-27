@@ -32,8 +32,11 @@ NPM_PACKAGES = firebase firebase-admin firebase-functions \
 functions/package.json:
 	cp functions/packagejson-template $@
 
+# the ending touch is necessary because package.json gets updated
+#   by the npm when creating the node_modules directory (go figure)
 functions/node_modules: functions/package.json
 	cd functions; npm install $(NPM_PACKAGES) --save
+	touch $@
 
 functions/seasonFile.js:
 	cp ../Season/$@ $@
