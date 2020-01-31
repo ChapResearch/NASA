@@ -418,14 +418,71 @@ function dataSend()
     var xmldata = document.getElementById("seasonXML").contentDocument;
     var jObject = $("app",xmldata);      // the jQuery'able xml data
 
-    var data = seasonDataGather(jObject);
+    if(checkRequiredFields(jObject))
+    {
+	var data = seasonDataGather(jObject);
 
-    data.teamColor = teamColorGet();
-    data.teamNumber = teamNumberGet();
+	data.teamColor = teamColorGet();
+	data.teamNumber = teamNumberGet();
 
-    console.log(data);
-    myNASA.sendData(data,function(disable) { jQuery('button.send').prop('disabled',disable);});
+	console.log(data);
+	myNASA.sendData(data,function(disable) { jQuery('button.send').prop('disabled',disable);});
+    }
+    else
+    {
+	console.log("Must enter in data for required fields");
+    }
 }
+
+//
+// checkRequiredFields() - Checks if all the layout fields tagged with <optional> have had data enetered into them
+//                         WARNING: right now this only works for checkboxes and radios, if the type of input is not
+//                                  one of those the <default> tag does nothing
+//
+function checkRequiredFields(seasonXML)
+{
+    console.log("We are in checkRequiredFields");
+    var errorMessage = "Cannot Send till the following required fields are filled out: ";
+
+    // If we find that all requried fields are filled out this will stay the same, and change otherwise
+    var canSend = true;
+    
+    seasonXML.find("layout field").each(function()
+					{
+					    //grab the name of this field which will be used to find many things includingg the element field
+					    var name = $(this).find('name').text();
+					    if($(this).find('type').text() == "radio" || $(this).find('type').text() == "checkbox"){
+						var optional = $(this).find('optional');
+						console.log("This is a radio or checkbox");
+						if(optional.length > 0 && optional.text() == "false")
+						{
+						    console.log("Optional exists and is false");
+						    console.log(name)
+						    var field = $(".content").find('[name = "' + name + '"]:checked');
+						    console.log(field.length);
+						    if(field.length < 1){
+							canSend = false;
+							// now we add the label from the xml for this field (plus a ,)
+							errorMessage += name + ", ";
+						    }
+						}
+					    }
+					    console.log("");
+					})
+
+    // if canSend is still true then we just return, otherwise we need to print out the error message for the user
+    if(canSend)
+	return true;
+    else
+    {
+	window.alert(errorMessage);
+	return false;
+    }
+
+}
+					    
+				      
+
 
 // must run the XML code after resources have been loaded to get the seasonXML object loaded
 

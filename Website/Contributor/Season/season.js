@@ -66,16 +66,19 @@ function reset(seasonXML)
     //					  });
 
     $('div.content').find('input[type="radio"]').each( function()
-						      {
+						       {
+							   // Grab all the attributes from the HTML andd XML
 							  var name = $(this).attr('name');
 							  var HTMLval = $(this).attr('value');
 							  var field = findElementByName(elementFields,name);
 							  var defaultVal = field.find('default').text();
-							  if(!defaultVal)
-							      defaultVal = 0;
+							  
+							  // gotta uncheck everything
 							  $(this).prop('checked',false);
-							  if(HTMLval==defaultVal)
-							      $(this).prop('checked',true);
+							  // Make sure we have a default val
+							  if(defaultVal != null)
+							      if(HTMLval==defaultVal)
+								  $(this).prop('checked',true);
 						      });
 
     $('div.content').find('input[type="checkbox"]').each( function()
