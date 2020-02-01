@@ -34,7 +34,7 @@ const local = require('./firebaseInit');
 //                   called like a CRON job, or can be called from the UI.
 //
 exports.superiorStats = functions.https.onRequest((request, response) => {
-
+ 
     // the request itslef is currently ignored, just calling it causes the computation
     //   of the superior stats.
 
@@ -105,6 +105,13 @@ exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match
 	} else {                      // brand-spanking new record
 	    newRecord = true;
 	}
+
+	// later on down the road we'll need the reference to the competition
+	//   part of the firebase tree.
+	
+	var competitionRef = firebase.database().ref(context.params.year + '/' +
+						   context.params.robot + '/' +
+						   context.params.competition);
 	
 	// otherwise we have either a create or a change, in any event
 	//  work with the new data.
@@ -118,6 +125,17 @@ exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match
 		newvalue.updated = firebase.database.ServerValue.TIMESTAMP;
 		change.after.ref.set(newvalue);
 	    })
+
+	// here is a change!  At this point, we go ahead and calculate the competition
+	// stats. Since normally there is a single match coming in to each robot, there
+	// is no reason NOT to go ahead and do the competition stats.  Also, these are
+	// the stats that are most useful/needed.  NOTE that we go get the JSON metaData
+	// again - as opposed to passing it down somehow.  NOTE TOO - we don't hold on
+	// to the match stats data from above, it is set in the record prior to this
+	// point so we just get it all anyway.
+
+	    .then(()=> getNASAdataJSON())              // I know, I know, getting it again...
+	    .then((nasaData) => metaData.calcMetaDataSpecific(nasaData.metaData,"competition",competitionRef))
 		
 	// and if things go wrong
 	

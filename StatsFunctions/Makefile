@@ -60,10 +60,38 @@ clean:
 	rm -fr .firebaserc
 
 #
+# remove the functions that may have been deployed for tests
+#
+remove-tests:
+	firebase functions:delete test2 test3
+
+#
 # TESTS TESTS TESTS
 #
 #   These are tests that were useful at one point.  There are here to serve as examples.
 #
+
+#
+# XML Test functions - there is a "test" xml that resides in this directory.  When using it, these
+#     tests are appropriately configured to have the right "stuff" in them for testing.  Most of these
+#     tests generate a match with a match number that is the PID of the sub-shell...for a bit of
+#     "randomness" (ish).
+
+TESTYEAR := 2119
+TESTTEAM := 5628
+TESTCOMP := ElPaso
+
+test1:
+	@MATCH=$$$$; \
+	EVENT1=`rand -M 180 -u -N 10 -s 1| tr " " "\n" | sort -n | tr "\n" "," | sed -e 's/,$$/\n/' | sed -e 's/\([0-9][0-9]*\)/"&"/g'`; \
+	EVENT2=`rand -M 180 -u -N 10 -s 2| tr " " "\n" | sort -n | tr "\n" "," | sed -e 's/,$$/\n/' | sed -e 's/\([0-9][0-9]*\)/"&"/g'`; \
+	curl --header "Content-Type: application/json" -X POST \
+            -d '{"year":"$(TESTYEAR)","team_number":"$(TESTTEAM)","competition":"$(TESTCOMP)","match":"'$$MATCH'","record":{"one":"47","two":"2","team":"'$$MATCH'","event1":['$$EVENT1'],"event2":['$$EVENT2']}}' \
+		https://nasa.chapresearch.com/catcher; \
+	    echo "Match number is $$MATCH"
+
+
+newtest:
 
 test:
 	curl -H "Content-Type: application/json" -d @combineTest.json https://nasa.chapresearch.com/catcher

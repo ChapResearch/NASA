@@ -15,7 +15,8 @@ var METADATA = "_metaData";
 
 module.exports = {
     calcMetaData: function (data,params,xmldata) { return(calcMetaData(data,params,xmldata));},
-    calcMetaDataUpper: function (data,metaData,ref) { return(calcMetaDataUpper(data,metaData,ref));}
+    calcMetaDataUpper: function (data,metaData,ref) { return(calcMetaDataUpper(data,metaData,ref));},
+    calcMetaDataSpecific: function (metaData,perspective,ref) { return(calcMetaDataSpecific(metaData,perspective,ref));}
 };
 
 
@@ -37,6 +38,23 @@ function calcMetaData(data,params,metaData)
 
     return(data);
 }
+
+//
+// calcMetaDataSpecific() - given a particular level, calculate the metaData
+//                          FOR THAT LEVEL. Note that the ref must be pointing
+//                          to something at that level...or this simply won't
+//                          work right.
+//
+function calcMetaDataSpecific(metaDataSpec,perspective,ref)
+{
+    return(
+	ref.once('value')
+	    .then((snapshot) => { console.log("running on " + perspective); return(snapshot); })
+	    .then((snapshot) => upperMetaData(metaDataSpec,perspective,snapshot.val()))
+            .then((metaData) => ref.child(METADATA).set(metaData))
+    );
+}
+    
 
 //
 // calcMetaDataUpper() - calculate the metaData for all perspectives BUT the
@@ -173,7 +191,8 @@ function calcMetaDataField(data,params,field)
     case 'min':         return(calcMetaDataField_min(data,params,field));
     case 'max':         return(calcMetaDataField_max(data,params,field));
     case 'defEffect':   return(calcMetaDataField_defEffect(data,params,field));
-    case 'compare':     return(calcMetaDataField_compare(data,params,field));	
+    case 'compare':     return(calcMetaDataField_compare(data,params,field));
+    case 'constant':    return(calcMetaDataField_constant(data,params,field));
     default:         console.log("BAD OP: " + operation); return(false);
     }
 
@@ -332,6 +351,36 @@ function normalizeDataItem(data,fieldName)
     }
     return(returnArray);
 }
+
+//
+// _constant() - operation that simply uses the given target as a literal.
+//               That is, the target IS NOT another field, it is instead
+//               something like a string or a number.
+//
+function calcMetaDataField_constant(data,params,field)
+{
+    var retval = null;
+
+    // if there is no target field => null
+    // if there is a target field that was not processed as an array => target.field
+    // if there is a target field as array, length 0 => null
+    // if there is a target field as array, length 1 => target.field[0]
+    // if there is a target field as array, length >1 => target.field
+
+    if(field.hasOwnProperty('target')) {
+	if (Array.isArray(field.target)) {
+	    if(field.target.length == 1) {
+		retval = field.target[0];
+	    } else if(field.target.length > 1) {
+		retval = field.target;
+	    }
+	} else {
+	    retval = field.target;
+	}
+    }
+
+    return(retval);
+}    
 
 function calcMetaDataField_count(data,params,field)
 {
@@ -609,8 +658,7 @@ function calcMetaDataField_multiply(data,params,field)
 	    console.log("Cannot multiply by an array (this is likely a list of events)");
 	    return null;
 	}
-
-	product = product * nextNum;
+	product = product * parseFloat(nextNum[0]);    // ensure that we're working with a number
     }
     
     return(product);
@@ -675,8 +723,9 @@ function calcMetaDataField_min(data,params,field)
     var min = null;
 
     for(var i=0; i < dataTarget.length; i++) {
-	if(min===null || dataTarget[i] < min){
-	    min = dataTarget[i];
+	var thisNumber = parseFloat(dataTarget[i]);
+	if(min===null || thisNumber < min){
+	    min = thisNumber;
 	} 
     }
 
@@ -685,7 +734,9 @@ function calcMetaDataField_min(data,params,field)
 
 //
 // _max() - Loops through every value of the given field
-//          and returns the highest value.
+//          and returns the highest value.  Note that these
+//          routines operate on NUMBERS, so strings will
+//          confuse them, if it weren't for parseFloat()!
 //
 function calcMetaDataField_max(data,params,field)
 {
@@ -695,8 +746,9 @@ function calcMetaDataField_max(data,params,field)
     var max = null;
 
     for(var i=0; i < dataTarget.length; i++) {
-	if(max===null || dataTarget[i] > max){
-	    max = dataTarget[i];
+	var thisNumber = parseFloat(dataTarget[i]);
+	if(max===null || thisNumber > max){
+	    max = thisNumber;
 	} 
     }
 
