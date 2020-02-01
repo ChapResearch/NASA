@@ -205,7 +205,13 @@ NASA.prototype.setColor = function(color,uponCompletion = null)
 //
 NASA.prototype.setTeamAndOrColor = function(team,color,uponCompletion = null)
 {
-    if(this.connected) {
+    if(!this.connected) {
+
+	if(uponCompletion) {
+	    uponCompletion();
+	}
+
+    } else {
 
 	var colorMessage;
 	var teamMessage;
@@ -251,6 +257,12 @@ NASA.prototype.setTeamAndOrColor = function(team,color,uponCompletion = null)
 	    }
 	}
 
+	// run the functions to send team/color up to controller.
+	//   If more than one, the team is first followed by color.
+	//   Note that in that case, the color-transmit function is
+	//   used as the team completion function, after having
+	//   the passed-in completion function bound to it.
+	
 	if(team !== null && color === null) {
 	    teamFN(uponCompletion);
 	} else if(team !== null && color !== null) {
