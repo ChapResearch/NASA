@@ -32,6 +32,8 @@ function resetChange()
 
     reset(jObject);
 
+    imageMap_reset();
+    
     timerStop();
     timerClear();
 }
@@ -425,6 +427,8 @@ function dataSend()
 	data.teamColor = teamColorGet();
 	data.teamNumber = teamNumberGet();
 
+	imageMap_gather(data);     // data is augmented by the imageMaps' data
+
 	console.log(data);
 	myNASA.sendData(data,function(disable) { jQuery('button.send').prop('disabled',disable);});
     }
@@ -502,8 +506,8 @@ $( window ).on( "load", function() {
     target.append(output);
 
     resetChange();
-    
     numSpinner_initAll();
+    imageMap_initAll();
 });
 
 //
@@ -702,4 +706,5 @@ $( document ).ready(function() {
 	}
 		
     });
+
 });

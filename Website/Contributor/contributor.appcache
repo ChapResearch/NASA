@@ -13,6 +13,7 @@ SegmentDisplay/segment-display.js
 Season/generateHTML2.js
 Season/season.js
 Season/seasonDataGather.js
+imageMap.js
 ../season.xml
 birdy.png
 nasa-logo-250x110.png

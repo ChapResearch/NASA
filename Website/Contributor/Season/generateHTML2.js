@@ -9,8 +9,10 @@ function seasonLoad_generateHTML(seasonXML)
     var output = '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>';
 //    output += generateHeader();
     
-    var layoutFields = seasonXML.find("layout field");
+    var layoutFields = seasonXML.find("layout > field");     // the ">" limits search to immediate child
     var elementFields = seasonXML.find("elements field");
+
+    output += '<script>var imageMapImage = {};</script>';
     
     layoutFields.each(function()
 		      {
@@ -35,11 +37,12 @@ function seasonLoad_generateHTML(seasonXML)
 			      case "event":       output += generateEventButton($(this),targetElementField); break;
 			      case "eventWindow": output += generateEventWindow($(this)); break;
 			      case "line":        output += generateLine($(this)); break;
-			      case "box":         output += generateBox($(this)); break;			      
+			      case "box":         output += generateBox($(this)); break;
+			      case "imageMap":    output += generateImageMap($(this),targetElementField); break;
 			  }
 		      });
     
-//    output += generateFooter();
+    //    output += generateFooter();
 
     return output;
 }
@@ -123,11 +126,11 @@ function fieldStyleLine(layoutField)
 function fieldStyleBox(layoutField)
 {
     var output = ""
-    var location = layoutField.find('location').text();
+    var location = layoutField.children('location').text();
     var pos = location.split(",");
-    var size  = layoutField.find('size').text();
+    var size  = layoutField.children('size').text();
     size = size.split(",");
-    var color = layoutField.find('color').text();
+    var color = layoutField.children('color').text();
     if (pos.length != 2){
 	pos = [50, 50];
     }
@@ -447,4 +450,105 @@ function plugInInput(value, target)
 	case "CHECKBOX": target[value].prop('checked', true);break;
 	case "NUMBER":   target.parent().find(".numSpinner_value").text(value);
     }
+}
+
+
+//
+// getLocationSize() - grab the location and size information from the incoming
+//                     field.  Returns:
+//                      { x:x%, y:y%, height:height%, width:width% }
+//
+function getLocationSize(layoutField)
+{
+    var location = layoutField.children('location');
+    var size  = layoutField.children('size');
+
+    if(location.length < 1) {
+	console.log("missing location for field");
+    }
+
+    if(size.length < 1) {
+	console.log("missing size for field");
+    }
+    
+    location = location.text().split(",");
+    size = size.text().split(",");
+
+    if(location.length !=2) {
+	console.log("location must be 2 ints between 0 and 100");
+	location = [50,50];
+    }
+    
+    if(size.length !=2) {
+	console.log("size must be 2 ints between 0 and 100");
+	size = [50,50];
+    }
+
+    return({
+	x:location[0],
+	y:location[1],
+	width:size[0],
+	height:size[1]
+    });
+}
+    
+function htmlStyleLocationSize(locSize)
+{
+    var style = '';
+
+    style += 'position:absolute;';
+    style += 'left:' + locSize.x + '%;';
+    style += 'top:' + locSize.y + '%;';
+    style += 'width:' + locSize.width + '%;';
+    style += 'height:' + locSize.height + '%';
+
+    return('style="' + style + '"');
+}
+
+//
+// generateImageMap() - generates a pretty image map along with the mechanisms
+//                      to display heat maps and such. NOTE that the incoming
+//                      argument is a jQuery object.
+//
+function generateImageMap(layoutField,targetField)
+{
+    var output = "";
+
+    var image64 = layoutField.children('image').text();            // the image encoded in base64
+    image64 = 'data:image/png;base64,' + image64;
+    image64 = image64.replace(/\s+/g,'');                          // get rid of pesky returns!
+
+    var style = htmlStyleLocationSize(getLocationSize(layoutField)) + ' ';
+
+    var id = targetField.children('name').text();
+    var type = targetField.children('type').text();
+
+    var xyFieldName = null;
+    var xyField = layoutField.children('locationField');
+    if(xyField.length > 0) {
+	xyFieldName = xyField.text();
+    }
+
+    var idProp = 'id="' + id + '" ';
+    var idOverlayProp = 'id="overlay-' + id + '" ';
+    var itemClass = 'class="nasa-imagemap" ';
+
+    var targetType = targetField.children('type').text();          // event or radio or checkbox
+
+    output += '<script>imageMapImage["' + id + '"] = new Image();</script>';
+    output += '<script>imageMapImage["' + id + '"].src = \'' + image64 + '\';</script>';
+    output += '<script>imageMapType["' + id + '"] = "' + type + '";</script>';
+
+    output += '<script>imageMapXYField["' + id + '"] = ';
+    if(xyFieldName) {
+	output += '"' + xyFieldName + '"';
+    } else {
+	output += 'null';
+    }
+    output += ';</script>';
+    
+    output += '<canvas ' + idProp + itemClass + style + '/>';
+    output += '<canvas ' + idOverlayProp + itemClass + style + '/>';
+    
+    return output;
 }
