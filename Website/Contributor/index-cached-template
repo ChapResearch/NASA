@@ -9,6 +9,7 @@
     <script src="NASA.js"></script>
     <script src="main.js"></script>
     <script src="numSpinner.js"></script>
+    <script src="imageMap.js"></script>
     <script src="SegmentDisplay/excanvas.js"></script>
     <script src="SegmentDisplay/segment-display.js"></script>
     <script src="Season/generateHTML2.js"></script>
