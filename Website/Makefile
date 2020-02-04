@@ -1,41 +1,10 @@
 #
 # NASA Website Makefile
 #
-#   The targets in this Makefile include:
-#
-#	deploy - assemble and send the website to Google Firebase Hosting
-#	push - push back up to github
-#	refresh - get all github stuff back down
-#
-#	fb-init - initialize firebase in the current directory (this is because
-#		  the firebase files aren't stored in github).
-#
-#	fb-install-tools - ONLY NEEDS TO BE DONE ONCE PER MACHINE
-#			   MUST BE DONE "sudo" because it installs globally
-#			   Rerun the command (sudo) ti update the tools
-#			   NOTE - running this command in an emacs buffer is
-#				pretty ugly because of the color/cursor control
-#				that the install script uses.
-#
-#	fb-login - simple/stupid target to login to firebase. YOU ONY NEED TO DO
-#			this once. It is here to remind you what you need to do.
-#			firebase-tools must be installed for this to work.
-#			This command uses the --no-localhost options of login
-#			so it doesn't try to launch a browser. You can, instead,
-#			copy the link generated and put it into the browser yourself.
-#
-#	fb-logout - another simple/stupid target to log OUT of firebase.
-#			firebase-tools must be installed for this to work.
-#
-#	fb-init - initialize firebase for this website. This short-circuits
-#			the process a bit, instead of running "firebase init"
-#			it configures the configuration files directly.
-#
 
 ROOT = ..
 FBCONFIG = $(ROOT)/FirebaseConfig
 DEPLOYDIR = deployment
-#DEPLOYDIR = /media/sf_Virtual_Machine_Shares/deployment
 
 # Hidden URL for running Fixit stuff
 HIDDENURL = ThisIsAScoutingApp
@@ -49,20 +18,6 @@ FMSTESTURL = FMSTEST
 firebase.json: firebasejson-template
 	cp firebasejson-template $@
 
-fb-install-tools:
-	sudo npm install -g firebase-tools
-
-fb-login:
-	firebase login --no-localhost
-
-fb-logout:
-	firebase logout
-
-fb-init: .firebaserc firebase.json
-
-fb-deploy:
-	firebase deploy --only hosting
-
 favicon.ico: nasa-birdy-logo.ico
 	cp nasa-birdy-logo.ico favicon.ico
 	cp nasa-birdy-logo.ico Contributor/favicon.ico
@@ -74,15 +29,15 @@ clean:
 	rm -fr node_modules
 	rm -fr firebase.json .firebaserc
 	rm -fr .firebase
-	rm -fr deployment
+	rm -fr $(DEPLOYDIR)
 	rm -fr *~
 
 $(DEPLOYDIR):
-	mkdir $(DEPLOYDIR)
+	[ -d $(DEPLOYDIR) ] || mkdir $(DEPLOYDIR)
 
 deploycopy: $(DEPLOYDIR) favicon.ico 
 	cp -R Main/* $(DEPLOYDIR)
-	cp -R Contributor $(DEPLOYDIR)
+	cp -RP Contributor $(DEPLOYDIR)
 	cp -R Statistics $(DEPLOYDIR)
 	cp -R Tools $(DEPLOYDIR)
 	cp -R Fixit $(DEPLOYDIR)
@@ -107,10 +62,57 @@ deploy:	.firebaserc firebase.json index deploycopy
 deploy-cached:	.firebaserc firebase.json index-cached deploycopy
 	firebase deploy --only hosting
 
-testdeploy: deploycopy
-	rm $(DEPLOYDIR)/Contributor/contributor.appcache
-	cp ../Season/DeepSpace2019.xml $(DEPLOYDIR)/season.xml
-	curl -L https://nasa.chapresearch.com/season.json > $(DEPLOYDIR)/season.json
+#######
+# TEST FUNCTIONS
+#
+#    Use these targets to do testing of the contributor (and other web things) locally.
+#    You can start up a local server if you want, but I just use the google app for
+#    a local web server.
+#
+#    These things work by reassigning the DEPLOYDIR to somewhere else.
+#    When I'm working (EJR) I have a shared folder between my virtual
+#    machine and the HOST OS on my Windows box. Then I run Chrome on the
+#    Windows side, since it has access to the laptop's BLE.  I run the
+#    web server on Chrome, pointing to the HOST side of the TESTDEPLOYDIR.
+#
+#      testXML - target to set up the test XML (copies it to season.XML)
+#      testdeploy - sets up the local folder for working
+#      testclean - just cleans up, like a normal clean would do but in
+#                   the TESTDEPLOYDIR
+#      localserver - use this target to start-up a local server on THIS machine
+#                    (or virtual machine in my case). I don't normally do this
+#                    because the virtual machine isn't appropriately set-up to
+#                    access BLE - and I don't WANT to set it up, because I'd
+#                    have to shift back and forth a lot.
+
+TESTDEPLOYDIR = /media/sf_Virtual_Machine_Shares/deployment
+
+testXML:
+	cp test.xml $(DEPLOYDIR)/season.xml
+#	curl -L https://nasa.chapresearch.com/season.json > $(DEPLOYDIR)/season.json
+
+testdeploy: DEPLOYDIR = $(TESTDEPLOYDIR)
+testdeploy: $(DEPLOYDIR) .firebaserc firebase.json testXML index deploycopy
+
+testclean: DEPLOYDIR = $(TESTDEPLOYDIR)
+testclean: clean
+
+localserver:
 	cd $(DEPLOYDIR); python -m SimpleHTTPServer
 
-refresh:
+#
+# a few firebase tools in case you forgot how to run firebase
+#
+fb-install-tools:
+	sudo npm install -g firebase-tools
+
+fb-login:
+	firebase login --no-localhost
+
+fb-logout:
+	firebase logout
+
+fb-init: .firebaserc firebase.json
+
+fb-deploy:
+	firebase deploy --only hosting
