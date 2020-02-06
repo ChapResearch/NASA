@@ -257,6 +257,13 @@ function generateTextInputField(layoutField,elementField)
     output += '<div class="NASA-field-textInput" ' + fieldStyleTextInput(layoutField) + '>';
     var label = elementField.find("label").text();
     var name = layoutField.find("name").text();
+
+    // allow the layout label to override the data label
+    var layoutLabel = layoutField.find("label");
+    if(layoutLabel.length != 0) {
+	label = layoutLabel.text();
+    }
+    
     output += '<div>' + label;
     output += '</div><div style="height: 100%; width: 100%;"><textarea name="' + name + '" style="width:100%;height:100%;font-size:18px;resize:none;"></textarea>';
     output += '</div>';
@@ -273,6 +280,13 @@ function generateNumberInputField(layoutField,elementField)
     
     output += '<div class="NASA-field-numberInput" ' + fieldStyleTextInput(layoutField) + '>';
     var label = elementField.find("label").text();
+
+    // allow the layout label to override the data label
+    var layoutLabel = layoutField.find("label");
+    if(layoutLabel.length != 0) {
+	label = layoutLabel.text();
+    }
+
     var name = layoutField.find("name").text();
     output += '<div>' + label;
     output += '</div><div style="height: 100%; width: 100%;"><input type="number" name="' + name + '" style="width:100%;height:100%;" value="1"></input>';
@@ -290,6 +304,11 @@ function generateRadioField(layoutField, elementField)
     var label = elementField.children("label").text();
     var name = elementField.children("name").text();    
     
+    // allow the layout label to override the data label
+    var layoutLabel = layoutField.find("label");
+    if(layoutLabel.length != 0) {
+	label = layoutLabel.text();
+    }
     output += '<div class="NASA-field-radio" ' + fieldPosition(layoutField) + '>';
     output += '<div><Strong>' + label + "</Strong><br></div>";
     output += '<div>';
@@ -309,6 +328,13 @@ function generateIntChoiceField(layoutField, elementField)
     var output = "";
     var name = layoutField.find('name').text();
     var label = elementField.find('label').text();
+
+    // allow the layout label to override the data label
+    var layoutLabel = layoutField.find("label");
+    if(layoutLabel.length != 0) {
+	label = layoutLabel.text();
+    }
+
     var defaultValue = elementField.find('default').text();
     console.log(defaultValue);
     if(defaultValue=="")
@@ -345,6 +371,12 @@ function generateCheckboxField(layoutField, elementField)
     var name = layoutField.children('name').text();
     var label = elementField.children('label').text();
     
+    // allow the layout label to override the data label
+    var layoutLabel = layoutField.find("label");
+    if(layoutLabel.length != 0) {
+	label = layoutLabel.text();
+    }
+
     output += '<div class="NASA-field-checkbox" ' + fieldPosition(layoutField) + '>';
     output += '<div><Strong>' + label + "</Strong></div>";
     output += '<div>'
@@ -363,6 +395,13 @@ function generateSliderField(layoutField, elementField)
     var name = layoutField.find('name').text();
     var textName = name + "DisplayValue";
     var label = elementField.find('label').text();
+
+    // allow the layout label to override the data label
+    var layoutLabel = layoutField.find("label");
+    if(layoutLabel.length != 0) {
+	label = layoutLabel.text();
+    }
+
     var max = layoutField.find('max').text();
     var min = layoutField.find('min').text();
     var defaultVal = elementField.find('default').text();
@@ -426,12 +465,16 @@ function generateDropField(layoutField,targetElementField)
 function seasonSetValue(element, value)
 {
     var target = $('[name="' + element + '"]');
-    var type = target.prop('nodeName').toUpperCase();
 
-    switch(type)
-    {
-	case "TEXTAREA":   plugInTextarea(value, target);break;
-	case "INPUT":      plugInInput(value, target);break;
+    // ignore fields that don't exist
+    if(target.length != 0) {
+	var type = target.prop('nodeName').toUpperCase();
+
+	switch(type)
+	{
+	    case "TEXTAREA":   plugInTextarea(value, target);break;
+	    case "INPUT":      plugInInput(value, target);break;
+	}
     }
 }
 
@@ -514,7 +557,8 @@ function generateImageMap(layoutField,targetField)
 {
     var output = "";
 
-    var image64 = layoutField.children('image').text();            // the image encoded in base64
+    var image64 = layoutField.children('imageb64').text();            // the image encoded in base64
+
     image64 = 'data:image/png;base64,' + image64;
     image64 = image64.replace(/\s+/g,'');                          // get rid of pesky returns!
 
