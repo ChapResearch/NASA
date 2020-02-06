@@ -50,10 +50,9 @@ function resetChange()
 //                once. It would NICE if the BLE machinery would handle this.
 //                Maybe next time.
 //
-function dataIncoming(jsonString)
+function dataIncoming(data)
 {
     try {
-	var data = JSON.parse(jsonString);
 	console.log("got incoming data:",data);
 
 	// at this point, need to catch the TOP fields: teamColor, teamNumber

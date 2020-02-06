@@ -85,6 +85,12 @@ function NASA()
     this.resetFN = null;
     this.startFN = null;
     this.dataFN = null;
+
+    // when data is sent from Controller, it is done in small bytes. So nothing
+    //   is done until the small bytes are assembled. If data is
+    //   building up, then the dataBuffer has the data in it.
+
+    this.dataBuffer = {};
 }
 
 Object.defineProperties(NASA.prototype, {
@@ -571,10 +577,25 @@ NASA.prototype.connect = function(reportFN)
 	})
     	.then((dataCharacteristic) => {
 	    dataCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+	    
+		// note that it is normal for this to be called in rapid succession.
+		// the controller will only send one attr:value at a time so it
+		// doesn't go over the 20 char limit for a single packet. each
+		// incoming attr:value is stored in the data buffer until the
+		// controller indicates that there is no more incoming.
+
 		var decoder = new TextDecoder('utf-8');
-		var jsonString = decoder.decode(event.target.value);
-		if(NASAObj.dataFN) {
-		    NASAObj.dataFN(jsonString);    // the jsonString has attribute(s) and value(s)
+		var attrValue = decoder.decode(event.target.value).split(':');
+		var more = parseInt(attrValue[0]);
+		var attr = attrValue[1];
+		var value = attrValue[2];
+//		console.log('incoming ' + attr + ":" + value + '(there is ' + (more?"MORE":"NOT more") + ')');
+		NASAObj.dataBuffer[attr] = value;
+		if(!more) {
+		    if(NASAObj.dataFN) {
+			NASAObj.dataFN({...NASAObj.dataBuffer});    // clone the dataBuffer and use clone
+		    }
+		    NASAObj.dataBuffer = {};                        //   and then clear original
 		}
 	    })
 	})
