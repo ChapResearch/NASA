@@ -12,11 +12,12 @@ var imageMapType = {};    // the type of the imageMap - used to enumerate imageM
                           //  that is filled in with the data
 
 // type = "event"
-var imageMapEvent = {};   // holds arrays of events attached to a property that is the ID of the imagemap
-var imageMapXYField = {}; // the field that will be filled in with XY data when gathering (if given)
-var imageMapXY = {};      // holds arrays of XY coordinates to a property that is the ID of the imagemap
-var imageMapImage = {};   // holds arrays of image map images
-var imageMapHeat = {};
+var imageMapEvent = {};       // holds arrays of events attached to a property that is the ID of the imagemap
+var imageMapXYField = {};     // the field that will be filled in with XY data when gathering (if given)
+var imageMapXY = {};          // holds arrays of XY coordinates to a property that is the ID of the imagemap
+var imageMapImage = {};       // holds arrays of image map images
+var imageMapHeat = {};        // holds the "simpleheat" object
+var imageMapEventWindow = {}; // points to the event window for this imageMap
 
 // type = "radio"
 
@@ -50,6 +51,12 @@ function imageMap_refresh(id)
     ctx.canvas.height = overlayCtx.canvas.height = height;
     
     ctx.drawImage(imageMapImage[id],0,0,canvas.width,canvas.height);
+
+    imageMapHeat[id] = new simpleheat(overlayCanvas);
+    imageMapHeat[id].max(2);
+    imageMapHeat[id].opacity(0.025);
+
+    imageMapHeat[id].resize();
 }
 
 //
@@ -66,9 +73,6 @@ function imageMap_initAll()
 
 	$('#' + 'overlay-' + imageMapID).off("click");
 	$('#' + 'overlay-' + imageMapID).on("click",imageMap_click.bind(null,imageMapID));
-	imageMapHeat[imageMapID] = new simpleheat('overlay-' + imageMapID);
-	imageMapHeat[imageMapID].max(2);
-	imageMapHeat[imageMapID].opacity(0.025);
     }
 }
 
@@ -166,6 +170,8 @@ function imageMap_clickEvent(id,x,y,rawx,rawy)
     }
     imageMapEvent[id].push(totalSeconds);
     imageMapXY[id].push({x:x,y:y});
+
+    // TODO - the event should be added to the associated event window if it exists
 }
     
 function imageMap_clickRadio(id,x,y,rawx,rawy)
