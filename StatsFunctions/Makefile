@@ -15,7 +15,7 @@
 #              EJR
 
 
-FUNCTIONS := superiorStats matchStats recalculate
+FUNCTIONS := superiorStats matchStats recalculate treeIndex rebuildIndex
 
 # this variable gets set to the list of functions each prefaced by "functions:"
 #   and separated by commas - this involves replacing the spaces with commas

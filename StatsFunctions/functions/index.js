@@ -24,7 +24,24 @@ var metaData = require('./calcMetaData');
 
 var seasonFile = require('./seasonFile');
 
-var METADATA = "_metaData";
+var treeIndex = require('./treeIndex');
+
+//
+// There are special nodes in the tree that don't participate
+// in stats. These are used for infrastructure or for holding
+// stats.
+//
+var METADATA = "_metaData";        // nodes where Metdata is stored
+var INDEX = "_index";              // nodes for the tree overlay index
+var FULLINDEX = "_fullindex";      // nodes for the tree overlay FULL index
+
+//
+// isSpecialNode() - return true if the given node (as a string) is special
+//
+function isSpecialNode(nodeString)
+{
+    return(nodeString[0] == '_');
+}
 
 const local = require('./firebaseInit');
 
@@ -80,13 +97,18 @@ exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match
 
 	local.firebaseInit(firebase);
 
-	if(context.params.match == METADATA ||
-	   context.params.competition == METADATA ||
-	   context.params.robot == METADATA ||
-	   context.params.year == METADATA	  ) {
-	    return null;               // don't process metaData leaves that just "happen" sometimes
-	                               // particularly at the competition & match levels
+	if(isSpecialNode(context.params.match) ||
+	   isSpecialNode(context.params.competition) ||
+	   isSpecialNode(context.params.robot) ||
+	   isSpecialNode(context.params.year)) {
+	    return null;               // don't process special leaves that just "happen" to fire
+	                               // the matchstats function
 	}
+
+	console.log('match stats on "' + context.params.year + '/' +
+		    context.params.robot + '/' +
+		    context.params.competition + '/' +
+		    context.params.match + '"');
 
 	if(!change.after.exists()) {   // key deleted - so just exit
 	    return null;
@@ -136,7 +158,16 @@ exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match
 
 	    .then(()=> getNASAdataJSON())              // I know, I know, getting it again...
 	    .then((nasaData) => metaData.calcMetaDataSpecific(nasaData.metaData,"competition",competitionRef))
-		
+
+	// update the indicies for the new data
+	
+	    .then(() => treeIndex.upperIndexUpdate(firebase.database().ref('/'),
+						   context.params.year,
+						   context.params.robot,
+						   context.params.competition,
+						   context.params.match,
+						   firebase.database.ServerValue.TIMESTAMP))
+
 	// and if things go wrong
 	
 	    .catch((e)=>console.log(e));
@@ -166,13 +197,13 @@ exports.recalculate = functions.https.onRequest((request, response) => {
         .then((snapshot) => {
 	    data = snapshot.val();
 	    for(var year in data) {
-		if(year != METADATA && data.hasOwnProperty(year)) {
+		if(!isSpecialNode(year) && data.hasOwnProperty(year)) {
 		    for(var robot in data[year]) {
-			if(robot != METADATA && data[year].hasOwnProperty(robot)) {
+			if(!isSpecialNode(robot) && data[year].hasOwnProperty(robot)) {
 			    for(var competition in data[year][robot]) {
-				if(competition != METADATA && data[year][robot].hasOwnProperty(competition)) {
+				if(!isSpecialNode(competition) && data[year][robot].hasOwnProperty(competition)) {
 				    for(var match in data[year][robot][competition]) {
-					if(match != METADATA && data[year][robot][competition].hasOwnProperty(match)) {
+					if(!isSpecialNode(match) && data[year][robot][competition].hasOwnProperty(match)) {
 					    ref.child(year).child(robot).child(competition).child(match).child("updated").remove();
 					}
 				    }
@@ -220,6 +251,77 @@ exports.statistics = functions.database.ref('{year}/{robot}/{competition}/{match
 
 	return(1);
     });
+
+//
+// rebuildIndex(HTTPS) - entry point for the tool to rebuild the tree index.
+//                       It starts at the root and rebuilds the whole thing.
+//
+exports.rebuildIndex = functions.https.onRequest((request,response) =>
+{
+    local.firebaseInit(firebase);
+
+    var root = "/";
+
+    if(request.query.hasOwnProperty('root')) {
+	root = request.query.root;
+    }
+
+    treeIndex.rebuildIndex(firebase.database().ref(root),firebase.database.ServerValue.TIMESTAMP)
+	.then(_ => response.send('OK'));
+});
+
+						 
+//
+// treeIndex (HTTPS) - entry point for incoming request for the tree index.
+//                     if data.root is set, then use it, otherwise just
+//                     return the index from the root.
+//
+//exports.treeIndex = functions.https.onCall((data,context) =>
+exports.treeIndex = functions.https.onRequest((request,response) =>
+{
+    local.firebaseInit(firebase);
+
+    var root = "/";
+    var single = false;            // if true, only return the index (not recursive) at the given root
+
+    // use this for an onRequest() style call
+    
+    if(request.query.hasOwnProperty('root')) {
+	root = request.query.root;
+    }
+
+    if(request.query.hasOwnProperty('single')) {
+	single = true;
+    }
+
+    // use this for a onCall() style call
+    //
+    //    if(data.hasOwnProperty('root')) {
+    //       root = data.root;
+    //    }
+
+    var indexToUse = single?INDEX:FULLINDEX;
+	
+    firebase.database().ref(root).child(indexToUse).once("value")
+	    .then((snapshot) => response.send(JSON.stringify(snapshot)));
+
+    // BIG NOTE - before the _fullindex was created, the following routine
+    //   would recursively go through the whole tree creating a full index.
+    //   But that took nearly as long (due to all the database traffic)
+    //   as did loading in the whole database.  So now, the _fullindex
+    //   is maintained at each level...and is FAR quicker.
+    //
+    //	treeIndex.treeIndexRecursive(firebase.database().ref(root))
+    //      .then((obj) => {
+    //          var s = JSON.stringify(obj);
+    //		response.send(s);
+    //	    });
+    //  }
+
+    // use this for an onCall() style call
+    // return(index);
+    
+});
 
 //
 // getNASAdataJSON() - get the "standard" xml data for NASA, but in json format.
