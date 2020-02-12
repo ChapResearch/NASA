@@ -566,14 +566,15 @@ function calcMetaDataField_average(data,params,field)
 // _percent() - calculate the percentage of targets that have the given targetVal
 //              in the data. Note that the comparison to the target/targetVal is
 //              done WITHOUT parsing - that is, as a string.
-//              You CAN NOT have multiple target values. A single one only.
+//              Multiple targetVals are used in an OR fashion.  That is, the
+//              percent is calculated based upon if the value is THIS or THAT.
 //
 function calcMetaDataField_percent(data,params,field)
 {
     // only use the first target & targetVal
 
     var target = field.target[0];          // these are always arrays coming in
-    var targetVal = field.targetVal[0];
+    var targetVals = field.targetVal;
 
     var dataTarget = normalizeDataItem(data,target);
     var percent = 0;
@@ -581,8 +582,11 @@ function calcMetaDataField_percent(data,params,field)
     if(dataTarget.length) {
 	var count = 0;
 	for(var i=0; i < dataTarget.length; i++) {
-	    if(dataTarget[i] == targetVal) {
-		count++;
+	    for(var j=0; j < targetVals.length; j++) {
+		if(dataTarget[i] == targetVals[j]) {
+		    count++;
+		    break;      // don't allow double counting if the same targetVal
+		}               //   is used multiple times
 	    }
 	}
 	percent = (count/dataTarget.length) * 100;
