@@ -160,13 +160,17 @@ exports.matchStats = functions.database.ref('{year}/{robot}/{competition}/{match
 	    .then((nasaData) => metaData.calcMetaDataSpecific(nasaData.metaData,"competition",competitionRef))
 
 	// update the indicies for the new data
+	// Previously the "timestamp" was passed as firebase.database.ServerValue.TIMESTAMP,
+	//   but that was really overkill, and pretty-much doubled the size of the index.
+	//   Now zero is passed, indicating that no data exists below. (this is somewhat
+	//   like the firebase REST API "shallow" does)
 	
 	    .then(() => treeIndex.upperIndexUpdate(firebase.database().ref('/'),
 						   context.params.year,
 						   context.params.robot,
 						   context.params.competition,
 						   context.params.match,
-						   firebase.database.ServerValue.TIMESTAMP))
+						   0))
 
 	// and if things go wrong
 	
@@ -266,7 +270,12 @@ exports.rebuildIndex = functions.https.onRequest((request,response) =>
 	root = request.query.root;
     }
 
-    treeIndex.rebuildIndex(firebase.database().ref(root),firebase.database.ServerValue.TIMESTAMP)
+    // Previously the "timestamp" was passed as firebase.database.ServerValue.TIMESTAMP,
+    //   but that was really overkill, and pretty-much doubled the size of the index.
+    //   Now zero is passed, indicating that no data exists below. (this is somewhat
+    //   like the firebase REST API "shallow" does)
+	
+    treeIndex.rebuildIndex(firebase.database().ref(root),0)
 	.then(_ => response.send('OK'));
 });
 
