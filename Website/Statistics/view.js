@@ -58,7 +58,9 @@ function viewDataRefresh(callback)
 		   }
 
 		   // now fix the views to have direct references to the appropriate
-		   // fields from either the rawData or metaData
+		   // fields from either the rawData or metaData - NOTE that there are
+		   // some built-in fields that are added here because they will normally
+		   // NOT be in the <elements>
 
 		   for(var viewName in VIEW_DATA) {
 		       var view = VIEW_DATA[viewName];
@@ -69,7 +71,8 @@ function viewDataRefresh(callback)
 			   { name:"robot", label:"Robot", type:"text" },
 			   { name:"competition", label:"Competition", type:"text" },
 			   { name:"match", label:"Match", type:"int" },
-			   { name:"date", label: "Date", type:"date"}
+			   { name:"date", label: "Date", type:"date"},
+			   { name:"teamColor", label: "Team Color", type:"text"}
 		       ];
 		       
 		       var newFieldArray = [];
@@ -147,6 +150,7 @@ function viewListRefresh_load(target,data)
 	case 'bar':    output += '<img src="bar-512-512.png">'; break;
 	case 'trend':  output += '<img src="trend-512-512.png">'; break;
 	case 'stacked':output += '<img src="bar-512-512.png">'; break;
+	case 'imagemap':output += '<img src="heatmap-512x512.png">'; break;
 	}
 	output += '</div>';
 
@@ -240,12 +244,13 @@ function viewGoLoad()
     var target = $('.results-box');
 
     switch(type) {
-    case 'table':  display = viewTableHTML.bind(null,target); break;
-    case 'bar':    display = viewBar.bind(null,target); break;
-    case 'report': display = viewReportHTML.bind(null,target); break;
-    case 'pie':    display = viewPie.bind(null,target); break;
-    case 'trend':  display = viewTrend.bind(null,target); break;
-    case 'stacked':display = viewStacked.bind(null,target); break;
+    case 'table':    display = viewTableHTML.bind(null,target); break;
+    case 'bar':      display = viewBar.bind(null,target); break;
+    case 'report':   display = viewReportHTML.bind(null,target); break;
+    case 'pie':      display = viewPie.bind(null,target); break;
+    case 'trend':    display = viewTrend.bind(null,target); break;
+    case 'stacked':  display = viewStacked.bind(null,target); break;
+    case 'imagemap': display = viewImageMap.bind(null,target); break;
     }
 	
     viewPopulate(display);
@@ -1112,7 +1117,114 @@ function viewTableSort_FN(dataTypes,sort,a,b)
 
     return(0);    // if nothing is marked for sorting, then don't sort
 }
+
+function viewImageMap(target)
+{
+    var data = CURRENT_VIEW.data;
+    var headers = CURRENT_VIEW.headers
+    var viewData = VIEW_DATA[CURRENT_VIEW.name];
+
+    // incoming data
+    //  [0] is the field that is being plotted
+    //  [1] is the data being plotted
+    //  [2] is the color of the data being plotted (if missing, 'none' is assumed)
     
+    target.empty();
+
+    var sizeX = 600;
+    var sizeY = 600;
+
+    // process the option(s) that can come in
+    
+    if(viewData.hasOwnProperty('option')) {
+	for(let i=0; i < viewData.option.length; i++) {
+	    var optionSplit = viewData.option[i].split(',');
+	    switch(optionSplit[0]) {
+	    case 'size':
+		if(optionSplit.length == 3) {
+		    sizeX = optionSplit[1];
+		    sizeY = optionSplit[2];
+		}
+		break;
+	    }
+	}
+    }
+
+    // now set-up the image and overlay canvases
+
+    var canvasCSS = {
+	width:sizeX,
+	height:sizeY,
+	position:'absolute',
+	top:0,
+	left:0
+    };
+
+    var groupNum = 1;     // the groups of overlaid canvasas
+    
+    var imageCanvasID = 'ic' + groupNum;
+    var imageCanvas = $('<canvas id="' + imageCanvasID + '" width="' + sizeX + '" height="' + sizeY + '"/>');
+    imageCanvas.css(canvasCSS);
+    target.append(imageCanvas);
+
+    // one overlay for each incoming data set
+    var overlayCanvases = {};
+    var overlayMaps = {};
+
+    for(i=0; i < data.length; i++) {
+	var overlayID = 'overlay' + groupNum + '-' + i;
+
+	overlayCanvases[overlayID] = $('<canvas id="' + overlayID + '" width="' + sizeX + '" height="' + sizeY + '"/>');
+	overlayCanvases[overlayID].css(canvasCSS);
+	overlayCanvases[overlayID].css('z-index',100);
+        target.append(overlayCanvases[overlayID]);
+
+	overlayMaps[overlayID] = new simpleheat(overlayCanvases[overlayID].get(0));
+	overlayMaps[overlayID].max(2);
+	overlayMaps[overlayID].opacity(0.025);
+	overlayMaps[overlayID].resize();
+
+	console.log("working on " + data[i][0] + ' (' + overlayID + ')');
+
+	for(let j=0; j < data[i][1].length; j++) {
+	    console.log("adding (" + data[i][1][j].x/100*sizeX + "," + data[i][1][j].y/100*sizeY + ")");
+	    overlayMaps[overlayID].add([data[i][1][j].x / 100 * sizeX,data[i][1][j].y / 100 * sizeY,1]);
+	}
+	overlayMaps[overlayID].draw();
+    }
+
+    // create the legend along the side, along with checkboxes for on/off
+
+    var legendID = 'legend';
+    var legendCSS = {                    // other parameters set in statistics.css
+	height:sizeY,
+	position:'absolute',
+	top:0,
+	left:sizeX
+    };
+    var legendDiv = $('<div class="imageMapLegend"/>');
+    var legendTitleDiv = $('<div class="imageMapLegend title"/>');
+    var legendItemsDiv = $('<div class="imageMapLegend items"/>');
+
+    legendDiv.css(legendCSS);
+    target.append(legendDiv);
+
+    legendDiv.append(legendTitleDiv);
+    legendDiv.append(legendItemsDiv);
+    legendTitleDiv.append(headers[0]);
+
+    // create the checkbox(es)
+
+    for(i=0; i < data.length; i++) {
+	var overlayID = 'overlay' + groupNum + '-' + i;
+	var octext = 'onclick=\'$("#' + overlayID + '").toggle();\'';
+	var textColor = 'none';
+	if(data[i].length > 2) {
+	    textColor = data[i][2];
+	}
+	legendItemsDiv.append($('<label class="' + textColor + '"><input type="checkbox" checked ' + octext + '>' + data[i][0] + '</label><br>'));
+    }
+}
 
 function viewTitleSet(name,description)
 {

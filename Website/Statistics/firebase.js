@@ -7,27 +7,20 @@ var FIREBASE_DATA = null;
 var PERSPECTIVES = [ "year","robot","competition","match" ];
 
 //
-// All metadata (except at the match level) are within this object, so
-//  it is normally filtered out.
+// There are special nodes in the tree that don't participate
+// in stats. These are used for infrastructure or for holding
+// stats.
 //
-var METADATA = "_metaData";
+var METADATA = "_metaData";        // nodes where Metdata is stored
+var INDEX = "_index";              // nodes for the tree overlay index
+var FULLINDEX = "_fullindex";      // nodes for the tree overlay FULL index
 
 //
-// databaseInit()- initialize firebase for retrieval
+// isSpecialNode() - return true if the given node (as a string) is special
 //
-function databaseInit()
+function isSpecialNode(nodeString)
 {
-	var config = {
-	    apiKey: "AIzaSyAJtiy-xB69zjg7VRdBiEDmtupBeoGgS9A",
-	    authDomain: "nasa-7a363.firebaseapp.com",
-	    databaseURL: "https://nasa-7a363.firebaseio.com",
-	    projectId: "nasa-7a363",
-	    storageBucket: "nasa-7a363.appspot.com",
-	    messagingSenderId: "885889218553"
-	};
-
-    firebase.initializeApp(config);
-    
+    return(nodeString[0] == '_');
 }
 
 //
@@ -38,9 +31,19 @@ function databaseInit()
 function databaseLoad(reload,callback)
 {
     if(reload || FIREBASE_DATA === null) {
+
+
+	var d = new Date();
+	var n = d.getTime();
+	console.log("database load started at " + n);
+
+
 	firebase.database().ref('/').once('value')
+	//	firebase.database().ref('/_fullindex').once('value')     // 5-10 times faster download
 	    .then((data) => {
 		FIREBASE_DATA = data;
+		var d = new Date();
+		console.log("database loaded after " + (d.getTime() - n));
 		callback(FIREBASE_DATA);
 	    });
     } else {
@@ -59,13 +62,13 @@ function databaseRecords(constraints,callback)
 		     var returnRecords = [];
 		     var data = snapshot.val();
 		     for(var year in data) {
-			 if(year != METADATA) {
+			 if(!isSpecialNode(year)) {
 			     for(var robot in data[year]) {
-				 if(robot != METADATA) {
+				 if(!isSpecialNode(robot)) {
 				     for(var competition in data[year][robot]) {
-					 if(competition != METADATA) {
+					 if(!isSpecialNode(competition)) {
 					     for(var match in data[year][robot][competition]) {
-						 if(match != METADATA) {
+						 if(!isSpecialNode(match)) {
 						     var record = data[year][robot][competition][match];
 						     record.year = year;
 						     record.robot = robot;
@@ -199,7 +202,7 @@ function databaseGetYears(callback)
 		 (snapshot) => {
 		     var years = [];
 		     for(var year in snapshot.val()) {
-			 if(year != METADATA) {
+			 if(!isSpecialNode(year)) {
 			     if(!years.includes(year)) {
 				 years.push(year);
 			     }
@@ -221,10 +224,10 @@ function databaseGetRobots(years,callback)
 		 (snapshot) => {
 		     var robots = [];
 		     for(var year in snapshot.val()) {
-			 if(year != METADATA) {
+			 if(!isSpecialNode(year)) {
 			     if(years.length == 0 || years.includes(year)) {
 				 for(var robot in snapshot.val()[year]) {
-				     if(robot != METADATA) {
+				     if(!isSpecialNode(robot)) {
 					 console.log("looking at robot:" + robot);
 					 if(!robots.includes(robot)) {
 					     robots.push(robot);
@@ -250,13 +253,13 @@ function databaseGetCompetitions(years,robots,callback)
 		     var data = snapshot.val();
 		     var competitions = [];
 		     for(var year in data) {
-			 if(year != METADATA) {
+			 if(!isSpecialNode(year)) {
 			     if(years.length == 0 || years.includes(year)) {
 				 for(var robot in data[year]) {
-				     if(robot != METADATA) {
+				     if(!isSpecialNode(robot)) {
 					 if(robots.length == 0 || robots.includes(robot)) {
 					     for(var competition in data[year][robot]) {
-						 if(competition != METADATA) {
+						 if(!isSpecialNode(competition)) {
 						     if(!competitions.includes(competition)) {
 							 competitions.push(competition);
 						     }
@@ -284,15 +287,15 @@ function databaseGetMatches(years,robots,competitions,callback)
 		     var matches = [];
 		     for(var year in data) {
 			 if(years.length == 0 || years.includes(year)) {
-			     if(year != METADATA) {
+			     if(!isSpecialNode(year)) {
 				 for(var robot in data[year]) {
-				     if(robot != METADATA) {
+				     if(!isSpecialNode(robot)) {
 					 if(robots.length == 0 || robots.includes(robot)) {
 					     for(var competition in data[year][robot]) {
-						 if(competition != METADATA) {
+						 if(!isSpecialNode(competition)) {
 						     if(competitions.length == 0 || competitions.includes(competition)) {
 							 for(var match in data[year][robot][competition]) {
-							     if(match != METADATA) {
+							     if(!isSpecialNode(match)) {
 								 if(!matches.includes(match)) {
 								     matches.push(match);
 								 }

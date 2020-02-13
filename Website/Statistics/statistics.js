@@ -58,7 +58,7 @@ $( document ).ready(function() {
     selectorSet('match','');
     selectorGoEnable(false);
 
-    databaseInit();
+    firebaseInit(firebase);
 
     // handle clicking on multi-select thingies - uses cool jQuery delegate "on" so that
     //  the parent is responsible for executing the lower level - makes it easy

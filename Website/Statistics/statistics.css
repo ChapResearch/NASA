@@ -576,3 +576,45 @@ div.multi-selection.selected.group.blue {
 div.multi-selection.selected.group.red {
     background-color: red;
 }
+
+div.imageMapLegend {
+    width: 200px;
+    font-size: 30px;
+    font-family: sans-serif;
+    text-left: center;
+    margin-left: 50px;
+}
+
+div.imageMapLegend.title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-left: 0px;
+    text-align: center;
+    border-bottom: 2px solid black;
+}
+
+div.imageMapLegend.items {
+    margin-top: 10px;
+    margin-left: 0px;
+}
+
+div.imageMapLegend.items input[type=checkbox] {
+    -ms-transform: scale(2);
+    -moz-transform: scale(2);
+    -webkit-transform: scale(2);
+    -o-transform: scale(2);
+    transform: scale(2);
+    padding: 10px;
+    margin-right: 20px;
+}
+
+div.imageMapLegend.items label.red {
+    color: red;
+}
+div.imageMapLegend.items label.blue {
+    color: blue;
+}
+div.imageMapLegend.items label.none {
+    color: black;
+}
+
