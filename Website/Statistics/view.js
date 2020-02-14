@@ -1197,6 +1197,11 @@ function viewImageMap(target)
 	sizeY = options.size[1];
     }
 
+    var useImage = null;
+    if(options.hasOwnProperty('image')) {
+	useImage = options.image[0];
+    }
+    
     // now set-up the image and overlay canvases
 
     var canvasCSS = {
@@ -1208,11 +1213,14 @@ function viewImageMap(target)
     };
 
     var groupNum = 1;     // the groups of overlaid canvasas
-    
-    var imageCanvasID = 'ic' + groupNum;
-    var imageCanvas = $('<canvas id="' + imageCanvasID + '" width="' + sizeX + '" height="' + sizeY + '"/>');
-    imageCanvas.css(canvasCSS);
-    target.append(imageCanvas);
+
+    if(useImage) {
+	var imageCanvasID = 'ic' + groupNum;
+
+	var img = $('<img src="' + useImage + '"/>');
+	img.css(canvasCSS);
+	target.append(img);
+    }
 
     // one overlay for each incoming data set
     var overlayCanvases = {};
