@@ -70,7 +70,7 @@ function viewDataRefresh(callback)
 			   { name:"year", label:"Year", type:"int" },
 			   { name:"robot", label:"Robot", type:"text" },
 			   { name:"competition", label:"Competition", type:"text" },
-			   { name:"match", label:"Match", type:"int" },
+			   { name:"match", label:"Match", type:"text" },
 			   { name:"date", label: "Date", type:"date"},
 			   { name:"teamColor", label: "Team Color", type:"text"}
 		       ];
@@ -593,6 +593,18 @@ function viewTrend_FN(target)
 //
 // viewPie() - spit out a pretty pie chart using google charts
 //
+// there are two ways to use pie charts:
+//
+//   1. have a set of records based upon a single data field, each
+//      record will contribute its value, forming a pie chart from
+//      that data field. Note that the first field, the record id,
+//      will be cast to a string, while the second field cast to a number.
+//      This mode is selected if there is only 2 fields.
+//
+//   2. have a single record, with multiple fields, each field will be
+//      displayed in the pie. Note - in this mode, only the first record
+//      is displayed. TODO - this should change to display more in a matrix.
+
 function viewPie(target)
 {
     target.empty();
@@ -612,32 +624,56 @@ function viewPie_FN(target)
     var sort = CURRENT_VIEW.sort;
     var format = CURRENT_VIEW.format;
 
+    console.log(data);
+
+    var options = incomingOptions();
+    
     viewTableSort(data,dataTypes,sort);         // replaces the data by a sorted version
 
     var dataTable = new google.visualization.DataTable();
 
-    for(var i=0; i < headers.length; i++) {
-	dataTable.addColumn(chartsTypeTranslate(dataTypes[i]), headers[i]);
+    var chartOptions = {
+	backgroundColor: { fill:'transparent' },
+	pieSliceText: 'label',
+	legend: {position:'left'},
+	sliceVisibilityThreshold: 0,    // allow zero items to show in legend, if not in chart
+	is3D: true
+    };
+
+    if(headers.length > 2 || options.hasOwnProperty('single')) {    // this is the single record mode
+	dataTable.addColumn('string',"property");
+	dataTable.addColumn('number',"value");
+	for(var i=0; i < headers.length; i++) {
+	    dataTable.addRow([headers[i],data[0][i]]);       // TODO - multiple records draw multiple charts
+	}
+    } else {                    // this is the multi-record mode
+
+	// for pie charts, we tightly control the types of pie data
+
+	dataTable.addColumn('string', headers[0]);
+	dataTable.addColumn('number', headers[1]);
+
+	for(var i=0; i < data.length; i++) {
+	    dataTable.addRow([String(data[i][0]),parseFloat(data[i][1])]);
+	}
+
+	chartOptions.title = headers[0];
     }
 
-    dataTable.addRows(data);
-    
+//    for(var i=0; i < headers.length; i++) {
+//	dataTable.addColumn(chartsTypeTranslate(dataTypes[i]), headers[i]);
+//    }
+//
+//    dataTable.addRows(data);
+//    
 //    for(var i=0; i < data.length; i++) {
 //	dataTable.addRow([data[i][0],data[i][1]]);
     //    }
     
-    var options = {
-        title: name,
-	backgroundColor: { fill:'transparent' },
-	pieSliceText: 'label',
-	legend: {position:'left'},
-	sliceVisibilityThreshold: 1/20,
-	is3D: true
-    };
 
     var chart = new google.visualization.PieChart(target.get(0));
 
-    chart.draw(dataTable, options);
+    chart.draw(dataTable, chartOptions);
 }
 
 //
@@ -1118,6 +1154,27 @@ function viewTableSort_FN(dataTypes,sort,a,b)
     return(0);    // if nothing is marked for sorting, then don't sort
 }
 
+//
+// incomingOptions() - processes options in the current view, and returns
+//                     an object full options that were set, each with an
+//                     array of arguments for the option.
+//
+function incomingOptions()
+{
+    var viewData = VIEW_DATA[CURRENT_VIEW.name];
+
+    var returnObj = {};
+    
+    if(viewData.hasOwnProperty('option')) {
+	for(let i=0; i < viewData.option.length; i++) {
+	    var optionSplit = viewData.option[i].split(',');
+	    returnObj[optionSplit[0]] = optionSplit.slice(1);
+	}
+    }
+
+    return(returnObj);
+}
+
 function viewImageMap(target)
 {
     var data = CURRENT_VIEW.data;
@@ -1134,20 +1191,10 @@ function viewImageMap(target)
     var sizeX = 600;
     var sizeY = 600;
 
-    // process the option(s) that can come in
-    
-    if(viewData.hasOwnProperty('option')) {
-	for(let i=0; i < viewData.option.length; i++) {
-	    var optionSplit = viewData.option[i].split(',');
-	    switch(optionSplit[0]) {
-	    case 'size':
-		if(optionSplit.length == 3) {
-		    sizeX = optionSplit[1];
-		    sizeY = optionSplit[2];
-		}
-		break;
-	    }
-	}
+    var options = incomingOptions();
+    if(options.hasOwnProperty('size')) {
+	sizeX = options.size[0];
+	sizeY = options.size[1];
     }
 
     // now set-up the image and overlay canvases
