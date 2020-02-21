@@ -1,6 +1,6 @@
 module.exports = {
     combineOP: function (s1,s2) {return combine(s1,s2);},
-    deltaOP: function (start,end) {return delta(start,end);}
+    deltaOP: function (start,end,strict) {return deltaCalc(start,end,strict);}
 };
 
 function combine (s1,s2) {
@@ -27,44 +27,50 @@ function isEnd(x,end) {
     return false;
 }
 
-function delta (start, end) {
+//
+// deltaCalc() - calculate the delta between a set of start events and end events.
+//               There are two ways to calculate the deltas, either strict or not.
+//
+//                 STRICT - an end event must be preceeded by a start event. If that
+//                          is the case, then a "delta" amount is generated as the
+//                          difference between the start and end event. If an end
+//                          event is not directly preceeded by a start, no delta is
+//                          produced.
+//
+//             NOT STRICT - every end event generates a delta - think of this as
+//                          the *end* being the important piece of data, even if there
+//                          was no associated start. In this mode, if an end event
+//                          is the first event (no preceeding start) then a delta is
+//                          produced relative to zero. If an end event is followed
+//                          directly by another end event, the delta is the difference
+//                          between the two. Otherwise, the delta is calculated between
+//                          the start event directly preceeding the end event.
+//
+function deltaCalc(start,end,strict)
+{
     var combined = combine(start,end);
     var output = [];
 
-    var d = 0;
-    for (var i = 0; i<combined.length; i++)
-	{
+    const NONE = 0;
+    const START = 1;
+    const END = 2;
 
-	    //last element is start
-	    if (i==combined.length-1 &&
-		isStart(combined[i], start))
-		{
-		    break;
-		}
-	    //next two elements are start and end
-	    //separates start, start; end, start; end, end
-	    else if (isStart(combined[i],start) &&
-		     isEnd(combined[i+1], end))
-		{
-		    d = combined[i+1] - combined[i];
-		    output.push(d);
-		    i++;
-		}
-	    //extra end event with no start
-	    //uses previous end element as new "start"
-	    else if (isEnd(combined[i],end))
-		{
-		    if (i == 0)
-			{
-			    d = combined[i];
-			}
-		    else 
-			{
-			    d = combined[i]-combined[i-1];
-			}
-		    output.push(d);
-		}
+    var prevType = NONE;
+    var prevValue = 0;
+    
+    for(var i=0; i < combined.length; i++) {
 
+	if(isEnd(combined[i])) {
+	    if(!strict || prevType == START) {          // and *end* causes a delta in non-strict mode
+		output.push(combined[i] - prevValue);   // or, if strict, only with an end following a start
+	    }
+	    prevType = END;
+	} else {
+	    prevType = START;
 	}
-    return output;
+
+	prevValue = combined[i];
+    }
+
+    return(output);
 }

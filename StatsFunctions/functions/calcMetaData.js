@@ -179,7 +179,8 @@ function calcMetaDataField(data,params,field)
     case 'count':       return(calcMetaDataField_count(data,params,field));
     case 'average':     return(calcMetaDataField_average(data,params,field));
     case 'combine':     return(calcMetaDataField_combine(data,params,field));
-    case 'delta':       return(calcMetaDataField_delta(data,params,field));
+    case 'delta':       return(calcMetaDataField_delta(data,params,field,false));
+    case 'delta2':      return(calcMetaDataField_delta(data,params,field,true));
     case 'sum':         return(calcMetaDataField_sum(data,params,field));
     case 'subtract':    return(calcMetaDataField_subtract(data,params,field));	
     case 'percent':     return(calcMetaDataField_percent(data,params,field));
@@ -492,7 +493,12 @@ function calcMetaDataField_combine(data,params,field)
     return(x);
 }
 
-function calcMetaDataField_delta(data,params,field)
+//
+// _delta() - create a time-delta array from the named fields (start and end).
+//            Do a "strict" delta if strict is given as true.
+//            (see file:combineDelta.js for more information)
+
+function calcMetaDataField_delta(data,params,field,strict)
 {
     var start = field.start[0];    // only use the first field of start/end
     var end = field.end[0];
@@ -509,10 +515,8 @@ function calcMetaDataField_delta(data,params,field)
 	endVal = data[end];
     }
            
-    var delta = combineDelta.deltaOP(startVal,endVal);
+    var delta = combineDelta.deltaOP(startVal,endVal,strict);
     return(delta);
-
-
 }
 
 function calcMetaDataField_average(data,params,field)
@@ -772,8 +776,9 @@ function calcMetaDataField_compare(data,params,field)
     var gtVal = "Greater Than";
     var eqVal = "Equal";
 
-    var dataTarget = normalizeDataItem(data,target);
-    var dataTarget2 = normalizeDataItem(data,target2);
+    // go ahead and reassign the targets
+    target = normalizeDataItem(data,target)[0];
+    target2 = normalizeDataItem(data,target2)[0];
 
     if(field.hasOwnProperty('ltVal')){
 	ltVal = field.ltVal;
