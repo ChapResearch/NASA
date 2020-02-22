@@ -18,6 +18,10 @@ var imageMapXY = {};          // holds arrays of XY coordinates to a property th
 var imageMapImage = {};       // holds arrays of image map images
 var imageMapHeat = {};        // holds the "simpleheat" object
 var imageMapEventWindow = {}; // points to the event window for this imageMap
+var imageMapSize = {};        // size of the image maps for easy rotation
+var imageMapTimers = {};      // tracks the length of a press for either click or longpress
+var imageMapRotation = {};    // used to track if an image has been rotated
+
 
 // type = "radio"
 
@@ -56,6 +60,8 @@ function imageMap_refresh(id)
     imageMapHeat[id].max(2);
     imageMapHeat[id].opacity(0.025);
 
+    imageMapSize[id] = {width:width,height:height};
+
     imageMapHeat[id].resize();
 }
 
@@ -71,8 +77,14 @@ function imageMap_initAll()
 	// set up to refresh the display canvas when the image is loaded
 	imageMapImage[imageMapID].addEventListener("load",imageMap_refresh.bind(null,imageMapID),false);
 
-	$('#' + 'overlay-' + imageMapID).off("click");
-	$('#' + 'overlay-' + imageMapID).on("click",imageMap_click.bind(null,imageMapID));
+// the old way was just to do clicks, now we process longpresses
+//	
+//	$('#' + 'overlay-' + imageMapID).off("click");
+//	$('#' + 'overlay-' + imageMapID).on("click",imageMap_click.bind(null,imageMapID));
+
+    	$('#' + 'overlay-' + imageMapID).off();
+	$('#' + 'overlay-' + imageMapID).on("mousedown",imageMap_mouseDown.bind(null,imageMapID));
+	$('#' + 'overlay-' + imageMapID).on("mouseup",imageMap_mouseUp.bind(null,imageMapID));
     }
 }
 
@@ -105,6 +117,45 @@ function imageMap_reset()
 }
 
 //
+// imageMap_mouseDown() - when the mouse goes down on an image map, this functions sets
+//                        a timer to check for a simple click or a long press.
+//
+function imageMap_mouseDown(id,event)
+{
+    var d = new Date();
+
+    imageMapTimers[id] = d.getTime();
+}
+
+function imageMap_mouseUp(id,event)
+{
+    var d = new Date();
+    var now = d.getTime();
+
+    if(imageMapTimers.hasOwnProperty(id)) {
+	if((now - imageMapTimers[id]) > 2000) {
+	    imageMap_longPress(id,event);
+	} else {
+	    imageMap_click(id,event);
+	}
+	delete imageMapTimers[id];
+    }
+}
+
+function imageMap_longPress(id,event)
+{
+    if(imageMapRotation.hasOwnProperty(id)) {
+	delete imageMapRotation[id];
+	$('#'+id).css("transform","");
+    } else {
+	$('#'+id).css("transform","rotate(180deg)");
+	imageMapRotation[id] = true;
+    }
+
+    imageMap_redraw(id);
+}
+
+//
 // imageMap_click() - when an image map is clicked (the overlay that is), this routine
 //                    is called.
 //
@@ -119,7 +170,7 @@ function imageMap_click(id,event)
     // these are the standard "percentage" ints that are used in NASA
     var x = Math.ceil(rawx / parent.width * 100);
     var y = Math.ceil(rawy / parent.height * 100);
-    
+
 //    console.log('you clicked at (' + x + ',' + y + ')');
 //    console.log('you clicked at (' + rawx + ',' + rawy + ')');
 
@@ -169,9 +220,38 @@ function imageMap_clickEvent(id,x,y,rawx,rawy)
 	imageMapEvent[id] = [];
     }
     imageMapEvent[id].push(totalSeconds);
-    imageMapXY[id].push({x:x,y:y});
+
+    if(imageMapRotation.hasOwnProperty(id)) {
+	imageMapXY[id].push({x:100-x,y:100-y});
+    } else {
+	imageMapXY[id].push({x:x,y:y});
+    }
 
     // TODO - the event should be added to the associated event window if it exists
+}
+
+//
+// imageMap_redraw() - upon a rotate, the imageMap needs to be cleared and reloaded
+//                     from the STORED data.
+//
+function imageMap_redraw(id)
+{
+    imageMapHeat[id].clear();
+
+    for(var i=0; i < imageMapXY[id].length; i++) {
+	var x = imageMapXY[id][i].x / 100;
+	var y = imageMapXY[id][i].y / 100;
+
+	var width = imageMapSize[id].width;
+	var height = imageMapSize[id].height;
+
+	if(imageMapRotation.hasOwnProperty(id)) {
+	    imageMapHeat[id].add([width - (x*width), height-(y*height),1]);
+	} else {
+	    imageMapHeat[id].add([x*width,y*height,1]);
+	}
+    }
+    imageMapHeat[id].draw();
 }
     
 function imageMap_clickRadio(id,x,y,rawx,rawy)

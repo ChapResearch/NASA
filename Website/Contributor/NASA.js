@@ -278,7 +278,25 @@ NASA.prototype.setTeamAndOrColor = function(team,color,uponCompletion = null)
 	}
     }
 }
+
+//
+// testSendData() - sends the given object (data) straight to the catcher
+//                  as opposed to the controller.  Note that everything
+//                  must be specified appropriately or this routine will
+//                  bail - logging whatever needs to be logged to the
+//                  controller.
+//
+NASA.prototype.testSendData = function(obj,uiControl)
+{
+    uiControl(true);
+
+    console.log('test data send called');
+    console.log(obj);
+
+    $.post("https://nasa.chapresearch.com/catcher",obj);
     
+    uiControl(false);
+}
 
 //
 // sendData() - sends the given object (data) to the controller.
