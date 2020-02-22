@@ -36,6 +36,11 @@ function resetChange()
     
     timerStop();
     timerClear();
+
+    // if testing, generate a new match number
+    if(testAttributes.testing) {
+	matchChange(Math.ceil(Math.random()*199));
+    }
 }
 
 // dataIncoming() - incoming data from the controller!  It will be pushed into
@@ -425,11 +430,30 @@ function dataSend()
 
 	data.teamColor = teamColorGet();
 	data.teamNumber = teamNumberGet();
-
+	data.userName = $('div.myname-name span').text();
+	
 	imageMap_gather(data);     // data is augmented by the imageMaps' data
 
 	console.log(data);
-	myNASA.sendData(data,function(disable) { jQuery('button.send').prop('disabled',disable);});
+
+	if(testAttributes.testing) {
+
+	    if(data.teamNumber == "") {
+		alert('Test Mode requires teamNumber to be entered! Data not sent.');
+	    } else {
+		// the data must be configured for the catcher
+		var catcherData = {};
+		catcherData.match = $('div.top-bar .match-name span').text();;
+		catcherData.competition = testAttributes.competition;
+		catcherData.team_number = data.teamNumber;
+		catcherData.year = testAttributes.year;
+		catcherData.record = data;
+	    
+		myNASA.testSendData(catcherData,function(disable) { jQuery('button.send').prop('disabled',disable);});
+	    }
+	} else {
+	    myNASA.sendData(data,function(disable) { jQuery('button.send').prop('disabled',disable);});
+	}
     }
     else
     {
@@ -523,11 +547,86 @@ function colorPickerDisable()
     $('div.team-color').addClass('disabled');
 }
 
+//
+// TEST MODE
+//
+//    If the query parameter "test" is given on the URL, then we enter test
+//    mode.  In this mode, the catcher is called directly from the contributor
+//    so that you don't have to have a controller.  The query parameters that
+//    MUST also be specified are:
+//
+//       competition - really any name at all
+//       year - this MUST be > 3000 and < 4000 - kinda' a test range
+//
+//    Unlike when using the controller, the following attributes are supplied
+//    by the contributor:
+//
+//       teamNumber - normally sent by the controller (MUST be specified)
+//       teamColor - also normally sent by the controller (optional)
+//
+//    And the following attribute is added, and really should be added to the
+//    data sent by the controller:
+//
+//       userName - set to the name of the user (optional)
+//
+var testAttributes = {};
+testAttributes.testing = false;
+
+//
+// checkTestAttributes() - looks into the query parameters to see if testing
+//                         has been set-up.  Will set testAttributes.testing = true
+//                         ONLY if a useful set of test attributes has been
+//                         specified.  Will emit console logs if things appear
+//                         to be amiss.
+//
+function checkTestAttributes()
+{
+    var error = false;
+    
+    var urlParams = new URLSearchParams(window.location.search);
+
+    if(urlParams.has('test')) {
+
+	if(!urlParams.has('year')) {
+	    console.log('TEST MODE: "year" must be specified for testing (3000 <= year < 4000)');
+	    error = true;
+	}
+	
+	if(!urlParams.has('competition')) {
+	    console.log('TEST MODE: "competition" must be specified for testing');
+	    error = true;
+	}
+
+	if(!error) {
+	    testAttributes.competition = urlParams.get('competition');
+	    testAttributes.year = urlParams.get('year');
+
+	    if(testAttributes.year < 3000 || testAttributes.year > 3999) {
+		console.log('TEST MODE: year is out of bounds (' + testAttributes.year + ')');
+		error = true;
+	    }
+
+	    if(!error) {
+		testAttributes.testing = true;
+		console.log('TEST MODE: enabled (' + testAttributes.year + ',' + testAttributes.competition + ')');
+	    }
+	}
+    }
+}
+
+
 $( document ).ready(function() {
 
     myNASA.slot = $('div.contributor .letter.selected').data('contributor');
     
     console.log(myNASA);
+
+    checkTestAttributes();
+
+    if(testAttributes.testing) {
+	nameChange("test mode");
+	matchChange(Math.ceil(Math.random()*199));
+    }
 
     // set-up for the about page, that terminates in bringing up the settingsForm
     about();
