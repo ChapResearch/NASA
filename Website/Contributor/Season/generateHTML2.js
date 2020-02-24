@@ -19,9 +19,9 @@ function seasonLoad_generateHTML(seasonXML)
 			  var type = $(this).find("type").text();
 			  var nameObj = $(this).find("name");
 			  if(nameObj.length != 0) {
-			      console.log("Processing: " + nameObj.text());
+//			      console.log("Processing: " + nameObj.text());
 			      var targetElementField = findElementByName(elementFields,nameObj.text());
-			      console.log(targetElementField);
+//			      console.log(targetElementField);
 			  }
 			  
 			  switch(type)
@@ -39,6 +39,7 @@ function seasonLoad_generateHTML(seasonXML)
 			      case "line":        output += generateLine($(this)); break;
 			      case "box":         output += generateBox($(this)); break;
 			      case "imageMap":    output += generateImageMap($(this),targetElementField); break;
+			      case "imageMapFlip":output += generateImageMapFlip($(this),targetElementField); break;
 			  }
 		      });
     
@@ -51,7 +52,7 @@ function seasonLoad_generateHTML(seasonXML)
 
 function findElementByName(elementFields, targetName)
 {
-    console.log("looking for " + targetName);
+//    console.log("looking for " + targetName);
 
     var retElement = null;
     
@@ -59,7 +60,7 @@ function findElementByName(elementFields, targetName)
 		       {
 			   var name = $(this).find("name").text();
 			   if(name == targetName){
-			       console.log("found " + name);
+//			       console.log("found " + name);
 			       retElement = $(this);
 			   }
 		       });
@@ -175,7 +176,7 @@ function getChoices(name, targetElementField, type)
 		     }
 		     output += '<label><input type="' + type + '" name="' + name + '" value="' + value + '"><span>' + label + '</span><br></label>';
 		 });
-    console.log(output);
+//    console.log(output);
     return output;
 }
 
@@ -336,7 +337,7 @@ function generateIntChoiceField(layoutField, elementField)
     }
 
     var defaultValue = elementField.find('default').text();
-    console.log(defaultValue);
+//    console.log(defaultValue);
     if(defaultValue=="")
 	defaultValue = 0;
 
@@ -434,7 +435,7 @@ function generateLine(layoutField)
     output += '>';
     output += '</div>';
 
-    console.log(output);
+//    console.log(output);
     return output;
 }
 
@@ -447,7 +448,7 @@ function generateBox(layoutField)
     output += '>';
     output += '</div>';
 
-    console.log(output);
+//    console.log(output);
     return output;
 }
 
@@ -595,4 +596,17 @@ function generateImageMap(layoutField,targetField)
     output += '<canvas ' + idOverlayProp + itemClass + style + '/>';
     
     return output;
+}
+
+function generateImageMapFlip(layoutField,targetField)
+{
+    var output = "";
+    var style = htmlStyleLocationSize(getLocationSize(layoutField)) + ' ';
+
+    var id = targetField.children('name').text() + '-flip';
+    var idProp = 'id="' + id + '" ';
+    
+    output += '<image src="blue-red-flip-100x100.png" ' + idProp + style + '/>';
+
+    return(output);
 }

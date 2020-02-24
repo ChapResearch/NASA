@@ -12,10 +12,9 @@ function seasonDataGather(seasonXML)
     gatherIntChoiceData(seasonData);
     gatherCheckboxData(seasonData);
     gatherEventData(seasonData);
-    console.log("we about to go in bois");
     gatherTextInputData(seasonData);
 
-    console.log(seasonData);
+    //console.log(seasonData);
     return seasonData;
 }
 
@@ -24,7 +23,7 @@ function gatherRadioData(data)
     $('div.content').find("input[type=radio]:checked").each(function()
 							    {
 								var name = $(this).attr("name");
-								console.log(data);
+								//console.log(data);
 								data[name] = $(this).val();
 							    });
 }
@@ -34,7 +33,7 @@ function gatherIntChoiceData(data)
     $('div.content').find("input[type=number]").each(function()
 							    {
 								var name = $(this).attr("name");
-								console.log(data);
+								//console.log(data);
 								data[name] = $(this).val();
 							    });
 }
@@ -56,7 +55,7 @@ function gatherSliderData(data)
     $('div.content').find("input[type=range]").each(function()
 							       {
 								   var name = $(this).attr("name");
-								   console.log(data);
+								   //console.log(data);
 								   data[name] = $(this).val();    
 							       });
 }
@@ -91,7 +90,6 @@ function gatherEventData(data)
 
 function gatherTextInputData(data)
 {
-    console.log("we in bois");
     $('div.content').find(".NASA-field-textInput").each(function()
 						     {
 							 $(this).find("textarea").each(function()

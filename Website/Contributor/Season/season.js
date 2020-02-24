@@ -97,10 +97,10 @@ function reset(seasonXML)
     $('div.content').find('input[type="number"]').each( function()
 						      {
 							  var name = $(this).attr('name');
-							  console.log(name);
+//							  console.log(name);
 							  var field = findElementByName(elementFields,name);
 							  var defaultVal = field.find('default').text();
-							  console.log(field);
+//							  console.log(field);
 							  if(!defaultVal)
 							      defaultVal = 0;
 							  $(this).val(defaultVal);
