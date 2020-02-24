@@ -24,6 +24,8 @@ function matchChange(match)
 //
 function resetChange()
 {
+    console.log("resetChange()");
+    
     keypadReset();       // clear robot number
     teamColorReset();    // clear the color
 
@@ -185,13 +187,17 @@ function timerStart()
     $('button.start').prop('disabled',true);
     $('button.send').prop('disabled',true);
     $('button.stop').prop('disabled',false);
-    
+
+    if(timerInterval !== null) {
+	clearInterval(timerInterval);
+    }
     timerInterval = setInterval(timerTick,1000);
 }
 
 function timerStop()
 {
     clearInterval(timerInterval);
+    timerInterval = null;
     timerDisplay();
     $('button.reset').prop('disabled',false);
     $('button.start').prop('disabled',false);
