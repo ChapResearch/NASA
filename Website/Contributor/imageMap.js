@@ -40,8 +40,6 @@ function imageMap_refresh(id)
     //   directly so that the coordinate system for clicking is set right
     //   NOTE - without this, the mouse clicking won't be aligned
 
-    console.log("called refresh");
-    
     var canvas = document.getElementById(id);
     var overlayCanvas = document.getElementById('overlay-' + id);
 
@@ -85,6 +83,13 @@ function imageMap_initAll()
     	$('#' + 'overlay-' + imageMapID).off();
 	$('#' + 'overlay-' + imageMapID).on("mousedown",imageMap_mouseDown.bind(null,imageMapID));
 	$('#' + 'overlay-' + imageMapID).on("mouseup",imageMap_mouseUp.bind(null,imageMapID));
+	$('#' + 'overlay-' + imageMapID).on("taphold",imageMap_longPress.bind(null,imageMapID));
+
+	$('#' + imageMapID + '-flip').off();
+	$('#' + imageMapID + '-flip').on('click',imageMap_longPress.bind(null,imageMapID));
+
+	imageMapXY[imageMapID] = [];
+	
     }
 }
 
@@ -152,6 +157,7 @@ function imageMap_longPress(id,event)
 	imageMapRotation[id] = true;
     }
 
+    delete imageMapTimers[id];
     imageMap_redraw(id);
 }
 
