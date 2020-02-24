@@ -14,7 +14,7 @@ Season/generateHTML2.js
 Season/season.js
 Season/seasonDataGather.js
 imageMap.js
-../season.xml
+https://nasa.chapresearch.com/season.xml
 birdy.png
 nasa-logo-250x110.png
 SegmentDisplay/plexiglas.png
