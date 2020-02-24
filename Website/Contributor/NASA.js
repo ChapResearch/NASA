@@ -244,7 +244,7 @@ NASA.prototype.setTeamAndOrColor = function(team,color,uponCompletion = null)
 	}
 
 	if(color !== null) {
-	    switch(color) {
+	    switch(color.toLowerCase()) {
 	    case 'blue':   color = 1; break;
 	    case 'red':    color = 2; break;
 	    default:       color = 0; break;
