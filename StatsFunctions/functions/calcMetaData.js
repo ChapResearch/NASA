@@ -11,7 +11,22 @@ require('firebase/storage');            // extremely important! (firebase must e
 
 var combineDelta = require('./combineDelta');
 
-var METADATA = "_metaData";
+//
+// There are special nodes in the tree that don't participate
+// in stats. These are used for infrastructure or for holding
+// stats.
+//
+var METADATA = "_metaData";        // nodes where Metdata is stored
+var INDEX = "_index";              // nodes for the tree overlay index
+var FULLINDEX = "_fullindex";      // nodes for the tree overlay FULL index
+
+//
+// isSpecialNode() - return true if the given node (as a string) is special
+//
+function isSpecialNode(nodeString)
+{
+    return(nodeString[0] == '_');
+}
 
 module.exports = {
     calcMetaData: function (data,params,xmldata) { return(calcMetaData(data,params,xmldata));},
@@ -49,7 +64,7 @@ function calcMetaDataSpecific(metaDataSpec,perspective,ref)
 {
     return(
 	ref.once('value')
-	    .then((snapshot) => { console.log("running on " + perspective); return(snapshot); })
+//	    .then((snapshot) => { console.log("running on " + perspective); return(snapshot); })
 	    .then((snapshot) => upperMetaData(metaDataSpec,perspective,snapshot.val()))
             .then((metaData) => ref.child(METADATA).set(metaData))
     );
@@ -72,11 +87,11 @@ function calcMetaDataUpper(data,metaDataSpec,ref)
     // now, cruise through the data updating things...
 
     for(var year in data) {
-	if(year != METADATA) {
+	if(!isSpecialNode(year)) {
 	    for(var robot in data[year]) {
-		if(robot != METADATA) {
+		if(!isSpecialNode(robot)) {
 		    for(var competition in data[year][robot]) {
-			if(competition != METADATA) {
+			if(!isSpecialNode(competition)) {
 			    data[year][robot][competition][METADATA] =
 				upperMetaData(metaDataSpec,"competition",data[year][robot][competition]);
 //			    console.log(data[year][robot][competition][METADATA]);
@@ -115,7 +130,7 @@ function upperMetaData(metaDataSpec,perspective,data)
     // first, get all of the data for all lower layers
 
     for(var lowerLevel in data) {
-	if(lowerLevel != METADATA) {               // skip this level's METADATA
+	if(!isSpecialNode(lowerLevel)) {
 
 	    // if the lower level has METADATA use it
 	    if(data[lowerLevel].hasOwnProperty(METADATA)) {
@@ -194,6 +209,8 @@ function calcMetaDataField(data,params,field)
     case 'defEffect':   return(calcMetaDataField_defEffect(data,params,field));
     case 'compare':     return(calcMetaDataField_compare(data,params,field));
     case 'constant':    return(calcMetaDataField_constant(data,params,field));
+    case 'assign':      return(calcMetaDataField_assign(data,params,field));
+    case 'flatten':     return(calcMetaDataField_flatten(data,params,field));
     default:         console.log("BAD OP: " + operation); return(false);
     }
 
@@ -354,6 +371,98 @@ function normalizeDataItem(data,fieldName)
 }
 
 //
+// _flatten() - operation that 'flattens' its field, that is,
+//              instead of a 2-member array with two arrays
+//              as its elements, crack-open the two arrays and
+//              create a new array with all of the members of
+//              the two arrays.
+//
+//              For example:
+//                     A = [ 10, 20, 30, 40 ]
+//                     B = [ 6, 7, 8, 9, 10 ]
+//                     C = [ A, B, 50 ]
+//                     flatten(C) = [ 10, 20, 30, 40, 6, 7, 8 , 10, 50 ]
+//
+//              There are numerous rules for flatten:
+//                - it takes one or more target(s)
+//                - it is expected that each target is an array
+//                - if a target is NOT an array, then it is treated
+//                   as an array with a single member
+//                - if a target is null/undefined/NaN, then it is ignored completely
+//                - the output is ALWAYS an array
+//
+function calcMetaDataField_flatten(data,params,field)
+{
+    var retArray = [];
+
+    if(!field.hasOwnProperty('target')) {
+	console.log('flatten in field ' + field.name + ' missing target (empty array returned)');
+    } else {
+
+	// if target exists, it will be an array of targets (at least one)
+	for(var i=0; i < field.target.length; i++) {
+
+	    let item = normalizeDataItem(data,field.target[i]);   	// item is normalized into array of values
+	    //    for the given field (may be zero length)
+	    if(item.length != 0) {
+		for(var j=0; j < item.length; j++) {
+
+		    // flatten is often used for higher-level metadata, where the fields
+		    //   of lower-levels are combined into an array by this machinery.
+		    //   In this case, we can arrays of arrays for things like events,
+		    //   or arrays of arrays of objects for things like imagemap points.
+
+		    if(Array.isArray(item[j])) {                          // flatten FIRST array level if it exists
+			for(var k=0; k < item[j].length; k++) {
+			    retArray.push(item[j][k]);
+			}
+		    } else {
+			retArray.push(item[j]);                    // otherwise, just use the current item
+		    }
+		}
+	    }
+	}
+    }
+       
+    return(retArray);
+}
+    
+
+//
+// _assign() - operation that simply assigns one field to another.
+//             This is particularly useful in upper level metaData
+//             where you want to take advantage of the merging of
+//             the data in lower levels, and simply replicate the
+//             data name.
+//
+function calcMetaDataField_assign(data,params,field)
+{
+    // only one target field is used. Note that there is data normalization
+    // that occurs, causing the assignment to always have something.  But
+    // the rules are slightly different.
+    //
+    //   target doesn't exist   ==> null
+    //   target = null ==> null
+    //   target = single value  ==> single value (as opposed to normalized array)
+    //   target = anything else   ==> exact value of target
+    //
+    
+    if(!field.hasOwnProperty('target')) {
+	console.log('assignment in field ' + field.name + ' missing target');
+    } else {
+	var item = normalizeDataItem(data,field.target[0]);
+
+	if(item.length < 1) {
+	    item = null;
+	} else if(item.length == 1) {
+	    item = item[0];
+	}
+    }
+
+    return(item);
+}
+
+//
 // _constant() - operation that simply uses the given target as a literal.
 //               That is, the target IS NOT another field, it is instead
 //               something like a string or a number.
@@ -427,14 +536,26 @@ function calcMetaDataField_sum(data,params,field)
 	for (var i = 0; i<ourTargets.length; i++) {
 
 	    if(data.hasOwnProperty(ourTargets[i])) {    // make sure the target field exists
+
+		// process arrays of things
 		if(typeof data[ourTargets[i]] === 'object' && data[ourTargets[i]] !== null) {
 		    for(k in data[ourTargets[i]]) {
 			if(data[ourTargets[i]].hasOwnProperty(k)) {
-			    sum += parseInt(data[ourTargets[i]][k]);
+			    let targetVal = parseInt(data[ourTargets[i]][k]);
+			    if(isNaN(targetVal)) {
+				targetVal = 0;
+			    }
+			    sum += targetVal;
 			}
 		    }
+
+		// otherwise, just a value
        		} else {
-		    sum += parseInt(data[ourTargets[i]]);
+		    let targetVal = parseInt(data[ourTargets[i]]);
+		    if(isNaN(targetVal)) {
+			targetVal = 0;
+		    }
+		    sum += targetVal;
 		}
 	    }
 	}	
@@ -626,7 +747,7 @@ function calcMetaDataField_divide(data,params,field)
     }
 
     if(dataDenom == 0){
-	console.log("denominator was 0");
+	console.log("denominator was 0 in divide for " + field.name);
 	return(dataNum[0]);
     }
     
