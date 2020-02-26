@@ -60,7 +60,7 @@ function deltaCalc(start,end,strict)
     
     for(var i=0; i < combined.length; i++) {
 
-	if(isEnd(combined[i])) {
+	if(isEnd(combined[i],end)) {
 	    if(!strict || prevType == START) {          // and *end* causes a delta in non-strict mode
 		output.push(combined[i] - prevValue);   // or, if strict, only with an end following a start
 	    }
