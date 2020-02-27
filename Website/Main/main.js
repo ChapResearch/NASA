@@ -12,7 +12,8 @@ $( document ).ready(function() {
 	//	window.location = "app-release-v10.apk";
 	//window.location = "app-release-v12.apk";
 	//window.location = "app-release-v14.apk";
-	window.location = "app-release-v16.apk";
+	//window.location = "app-release-v16.apk";
+	window.location = "022520_v2.0_Controller.apk";
     });
 
     $('div.about').click(function() {
