@@ -27,6 +27,9 @@ var ALL_CONSTRAINTS = [{constraint:'year',indicator:'Y'},
 		       {constraint:'competition',indicator:'C'},
 		       {constraint:'match',indicator:'M'}];
 
+// METADATA is defined in firebase.js - it's here for reference
+// RECORDID is defined there too
+
 //
 // isOptionGroup() - returns true if the given viewname has the "robotGroup" option.
 //
@@ -72,7 +75,8 @@ function viewDataRefresh(callback)
 			   { name:"competition", label:"Competition", type:"text" },
 			   { name:"match", label:"Match", type:"text" },
 			   { name:"date", label: "Date", type:"date"},
-			   { name:"teamColor", label: "Team Color", type:"text"}
+			   { name:"teamColor", label: "Team Color", type:"text"},
+			   { name:RECORDID, label:"Record", type:'int'}
 		       ];
 		       
 		       var newFieldArray = [];
@@ -267,6 +271,7 @@ function viewPopulate(callback)
 
     databaseRecords(getConstraints(),(records) => {
 	var filtered = databasePerspectiveFilter(records,view.perspective);
+	console.log(filtered);
 
 	// at this point, we have records, we just need to display them
 	// according to the view
@@ -292,7 +297,7 @@ function viewPopulate(callback)
 		if(!fields[j].hasOwnProperty("perspective") || fields[j].perspective == "match") {
 		    currentRow.push(filtered[i][fieldName]);
 		} else {
-		    var meta = fields[j].perspective + "_metaData";
+		    var meta = fields[j].perspective + METADATA;
 		    if(filtered[i].hasOwnProperty(meta)) {
 			if(filtered[i][meta].hasOwnProperty(fieldName) &&
 			   typeof filtered[i][meta][fieldName] != "undefined") {
@@ -303,7 +308,7 @@ function viewPopulate(callback)
 		    } else {
 			currentRow.push("NA");
 		    }
-//		    currentRow.push(filtered[i][fields[j].perspective + "_metaData"][fieldName]);
+//		    currentRow.push(filtered[i][fields[j].perspective + METADATA][fieldName]);
 		}
 	    }
 
@@ -311,6 +316,7 @@ function viewPopulate(callback)
 	}
 
 	// sort comes in as a single field setting in the view
+	// TODO - should allow deeper sort
 
 	CURRENT_VIEW.sort = [];
 	CURRENT_VIEW.sortType = [];
@@ -335,6 +341,8 @@ function viewPopulate(callback)
 	    }
 	    CURRENT_VIEW.sort[0] = "DESC";
 	}
+
+	// insert all of the datatypes
 
 	CURRENT_VIEW.dataTypes = [];
 
@@ -489,17 +497,6 @@ function viewTrend(target)
 //    $(window).resize(viewTrend_FN.bind(null,target));
 }
 
-//
-// ** Thu Feb 28 14:30:20 2019 **
-// So this all works - HOWEVER
-//   There needs to be a mechanism (probably a built-in "index" field)
-//   that allows the data to be organized one-by-one - that is, sorted by date,
-//   show the matches in order from 1 to X along with performance.
-//   PROPOSAL - create "index" which is related to the uniqueness of perspective
-//     Each record has an index, which counts starting at 1, and increases for
-//     every unique record as returned. This does indicate a "sort" to make the
-//     index increase by a useful amount (sorted by date for example).
-
 function viewTrend_FN(target)
 {
     var name = CURRENT_VIEW.name;
@@ -510,6 +507,8 @@ function viewTrend_FN(target)
     var format = CURRENT_VIEW.format;
 
     viewTableSort(data,dataTypes,sort);         // replaces the data by a sorted version
+
+    var viewOptions = incomingOptions();
 
     var dataTable = new google.visualization.DataTable();
 
@@ -526,6 +525,12 @@ function viewTrend_FN(target)
     // For example: [ date, robot, masterAAR, ... ]
     //
     // The records will be re-organized to the columnar format above
+    //
+    // ** Fri Feb 21 12:26:52 2020 **
+    // Note that a new "id" field has been integrated. It will increase
+    // once per SORTED record. In addition, if 'groupBy' is an option
+    // specified, then the groupBy field will be used to organize the
+    // data.
 
     // get all of the unique values for the line-id for use in the headers
     //  and in structing the data appropriately
@@ -582,7 +587,12 @@ function viewTrend_FN(target)
 	vAxis: { title: headers[2] },
 	backgroundColor: { fill:'transparent' },
 	pointSize: 10,
+	hAxis: { gridlines: { multiple: 1 } }
     };
+
+    if(viewOptions.hasOwnProperty('x-label')) {
+	options.hAxis =  {title:viewOptions['x-label'][0]};
+    }
 
     var chart = new google.visualization.LineChart(target.get(0));
 
@@ -896,6 +906,40 @@ function groupSplitData(data,red,blue)
     return({red:redData,blue:blueData});
 }
 
+//
+// colorSplitData() - split the given data into red/blue groups, so they can be
+//                    processed separately. It is assumed that teamColor is available.
+//                    And object is returned with:
+//                      { red: redData, blue:blueData }
+//                    If there is none of a particular color, a empty array is
+//                    returned for that color.
+//          NOTE - color of something other than red or blue is ignored (removed
+//                 from the resultant data set(s).
+//
+function colorSplitData(data)
+{
+    var redData = [];
+    var blueData = [];
+
+    var rindex = findFieldIndex('teamColor');
+
+    if(rindex < 0) {
+	console.log("ERROR: colorSplit option view doesn't have 'teamColor' column");
+	redData = data;
+    } else {
+	for(var i=0; i < data.length; i++) {
+	    if(data[i][rindex] == 'red') {
+		redData.push(data[i]);
+	    } else if(data[i][rindex] == 'blue') {
+		blueData.push(data[i]);
+	    }
+	}
+    }
+
+    return({red:redData,blue:blueData});
+}
+    
+
 
 //
 // viewTableHTML() - Refreshes the current view to the table area. It is normally
@@ -1115,6 +1159,54 @@ function viewDataFormat(data,format)
     return(formatted);
 }
 	
+//
+// viewTableIndex() - RE-indexes the data in the data table, normally
+//                    used after a sort. If there is a "groupBy" option
+//                    supplied for the view, then the _index will be counted
+//                    within each instance of a value in the groupBy field.
+//
+//          NOTE - this needs to be called AFTER a table sort, because the
+//                 order of the records affects the index.
+//
+function viewTableIndex(data)
+{
+    var idField = findFieldIndex(RECORDID);
+
+    // if the id field isn't mentioned, then it doesn't need to be recomputed
+    
+    if(idField >= 0) {
+
+	var options = incomingOptions();
+
+	var groupByField = -1;
+	if(options.hasOwnProperty('groupBy')) {     // could be something like "robot"
+	    groupByField = findFieldIndex(options.groupBy);
+	}
+
+	if(groupByField >= 0) {
+
+	    // a group-by was specified, so process it
+
+	    var indexCounts = {};
+	    for(let i=0; i < data.length; i++) {
+		let thisIndex = data[i][groupByField];
+		if(!indexCounts.hasOwnProperty(thisIndex)) {
+		    indexCounts[thisIndex] = 0;
+		}
+		indexCounts[thisIndex] += 1;
+		data[i][idField] = indexCounts[thisIndex];
+	    }
+
+	} else {
+
+	    // no group-by, so simple index
+
+	    for(let i=1; i <= data.length; i++) {
+		data[i-1][idField] = i;
+	    }
+	}
+    }
+}
 
 //
 // viewTableSort() - sorts the data
@@ -1125,6 +1217,11 @@ function viewTableSort(data,dataTypes,sort)
     //   their dataTypes and sort or given in those two arrays.
 
     data.sort(viewTableSort_FN.bind(null,dataTypes,sort));
+
+    // after the data is sorted, then it must be re-indexed according to
+    //  the sort.  We also process any "groupBy" options here.
+
+    viewTableIndex(data);
 }
 
 //
@@ -1175,12 +1272,71 @@ function incomingOptions()
     return(returnObj);
 }
 
+//
+// viewImageMap() - upper-level image map call, can cause multiple maps to be drawn
+//                  based upon options.
+//
 function viewImageMap(target)
 {
-    var data = CURRENT_VIEW.data;
+    var data = CURRENT_VIEW.data;    
+    var viewOptions = incomingOptions();
+
+    // if "robotGroup" is specified as an option, that means that we have
+    //   two groups red/blue that are meant to be displayed separately
+
+    if(isOptionGroup(VIEW_DATA[CURRENT_VIEW.name])) {
+	var split = multiSelected('robot');
+	var splitData = groupSplitData(data,split.red,split.blue);
+	
+	var redDiv = $('<div class="imageMap outer red"></div>');
+	var blueDiv = $('<div class="imageMap outer blue"></div>');
+
+	viewImageMap_FN1(splitData.red,redDiv,1,'red');
+	viewImageMap_FN1(splitData.blue,blueDiv,2,'blue');
+
+	target.empty();
+	target.append(redDiv);
+	target.append(blueDiv);
+
+    } else {
+	viewImageMap_FN1(data,target,1,'black');
+    }
+}
+
+function viewImageMap_FN1(data,target,groupNum,titleColor)
+{
+    var viewOptions = incomingOptions();
+
+    // if we have colorSplit as an option, then draw two different
+    //   maps, one for when the robot(s) play blue, and one for red.
+    
+    if(viewOptions.hasOwnProperty("colorSplit")){
+	var splitData = colorSplitData(data);
+	
+	var redDiv = $('<div class="imageMap outer red"></div>');
+	var blueDiv = $('<div class="imageMap outer blue"></div>');
+
+	viewImageMap_FN2(splitData.red,redDiv,groupNum + 10,'red');
+	viewImageMap_FN2(splitData.blue,blueDiv,groupNum + 20,'blue');
+
+	target.empty();
+	target.append(redDiv);
+	target.append(blueDiv);
+
+    } else {
+	viewImageMap_FN2(data,target,groupNum,titleColor);
+    }
+}
+
+function viewImageMap_FN2(data,target,groupNum,titleColor)
+{
+    var dataTypes = CURRENT_VIEW.dataTypes;
     var headers = CURRENT_VIEW.headers
     var viewData = VIEW_DATA[CURRENT_VIEW.name];
+    var sort = CURRENT_VIEW.sort;
 
+    viewTableSort(data,dataTypes,sort);         // replaces the data by a sorted version
+    
     // incoming data
     //  [0] is the field that is being plotted
     //  [1] is the data being plotted
@@ -1212,8 +1368,6 @@ function viewImageMap(target)
 	left:0
     };
 
-    var groupNum = 1;     // the groups of overlaid canvasas
-
     if(useImage) {
 	var imageCanvasID = 'ic' + groupNum;
 
@@ -1231,7 +1385,7 @@ function viewImageMap(target)
 
 	overlayCanvases[overlayID] = $('<canvas id="' + overlayID + '" width="' + sizeX + '" height="' + sizeY + '"/>');
 	overlayCanvases[overlayID].css(canvasCSS);
-	overlayCanvases[overlayID].css('z-index',100);
+	overlayCanvases[overlayID].css('z-index',25);
         target.append(overlayCanvases[overlayID]);
 
 	overlayMaps[overlayID] = new simpleheat(overlayCanvases[overlayID].get(0));
@@ -1239,10 +1393,7 @@ function viewImageMap(target)
 	overlayMaps[overlayID].opacity(0.025);
 	overlayMaps[overlayID].resize();
 
-	console.log("working on " + data[i][0] + ' (' + overlayID + ')');
-
 	for(let j=0; j < data[i][1].length; j++) {
-	    console.log("adding (" + data[i][1][j].x/100*sizeX + "," + data[i][1][j].y/100*sizeY + ")");
 	    overlayMaps[overlayID].add([data[i][1][j].x / 100 * sizeX,data[i][1][j].y / 100 * sizeY,1]);
 	}
 	overlayMaps[overlayID].draw();
@@ -1255,7 +1406,8 @@ function viewImageMap(target)
 	height:sizeY,
 	position:'absolute',
 	top:0,
-	left:sizeX
+	left:sizeX,
+	color:titleColor
     };
     var legendDiv = $('<div class="imageMapLegend"/>');
     var legendTitleDiv = $('<div class="imageMapLegend title"/>');
