@@ -14,6 +14,7 @@ var PERSPECTIVES = [ "year","robot","competition","match" ];
 var METADATA = "_metaData";        // nodes where Metdata is stored
 var INDEX = "_index";              // nodes for the tree overlay index
 var FULLINDEX = "_fullindex";      // nodes for the tree overlay FULL index
+var RECORDID = "id";               // record ordinal - depends upon context
 
 //
 // isSpecialNode() - return true if the given node (as a string) is special
@@ -53,7 +54,8 @@ function databaseLoad(reload,callback)
 
 //
 // databaseRecords() - return all database "records" that match the given
-//                     constraints.
+//                     constraints. Note that the RECORDID is added to the record
+//                     for use later.
 //
 function databaseRecords(constraints,callback)
 {
@@ -61,6 +63,7 @@ function databaseRecords(constraints,callback)
 		 (snapshot) => {
 		     var returnRecords = [];
 		     var data = snapshot.val();
+		     var id = 1;
 		     for(var year in data) {
 			 if(!isSpecialNode(year)) {
 			     for(var robot in data[year]) {
@@ -74,6 +77,7 @@ function databaseRecords(constraints,callback)
 						     record.robot = robot;
 						     record.competition = competition;
 						     record.match = match;
+						     record[RECORDID] = id++;
 						     if(databaseConstraintMatch(record,constraints)) {
 							 returnRecords.push(record);
 						     }
@@ -129,9 +133,12 @@ function databasePerspectiveFilter(records,perspective)
     var uniquenessArray = [];
     var returnRecords = [];
 
+    var id = 1;
+
     for(var i=0; i < records.length; i++) {
 	var key = databasePerspectiveKey(records[i],pindex);
 	if(!uniquenessArray.includes(key)) {
+	    records[i][RECORDID] = id++;              // rewrite the id for this context
 	    returnRecords.push(records[i]);
 	    uniquenessArray.push(key);
 	}
