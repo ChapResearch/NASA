@@ -87,7 +87,7 @@ body > div.content {
     background-color: #bbbbff;
     text-align: center;
     padding: 5px;
-    z-index: 100;
+    z-index: 101;
 }
 
 .listbox .throbber {
@@ -548,7 +548,7 @@ div.constraint-input-multi {
     border-radius: 5px;
     overflow: hidden;
     background-color: white;
-    z-index: 1;
+    z-index: 50;
 }
 
 div.multi-selection {
@@ -575,6 +575,14 @@ div.multi-selection.selected.group.blue {
 
 div.multi-selection.selected.group.red {
     background-color: red;
+}
+
+div.imageMap.outer {
+    position: relative;
+    top: 0px;
+    left: 0px;
+    height: 500px;
+    width: 100%;
 }
 
 div.imageMapLegend {
