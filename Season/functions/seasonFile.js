@@ -4,10 +4,7 @@
 //   Includes the code to load the appropriate season data.
 //
 
-require('firebase/storage');            // extremely important! (firebase must exist)
-
-var requestMod = require('request');
-var reqGet = require('request-promise');
+var fetch = require('node-fetch');
 
 const SeasonDir = "NASA/Season/";      // firebase storage dir where the season files are kept
 const SeasonFile = "SEASONFILE";       // name of the file (in the above) where the *actual*
@@ -30,9 +27,9 @@ function seasonFile(firebase,json)
     var ref = storage.ref(SeasonDir + SeasonFile);
 
     return ref.getDownloadURL()
-	.then((url) => reqGet(url))
-	.then((body) => {
-	    var xmlFile = body.trim();
+	.then((url) => fetch(url))
+	.then((body) => body.text())
+	.then((xmlFile) => {
 	    var baseName = xmlFile.split(".")[0];
 	    var jsonFile = baseName + ".json";
 	    var target = json?jsonFile:xmlFile;

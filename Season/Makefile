@@ -21,8 +21,14 @@ space := $() $()
 comma := ,
 FUNCTIONONLY := $(subst $(space),$(comma),$(patsubst %,functions:%,$(FUNCTIONS)))
 
-NPM_PACKAGES = firebase firebase-admin firebase-functions request request-promise \
-               xml2js xml2js-es6-promise xhr2 toposort busboy
+#
+# NPM NOTES
+#   - in this version "request" was replaced with node-fetch
+#   - node-fetch has been updated to ESM-only, so we have to use version 2
+#   - firebase is at v9, but that is ESM too, so we need to do v8
+#
+NPM_PACKAGES = firebase@8 firebase-admin firebase-functions node-fetch@2 \
+               xml2js xhr2 toposort busboy
 
 functions/package.json:
 	cp functions/packagejson-template $@
@@ -46,12 +52,15 @@ deploy:	build
 
 clean:	
 	rm -fr functions/node_modules
-	rm -fr functions/package.json
+	rm -fr functions/package.json functions/package-lock.json
 	rm -fr functions/firebaseInit.js
 	rm -fr .firebaserc
 
 deploy-validate:
 	cd functions; firebase deploy --only functions:seasonXMLvalidate
+
+season:
+	cd functions; firebase deploy --only functions:season
 
 test-validate:
 	curl -F 'data=@DeepSpace2019.xml' https://us-central1-nasa-7a363.cloudfunctions.net/seasonXMLvalidate

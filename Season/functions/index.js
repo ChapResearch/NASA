@@ -32,14 +32,13 @@
 //                   CURRENTLY it doesn't do error checking like it should.
 
 const functions = require('firebase-functions');
+
 var firebase = require("firebase");
+var storage = require('firebase/storage');
 
-var XMLparse = require('xml2js-es6-promise');
+var XMLparse = require('xml2js');
+var fetch = require('node-fetch');
 
-var requestMod = require('request');   
-var reqGet = require('request-promise');
-
-require('firebase/storage');            // extremely important! (firebase must exist too)
 
 global.XMLHttpRequest = require("xhr2");   // necessary for the getDownloadURL()
 
@@ -63,8 +62,9 @@ exports.season = functions.https.onRequest((request, response) => {
 
     seasonFile.seasonFile(firebase)
 	.then((ref) => ref.getDownloadURL())
-    	.then((url) => reqGet(url))
-	.then((body) => response.send(body))
+    	.then((url) => fetch(url))
+	.then((body) => body.text())
+	.then((contents) => response.send(contents))
 //	.then((url) => response.redirect(url))
 	.catch(function(error) {
 	    console.log(error.code);
@@ -86,8 +86,9 @@ exports.seasonJSON = functions.https.onRequest((request, response) => {
 
     seasonFile.seasonFile(firebase,true)
 	.then((ref) => ref.getDownloadURL())
-    	.then((url) => reqGet(url))
-	.then((body) => response.send(body))
+    	.then((url) => fetch(url))
+	.then((body) => body.text())
+	.then((contents) => response.send(contents))
 	.catch(function(error) {
 	    console.log(error.code);
 	    response.send("Error");
@@ -111,15 +112,16 @@ exports.seasonJSONgenerate = functions.storage.object().onFinalize((object) => {
     // we only look at files in "NASA/Season" that end in ".xml"
 
     // TODO - this should call seasonFile.seasonDir()
+
+    // skip files written somewhere else
     var filename = object.name.split("/");
     if(filename.length != 3 || filename[0] != "NASA" || filename[1] != "Season") {
-	console.log("write in the wrong place");
 	return(false);
     }
 
+    // skip files that aren't xml
     filename = filename[2].split(".");
     if(filename.length != 2 || filename[1] != "xml") {
-	console.log("wrong file extension");
 	return(false);
     }
 
@@ -131,8 +133,9 @@ exports.seasonJSONgenerate = functions.storage.object().onFinalize((object) => {
     var toRef = storage.ref(seasonFile.seasonDir() + basename + ".json");
 
     return fromRef.getDownloadURL()
-	.then((url) => reqGet(url))
-	.then((body) => XMLparse(body,{trim: true}))
+	.then((url) => fetch(url))
+	.then((body) => body.text())
+	.then((contents) => XMLparse.parseStringPromise(contents,{trim: true}))
 	.catch((err) => {
 	    console.log("error from XML parsing: " + err);
 	})
@@ -264,6 +267,10 @@ function metaFieldData(xmlObj)
     var app = xmlObj.app;                     // top level is the app
 
     console.log(app);
+
+    if(!app.hasOwnProperty('metaData')) {
+	return(null);
+    }
     
     var metaFields = app.metaData[0].field;    // array of field objects
 
@@ -458,13 +465,13 @@ exports.seasonXMLvalidate = functions.https.onRequest((request, response) => {
     // busboy - is a library used to extract stuff from a form submit - it is
     //    being used in a very simple way here, because the XML files are small
 
-    const busboy = new Busboy({headers:request.headers});
+    const busboy = Busboy({headers:request.headers});
 
     busboy.on('file',(fieldname,file,filename) => {
 	file.on('data',(data)=> {
 	    var xml = data.toString('utf8');
 	    
-	    XMLparse(xml,{trim: true})
+	    XMLparse.parseStringPromise(xml,{trim: true})
 		.catch((err) => {
 		    response.send("Error from XML parsing: " + err + "\n");
 		})
@@ -513,7 +520,8 @@ function checkData(xmlobject)
 		      compare: ["target"],
 		      divide:  ["target"],
 		      multiply:["target"],
-		      subtract:["target"]
+		      subtract:["target"],
+		      constant:["target"]
 		    };
 
     var optFields = { weight: ["high","low"],
@@ -536,6 +544,12 @@ function checkData(xmlobject)
     }
 
     var metaData = xmlobject.metaData;
+
+    if(metaData === null) {
+	output += "METADATA ERROR: I can't find any metaData specs.<br>\n";
+	output += "Did you forget to capitalize the D in \"metaData\" in the XML?";
+	return(output);
+    }
 
     // need to check the perspectives in order, from lowest to highest
     
@@ -570,10 +584,23 @@ function checkData(xmlobject)
 			if(!thisMetaDataFields.includes(thisMetaData[i][thisCheck][j])) {
 			    if(!rawDataFields.includes(thisMetaData[i][thisCheck][j])) {
 				if(!previousLevelFields || !previousLevelFields.includes(thisMetaData[i][thisCheck][j])) {
-				    output += "METADATA ERROR: " +
-					perspectives[perspective] + ":" + thisMetaData[i].name + " - " +
-					'bad reference in ' + thisCheck + ' - ' +
-					thisMetaData[i][thisCheck][j]  + '<br>' + '\n';
+
+				    // special case for constants - just catch it here
+				    if(thisCheck == 'target' && thisMetaData[i]['op'] == 'constant') {
+					// this is OK, if there is just one target if more, warn
+					if(j > 0) {
+					    output += "METADATA WARNING: " +
+						perspectives[perspective] + ":" + thisMetaData[i].name + " - " +
+						'multiple targets for constant! ignoring: ' +
+						thisMetaData[i][thisCheck][j]  + '<br>' + '\n';
+					}
+				    } else {
+					// otherwise not
+					output += "METADATA ERROR: " +
+					    perspectives[perspective] + ":" + thisMetaData[i].name + " - " +
+					    'bad reference in ' + thisCheck + ' - ' +
+					    thisMetaData[i][thisCheck][j]  + '<br>' + '\n';
+				    }
 				}
 			    }
 			}
