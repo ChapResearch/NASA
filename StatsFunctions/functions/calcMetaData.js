@@ -4,10 +4,7 @@
 //   This file implements all of the statistics calculations.
 //
 
-const functions = require('firebase-functions');
 var firebase = require('firebase');
-require('firebase/storage');            // extremely important! (firebase must exist)
-
 
 var combineDelta = require('./combineDelta');
 
@@ -72,47 +69,56 @@ function calcMetaDataSpecific(metaDataSpec,perspective,ref)
     
 
 //
-// calcMetaDataUpper() - calculate the metaData for all perspectives BUT the
-//                       match.  Incoming data is the ENTIRE DATABASE. After
-//                       changes, the entire database is returned to be written
-//                       back.
+// calcMetaDataUpper() - NEW version of this function. The previous version expected
+//                       to have the WHOLE database at its fingertips...which is just
+//                       nasty. This version takes advantage of the INDEX that is maintained
+//                       to only load the METADATA part of the tree, at the level needed.
 //
-//                       This routine USED to send back the changed database, and
-//                       the whole thing would be slammed back into the database.
-//                       but this caused a cascade of updates for matches. So now
-//                       the changes are done directly given the "ref".
+//                       This function calculates the METADATA at a particular level
+//                       and writes it out.  Note that it is ony valid at the levels
+//                       that have separate METADATA:  competition, robot, year, top.
 //
-function calcMetaDataUpper(data,metaDataSpec,ref)
+//                       Args:
+//
+//                         - perspective - the level that will be computed. Note that
+//                                         this level is expected to be a member of the
+//                                         metaDataSpec.
+//
+//                         - metaDataSpec - the object that defines the metaData, including
+//                                          the perspective desired.
+//
+//                         - ref - the firebase.ref that points to the target level
+//                                 where the metadata will be calculated. This should
+//                                 agree with the metaDataSpec or results will be weird.
+//
+//                       A promise is returned that will return the new METADATA (letting
+//                       the caller write it out.
+//
+function calcMetaDataUpper(metaDataSpec,perspective,ref)
 {
-    // now, cruise through the data updating things...
+    return(
+	ref.child(INDEX).once('value')
 
-    for(var year in data) {
-	if(!isSpecialNode(year)) {
-	    for(var robot in data[year]) {
-		if(!isSpecialNode(robot)) {
-		    for(var competition in data[year][robot]) {
-			if(!isSpecialNode(competition)) {
-			    data[year][robot][competition][METADATA] =
-				upperMetaData(metaDataSpec,"competition",data[year][robot][competition]);
-//			    console.log(data[year][robot][competition][METADATA]);
-			    ref.child(year).child(robot).child(competition).child(METADATA)
-				.set(data[year][robot][competition][METADATA]);
-			}
-		    }
-		    data[year][robot][METADATA] = upperMetaData(metaDataSpec,"robot",data[year][robot]);
-		    ref.child(year).child(robot).child(METADATA).set(data[year][robot][METADATA]);
+            // for each child in an index, get the child's METADATA merged into the return object
+
+	    .then((snapshot) => {
+		
+		let pchain = Promise.resolve({});    // initialize the chain with an empty object
+
+		for(let child in snapshot.val()) {
+		    pchain = pchain.then((retObj) => {  //  METADATA from each child merged into the retObj
+			let childRef = ref.child(child).child(METADATA);
+			childRef.once('value')
+			    .then((snapshot) => { dataMerge(retObj,snapshot.val()); return(retObj); });
+		    });
 		}
-	    }
-	    data[year][METADATA] = upperMetaData(metaDataSpec,"year",data[year]);
-	    ref.child(year).child(METADATA).set(data[year][METADATA]);
-	}
-    }
+		return(pchain);
+	    })
 
-    // this may not be a thing...but what the heck
-    data[METADATA] = upperMetaData(metaDataSpec,"top",data);
-    ref.child(METADATA).set(data[METADATA]);
-
-    return(data);
+            // using the mergedData, run any specified calculations at this perspective
+	
+	    .then((mergedData) => calcPerspective(metaDataSpec,perspective,mergedData))
+    );
 }
 
 //
@@ -147,13 +153,22 @@ function upperMetaData(metaDataSpec,perspective,data)
     // and then process it all, if there is anything to do
 
     if(metaDataSpec.hasOwnProperty(perspective)) {
-	for(var i=0; i < metaDataSpec[perspective].length; i++) {
-	    var metaTarget = metaDataSpec[perspective][i];
-//	    console.log("Processing: " + metaTarget.name);
-	    var meta = calcMetaDataField(localData,{},metaTarget);
-	    localData[metaTarget.name] = meta;
-	    newMetaData[metaTarget.name] = meta;
-	}
+	newMetaData = calcPerspective(metaDataSpec,perspective,localData);
+    }
+
+    return(newMetaData);
+}
+
+function calcPerspective(metaDataSpec,perspective,localData)
+{
+    var newMetaData = {};
+    
+    for(var i=0; i < metaDataSpec[perspective].length; i++) {
+	var metaTarget = metaDataSpec[perspective][i];
+	//	    console.log("Processing: " + metaTarget.name);
+	var meta = calcMetaDataField(localData,{},metaTarget);
+	localData[metaTarget.name] = meta;
+	newMetaData[metaTarget.name] = meta;
     }
 
     return(newMetaData);

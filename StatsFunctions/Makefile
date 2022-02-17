@@ -13,9 +13,21 @@
 #              above this one, so it can be deployed easily (don't know how to
 #              do it any better way unfortunately ** Sat Jan 18 14:57:48 2020 **
 #              EJR
+#
+# ** Thu Dec 30 12:13:29 2021 **
+#
+# superiorStats() has been deprecated. It has been replaced by individual
+#   functions that calculate the upperStats for the level desired
+#
+# catcher() has been deprecated
+#
 
+#### only a subset of the defined functions are actually sent up to firebase
+####
+#### FUNCTIONS := matchStats recalculate treeIndex rebuildIndex upperStatsRobot upperStatsYear upperStatsTop
+####
 
-FUNCTIONS := superiorStats matchStats recalculate treeIndex rebuildIndex
+FUNCTIONS := matchStats recalculate treeIndex rebuildIndex upperStatsRobot
 
 # this variable gets set to the list of functions each prefaced by "functions:"
 #   and separated by commas - this involves replacing the spaces with commas
@@ -25,9 +37,9 @@ space := $() $()
 comma := ,
 FUNCTIONONLY := $(subst $(space),$(comma),$(patsubst %,functions:%,$(FUNCTIONS)))
 
-NPM_PACKAGES = firebase firebase-admin firebase-functions \
-		request request-promise \
-                xml2js xml2js-es6-promise xhr2 toposort
+NPM_PACKAGES = firebase@8 firebase-admin firebase-functions \
+		node-fetch@2 \
+                xml2js xhr2 toposort
 
 functions/package.json:
 	cp functions/packagejson-template $@
@@ -54,7 +66,7 @@ deploy:	build
 
 clean:	
 	rm -fr functions/node_modules
-	rm -fr functions/package.json
+	rm -fr functions/package.json functions/package-lock.json
 	rm -fr functions/seasonFile.js
 	rm -fr functions/firebaseInit.js
 	rm -fr .firebaserc
@@ -78,7 +90,7 @@ remove-tests:
 #     "randomness" (ish).
 
 TESTYEAR := 2119
-TESTTEAM := 5628
+TESTTEAM := 2468
 TESTCOMP := ElPaso
 
 test1:

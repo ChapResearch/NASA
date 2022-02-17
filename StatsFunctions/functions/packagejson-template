@@ -11,7 +11,7 @@
 			"dependencies": {
 			},
 			"engines": {
-						"node": "8"
+						"node": "12"
 			},
 			"private": true
 }

@@ -1,3 +1,36 @@
+//
+// database functions
+//
+//   Mostly stats, these are the functions that are deployed with this Makefile.
+//   The HTTP links are programmed into the web site, see ../../Website/firebase.json.
+//   (so check there for the authoratative information about these links)
+//   Those functions preceeded by an (X) are NOT deployed, even those they may
+//   be exported.
+//
+//    matchStats() - triggered on a write to firebase, calculates the match stats
+//       for the written record, updating the record in place. HTTP LINK - NONE
+//
+//    recalculate() - clear ALL non-match data, and recalculate it, for all matches
+//       in firebase.  This is normally only done when new metadata is needed.
+//       - HTTP LINK: /recalculate
+//
+//    treeIndex() - returns the tree index, which is used to make viewing MUCH
+//       faster and lighter weight.  - HTTP LINK: /treeIndex
+//
+//    rebuildIndex() - rebuilds the tree index from the root  - HTTP LINK: /rebuildIndex
+//
+//    upperStatsRobot() - process the "robot" level of metadata.  
+//    upperStatsYear() -  process the "year" level of metadata
+//    upperStatsTop() -  process the "top" level of metadata (above years)
+//
+//      UPPER STATS FUNCTIONS - these functions are connected to a data write at
+//      their particular level, and will calculate when that write occurs. NORMALLY,
+//      however, only the robot level is turned on.  In other words, uploaded as a
+//      function.
+//
+//    X catcher
+//    X xmlTest
+
 const functions = require('firebase-functions');
 
 // NOTE - this next line often produces a deployment error that firebase
@@ -5,16 +38,10 @@ const functions = require('firebase-functions');
 //        functions directory to fix it!  It updates the requirements .json.
 
 var firebase = require('firebase');
+var storage = require('firebase/storage');
 
-
-//var XMLparse = require('xml2js').parseString;
-var XMLparse = require('xml2js-es6-promise');
-
-var requestMod = require('request');
-var reqGet = require('request-promise');
-
-require('firebase/storage');            // extremely important! (firebase must exist)
-
+var XMLparse = require('xml2js');
+var fetch = require('node-fetch');
 
 global.XMLHttpRequest = require("xhr2");   // necessary for the getDownloadURL()
 
@@ -46,44 +73,92 @@ function isSpecialNode(nodeString)
 const local = require('./firebaseInit');
 
 //
-// superiorStats() - compute the statistics at all upper levels beyond the match.
-//                   This is a URL that is called to refresh the stats. It CAN be
-//                   called like a CRON job, or can be called from the UI.
+// upperStats****() - NEW VERSION - ** Tue Mar 10 09:41:22 2020 **
+//                   This function will calculate stats at the robot, year,
+//                   and top level (although the last two in particular haven't
+//                   ever been used). This function can be attached to the
+//                   METADATA at the competition, robot, and year level
+//                   so that when that data changes the upper level is
+//                   re-calculated. This has the potential to cause quite
+//                   a bit of function traffic at the year/top level, if there
+//                   are any calculations specified, because there are
+//                   six robots that change every few minutes.
 //
-exports.superiorStats = functions.https.onRequest((request, response) => {
- 
-    // the request itslef is currently ignored, just calling it causes the computation
-    //   of the superior stats.
 
+exports.upperStatsRobot = functions.database.ref('{year}/{robot}/{competition}/' + METADATA).
+    onWrite((change,context) => upperStats(change,context));
+
+// BIG NOTE - the year and top stats are NOT NORMALLY TURNED ON - see the
+//            Makefile in this directory to see which ones are turned on
+
+exports.upperStatsYear = functions.database.ref('{year}/{robot}/' + METADATA).
+    onWrite((change,context) => upperStats(change,context));
+
+exports.upperStatsTop = functions.database.ref('{year}/' + METADATA).
+    onWrite((change,context) => upperStats(change,context));
+	
+//
+// upperStats() - local function that is used by upperStats*****().  Calculates the METADATA
+//                at the given level
+//
+//                This routine is bound to an onWrite() firebase call on the data at
+//                locations that have METADATA, and attached to that METADATA path. Each
+//                onWrite() spec includes placeholders for the different perspectives:
+//
+//                    '{year}/{robot}/{competition}/METADATA'
+//                            - causes recalculation of the robot metaData
+//
+//                    '{year}/{robot}/METADATA'
+//                            - causes recalculation of the year metaData
+//
+//                    '{year}/METADATA'
+//                            - causes recalculation of the top metaData
+//
+//                    '/METADATA'
+//                            - INVALID - don't do this - there is nothing to be recalculated
+//
+//                With the METADATA level given in the references, calculate the stats at the
+//                level just above. This involves getting the METADATA from all of the
+//                parallel nodes, and running any calculations at the level just above
+//                that.
+//
+//                Note, by-the-way, that the METADATA that was changed just serves to indicate
+//                that the upper level needs to be re-calculated. The metaData in the call
+//                is not used.
+//
+//                Returns a promise that does it all.
+//
+function upperStats(change,context)
+{
     local.firebaseInit(firebase);
 
-    // get the ENTIRE DATABASE (yikes) for doing this computation
-    
-    var ref = firebase.database().ref("/");
-    var data;
+    // this function doesn't really care what path we're operating at.  It just knows
+    // that the ref points to a METADATA and that we need to load the parallel meta data.
 
-    ref.once("value")
-        .then((snapshot) => {
-	    data = snapshot.val();
-	    return(getNASAdataJSON());
-	})
-	.then((nasaData) => metaData.calcMetaDataUpper(data,nasaData.metaData,ref))
+    var refString = '/';
+    var perspective = 'top';
 
-    // The above routine used to update all of the data, then the following would
-    // slam it all back into the database. But this caused a cascade of things that
-    // "looked" like they changed. So now the routine does the changes directly to
-    // the right spot in the database.  OLD CODE BELOW:
-    //
-    //	.then((newvalue) => ref.set(newvalue))
-    
-    // and if things go wrong
-    
-	.catch((e)=>console.log(e));
+    if(context.params.hasOwnProperty('robot')) {
+	refString += context.params.year;
+	perspective = 'year';
+    }
+    if(context.params.hasOwnProperty('competition')) {
+	refString += '/' + context.params.robot;
+	perspective = 'robot';
+    }
 
-    response.send("OK");
-    return(1);
-    
-});
+    var ref = firebase.database().ref(refString);
+
+    // At this point, we have a ref that is the point of calculation - all of the
+    // METADATA below this point will be the subject of the calculations.
+
+    return(
+	getNASAdataJSON()
+	    .then((nasaData) => metaData.calcMetaDataUpper(nasaData.metaData,perspective,ref))
+	    .then((metaData) => ref.child(METADATA).set(metaData))
+    );
+
+}
 
 //
 // matchStats() - compute the statistics for a particular match. NOTE that this
@@ -345,8 +420,9 @@ function getNASAdataJSON()
     return(
 	seasonFile.seasonFile(firebase,true)
 	    .then((ref) => ref.getDownloadURL())
-	    .then((url) => reqGet(url))
-            .then((body) => JSON.parse(body)));
+	    .then((url) => fetch(url))
+	    .then((body) => body.text())
+            .then((contents) => JSON.parse(contents)));
 
 }    
 
@@ -362,49 +438,11 @@ function getNASAdataXML()
     return(
 	seasonFile.seasonFile(firebase)
 	    .then((ref) => ref.getDownloadURL())
-	    .then((url) => reqGet(url))
-            .then((body) => XMLparse(body,{trim: true}))
+	    .then((url) => fetch(url))
+	    .then((body) => body.text())
+	    .then((contents) => XMLparse.parseStringPromise(contents,{trim: true}))
 	    .then((xmlresult) => organizeFieldData(xmlresult)));
 }
-
-//
-// xmlTest() - gets the XML from the "standard" storage location,
-//             parses it, then logs the result
-//
-exports.xmlTest = functions.https.onRequest((request, response) =>
-{
-    local.firebaseInit(firebase);
-
-    seasonFile.seasonFile(firebase)
-	.then((ref) => ref.getDownloadURL())
-	.then(function(url) {
-
-	var origResponse = response;
-	requestMod.get(url,
-	    function(error,response,body) {
-
-//		console.log('error:',error);
-//		console.log('response:',response);
-//		console.log('body:',body);
-
-		XMLparse(body,function(xmlerror,xmlresult) {
-		    var fieldData = organizeFieldData(xmlresult);
-		    var rawFields = fieldData[0];
-		    var metaFields = fieldData[1];
-
-		    console.log(rawFields);
-		    console.log(metaFields);
-		    
-		    origResponse.send("Stats processed");
-		});
-	    });
-
-    }).catch(function(error) {
-	console.log(error.code);
-	response.send("Error");
-    });
-
-});
 
 //
 // organizeFieldData() - given the XML file, organize all of the field data (both raw and meta)
