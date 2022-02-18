@@ -153,7 +153,7 @@ function viewListRefresh_load(target,data)
 	case 'pie':    output += '<img src="pie-512-512.png">'; break;
 	case 'bar':    output += '<img src="bar-512-512.png">'; break;
 	case 'trend':  output += '<img src="trend-512-512.png">'; break;
-	case 'stacked':output += '<img src="bar-512-512.png">'; break;
+	case 'stacked':output += '<img src="stacked-512-512.png">'; break;
 	case 'imagemap':output += '<img src="heatmap-512x512.png">'; break;
 	}
 	output += '</div>';
@@ -232,7 +232,7 @@ function viewDisplay(name)
     
     setTimeout(function() {
 	selectorGoEnable(checkConstraints());
-    },1000);
+    },1500);
 }
 
 //
@@ -240,6 +240,9 @@ function viewDisplay(name)
 //
 function viewGoLoad()
 {
+    
+    multiOnCloseAll();    // close any multi-selectors to get them out of the way of the view
+    
     var view = VIEW_DATA[CURRENT_VIEW.name];
     var type = view.type;
 
@@ -508,6 +511,9 @@ function viewTrend_FN(target)
 
     viewTableSort(data,dataTypes,sort);         // replaces the data by a sorted version
 
+    console.log("trend upcoming");
+    console.log(data);
+
     var viewOptions = incomingOptions();
 
     var dataTable = new google.visualization.DataTable();
@@ -695,15 +701,18 @@ function viewStacked(target)
 
     target.empty();
 
-    google.charts.load('visualization','1.1', {packages: ['bar']});
+//    google.charts.load('visualization','1.1', {packages: ['bar']});
 
-    if(isOptionGroup(VIEW_DATA[CURRENT_VIEW.name])) {
-	var split = multiSelected('robot');
-	var splitData = groupSplitData(data,split.red,split.blue);
-	google.charts.setOnLoadCallback(viewStacked_FN_Group.bind(null,target,splitData.blue,splitData.red));
-    } else {
-	viewStacked_FN(target);
-    }
+    google.charts.load('current', {packages: ['corechart', 'bar']});
+    google.charts.setOnLoadCallback(viewStacked_FN.bind(null,target));
+    
+//    if(isOptionGroup(VIEW_DATA[CURRENT_VIEW.name])) {
+//	var split = multiSelected('robot');
+//	var splitData = groupSplitData(data,split.red,split.blue);
+//	google.charts.setOnLoadCallback(viewStacked_FN_Group.bind(null,target,splitData.blue,splitData.red));
+//    } else {
+//	viewStacked_FN(target);
+//    }
 
 //    $(window).resize(viewStacked_FN.bind(null,target));
     
@@ -829,9 +838,73 @@ function viewStacked_FN_Group(target,blueData,redData)
     chart.draw(dataTable, google.charts.Bar.convertOptions(options));
 }
 
+//
+// viewStacked_FN() - standard stacked bar chart.  Data coming in (records):
+//
+//                        robot field1  field2  field3 ...
+//                        ----- ------- ------- ----------
+//                        2468     10      20       30
+//                        2687     5       50       15
+//
 
 function viewStacked_FN(target)
 {
+    var name = CURRENT_VIEW.name;
+    var headers = CURRENT_VIEW.headers;
+    var data = CURRENT_VIEW.data;
+    var dataTypes = CURRENT_VIEW.dataTypes;
+    var sort = CURRENT_VIEW.sort;
+    var sortType = CURRENT_VIEW.sortType;
+    var format = CURRENT_VIEW.format;
+
+    viewTableSort(data,dataTypes,sort);         // replaces the data by a sorted version
+
+    var dataTable = new google.visualization.DataTable();
+
+    for(var i=0; i < headers.length; i++) {
+	dataTable.addColumn(chartsTypeTranslate(dataTypes[i]), headers[i]);
+    }
+
+    data.sort(function(a,b) {
+	// each a,b is a row of data that should be sorted by the second column and beyond
+	//   totaling each. IT IS ASSUMED that both a,b have the same # of columns
+
+	var atotal = 0;
+	var btotal = 0;
+	for(var i=1; i < a.length; i++) {
+	    atotal += a[i];
+	    btotal += b[i];
+	}
+
+	if(atotal < btotal) {
+	    return(-1);
+	} else if(atotal > btotal) {
+	    return(1);
+	} else {
+	    return(0);
+	}});
+
+    dataTable.addRows(data);
+
+    console.log("stacked data table:");
+    console.log(dataTable);
+    console.log(data);
+    
+    var options = {
+        isStacked: true,
+        title: name,
+	legend: {position:'top'},
+        hAxis: {
+            title: headers[0],
+        },
+        vAxis: {
+            title: headers[1]
+        },
+	backgroundColor: { fill:'transparent' }
+    };
+
+    var chart = new google.visualization.ColumnChart(target.get(0));
+    chart.draw(dataTable, options);
 }
 
 //
@@ -966,10 +1039,10 @@ function viewTableHTML(target)
 	var blueAverageRow = specialRow(splitData.blue,'average');
 	var blueTotalRow = specialRow(splitData.blue,'total');
 
-	console.log(redAverageRow);
-	console.log(redTotalRow);
-	console.log(blueAverageRow);
-	console.log(blueTotalRow);
+//	console.log(redAverageRow);
+//	console.log(redTotalRow);
+//	console.log(blueAverageRow);
+//	console.log(blueTotalRow);
 
 	viewTableHTML_table(splitData.red,redDiv,redTotalRow,redAverageRow);
 	viewTableHTML_table(splitData.blue,blueDiv,blueTotalRow,blueAverageRow);
@@ -1309,12 +1382,20 @@ function viewImageMap_FN1(data,target,groupNum,titleColor)
 
     // if we have colorSplit as an option, then draw two different
     //   maps, one for when the robot(s) play blue, and one for red.
+
+    console.log("in viewImageMap_FN1");
     
     if(viewOptions.hasOwnProperty("colorSplit")){
+
+	console.log("found colorsplit");
+	
 	var splitData = colorSplitData(data);
 	
 	var redDiv = $('<div class="imageMap outer red"></div>');
 	var blueDiv = $('<div class="imageMap outer blue"></div>');
+
+	console.log(splitData.red);
+	console.log(splitData.blue);
 
 	viewImageMap_FN2(splitData.red,redDiv,groupNum + 10,'red');
 	viewImageMap_FN2(splitData.blue,blueDiv,groupNum + 20,'blue');
@@ -1393,9 +1474,13 @@ function viewImageMap_FN2(data,target,groupNum,titleColor)
 	overlayMaps[overlayID].opacity(0.025);
 	overlayMaps[overlayID].resize();
 
-	for(let j=0; j < data[i][1].length; j++) {
-	    overlayMaps[overlayID].add([data[i][1][j].x / 100 * sizeX,data[i][1][j].y / 100 * sizeY,1]);
+	// if no data, don't try to draw it
+	if(Array.isArray(data[i][1])) {
+	    for(let j=0; j < data[i][1].length; j++) {
+		overlayMaps[overlayID].add([data[i][1][j].x / 100 * sizeX,data[i][1][j].y / 100 * sizeY,1]);
+	    }
 	}
+	
 	overlayMaps[overlayID].draw();
     }
 
@@ -1914,4 +1999,22 @@ function specialRow(rows,special)
     }
 
     return(specialRow);
+}
+
+//
+// multiOnCloseAll() - close all of the multi-on selector windows, and pop-out all of the
+//                     multi-selector buttons.
+//
+function multiOnCloseAll()
+{
+    ['year','robot','competition','match'].forEach((level) => {
+
+	var button = $('div.multi-on-button[data-selector=' + level + ']');
+	var area = $('div.constraint-input-multi-' + level);
+
+	if(area.is(":visible")) {
+	    area.slideUp(200);
+	    button.removeClass('active');
+	}
+    });
 }
