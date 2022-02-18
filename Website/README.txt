@@ -15,3 +15,23 @@ Directories -
 		      It is transferred to the deployment directory before deployment.
 
 	Viewer - the end-user statistical/data viewer web software is kept here
+
+
+
+INTERACTING WITH GOOGLE FIREBASE STORAGE
+
+- install gsutils (will install a lot):
+
+  	  $ sudo apt-get install google-cloud-sdk
+
+- login to google cloud (doesn't matter if you're already logged in to firebase)
+
+  	  $ gcloud auth login
+
+- set the project name
+
+      	  $ gcloud config set project nasa-7a363
+
+- then you can use gsutil, for example:
+
+       	  $ gsutil cp season.xml gs://nasa-7a363.appspot.com/NASA/Season/testSeason.xml

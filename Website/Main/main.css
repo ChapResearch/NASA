@@ -40,7 +40,7 @@ div.buttons div.statistics {
     height: 50px;
 }
 
-div.buttons div.app {
+div.buttons div.app, div.buttons .testapp {
     padding-top: 25px;
     background-color: white;
     color: black;

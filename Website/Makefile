@@ -15,6 +15,9 @@ FMSTESTURL = FMSTEST
 .firebaserc: $(FBCONFIG)/firebaserc-template
 	cp $(FBCONFIG)/firebaserc-template $@
 
+Statistics/firebaseInit.js:
+	gpg -d ../FirebaseConfig/firebaseInit.js.gpg > $@
+
 firebase.json: firebasejson-template
 	cp firebasejson-template $@
 
@@ -35,7 +38,7 @@ clean:
 $(DEPLOYDIR):
 	[ -d $(DEPLOYDIR) ] || mkdir $(DEPLOYDIR)
 
-deploycopy: $(DEPLOYDIR) favicon.ico 
+deploycopy: $(DEPLOYDIR) Statistics/firebaseInit.js favicon.ico 
 	cp -R Main/* $(DEPLOYDIR)
 	cp -RP Contributor $(DEPLOYDIR)
 	cp -R Statistics $(DEPLOYDIR)
@@ -89,16 +92,40 @@ TESTDEPLOYDIR = /media/sf_Virtual_Machine_Shares/deployment
 
 testXML:
 	cp test.xml $(DEPLOYDIR)/season.xml
-#	curl -L https://nasa.chapresearch.com/season.json > $(DEPLOYDIR)/season.json
 
 testdeploy: DEPLOYDIR = $(TESTDEPLOYDIR)
-testdeploy: $(DEPLOYDIR) .firebaserc firebase.json testXML index deploycopy
+testdeploy: $(DEPLOYDIR) .firebaserc firebase.json season.xml season.json seasonfiles index deploycopy
 
 testclean: DEPLOYDIR = $(TESTDEPLOYDIR)
 testclean: clean
 
+season.xml:
+	curl -L https://nasa.chapresearch.com/season.xml > season.xml
+
+season.json:
+	curl -L https://nasa.chapresearch.com/season.json > season.json
+
+seasonfiles: season.xml season.json
+	cp $^ $(DEPLOYDIR)
+
 localserver:
 	cd $(DEPLOYDIR); python -m SimpleHTTPServer
+
+generatejson:
+	@tmpid=$$$$; \
+		echo "using temp file temp$$tmpid.xml"; \
+		gsutil cp season.xml gs://nasa-7a363.appspot.com/NASA/Season/temp$$tmpid.xml; \
+		while : ; do \
+			echo trying...; \
+			gsutil ls gs://nasa-7a363.appspot.com/NASA/Season | grep temp$$tmpid.json > /dev/null && break; \
+			sleep 1; \
+		done; \
+		gsutil cp gs://nasa-7a363.appspot.com/NASA/Season/temp$$tmpid.json season.json; \
+		gsutil rm gs://nasa-7a363.appspot.com/NASA/Season/temp$$tmpid.json; \
+		gsutil rm gs://nasa-7a363.appspot.com/NASA/Season/temp$$tmpid.xml;
+
+
+
 
 #
 # a few firebase tools in case you forgot how to run firebase

@@ -10,6 +10,8 @@
 		       ],
 
 	      "rewrites": [
+	      		  { "source":"/rebuildIndex", "function":"rebuildIndex" },
+	      		  { "source":"/treeIndex", "function":"treeIndex" },
 	      		  { "source":"/recalculate", "function":"recalculate" },
 	      		  { "source":"/superior", "function":"superiorStats" },
 	      		  { "source":"/validate", "function":"seasonXMLvalidate" },
