@@ -226,6 +226,9 @@ function calcMetaDataField(data,params,field)
     case 'constant':    return(calcMetaDataField_constant(data,params,field));
     case 'assign':      return(calcMetaDataField_assign(data,params,field));
     case 'flatten':     return(calcMetaDataField_flatten(data,params,field));
+    case 'containsHowMany': return(calcMetaDataField_containsHowMany(data,params,field));
+    case 'filterArray': return(calcMetaDataField_containsHowMany(data,params,field));
+    case 'lastVal':     return(calcMetaDataField_lastValueArray(daata,params,field));
     default:         console.log("BAD OP: " + operation); return(false);
     }
 
@@ -299,7 +302,6 @@ function calcMetaDataField_weight(data,params,field)
 
     // note that if a target doesn't exist in the data, then it is
     // quietly ignored
-
     var sum = 0;
     for(var i=0; i < targets.length; i++) {
 	var item = normalizeDataItem(data,targets[i]);
@@ -319,6 +321,8 @@ function calcMetaDataField_weight(data,params,field)
 	    if(Number.isNaN(multiplier)) {
 		console.log("Bad multiplier for " + targets[i] + "(" + multiplier[i] + ")");
 		continue;
+	    } else {
+		multiplier = normalizeDataItem(data,field.target[0])
 	    }
 	    if(Number.isNaN(high)) {
 		console.log("Bad high for " + targets[i] + "(" + highs[i] + ")");
@@ -943,6 +947,74 @@ function calcMetaDataField_compare(data,params,field)
 
 
 //
+// _containsHowMany() - given a list of targetvals is tells you how many times
+//                      any of them appear
+//
+function calcMetaDataField_containsHowMany(data,params,field)
+{
+    var target = field.target[0];          // these are always arrays coming in
+    var targetVals = field.targetVal;
+    var numFound = 0;
+
+    var dataTarget = normalizeDataItem(data,target);
+
+    var numFound = 0;
+    for(var i=0; i < targetVals.length; i++) {
+	if(dataTarget.includes(targetVals[i])) {
+	    numFound++;                        // if ANY match, we're done
+	}
+    }
+
+    return(numFound);
+}
+
+//
+// percent100() - this function essentially divides one value by another then multiplies
+//                the result by 100 to make it appear as a percent
+//
+function calcMetaDataField_divPercent(data, params, field)
+{
+    if(field.target.length == 0){
+	console.log("no fields were given to multiply by");
+	return(0);
+    }
+    
+    // grab the first element (because i could set this to 1 or 0, but then either
+    // the product would always be 0, or a return of 1 would come back on an unseccessful multiplication)
+    var dividend = normalizeDataItem(data,field.target[0]);
+
+    // now we need to check if the dividend we start with is an array with a length greater than 1, we will also do this in the loop
+    if(dividend.length > 1){
+	console.log("Cannot multiply by an array (this is likely a list of events)");
+	return null;
+    }
+    
+    var nextNum;
+
+    // for each target multiply the current dividend by the next target field
+    for(var i = 1; i < field.target.length; i++){
+	nextNum = normalizeDataItem(data,field.target[i]);
+	// if our next num is an array with length greater than 1 we can't multiply, return null
+	if(nextNum.length > 1){
+	    console.log("Cannot multiply by an array (this is likely a list of events)");
+	    return null;
+	}
+	dividend = dividend * parseFloat(nextNum[0]);    // ensure that we're working with a number
+    }
+    
+    return(dividend*100);    
+}
+
+
+
+
+
+
+
+
+
+
+//
 // _defEffect() - calculates the difference between a target robot's data value
 //                in a match at the competition level and the current match's data value. The
 //                current match has both the target robot and the robot whose defense effect is being 
@@ -1037,3 +1109,81 @@ function calcMetaDataField_defEffect(data,params,field)
 
     return retVal;
 }
+
+
+//
+// _filter() - take an array and filter out values that do not match
+//             target vals
+//
+
+function calcMetaDataField_filter(data,params,field,strict)
+{
+    var start = field.start[0];    // only use the first field of start/end
+    var end = field.end[0];
+
+    // if the start or end fields aren't there, default them to empty
+
+    startVal = [];
+    if(data.hasOwnProperty(start)) {
+	startVal = data[start];
+    }
+
+    endVal = [];
+    if(data.hasOwnProperty(end)) {
+	endVal = data[end];
+    }
+           
+    var delta = combineDelta.deltaOP(startVal,endVal,strict);
+    return(delta);
+}
+
+
+//
+// _lastValueArray() - take multiple arrays, find the one with the largest numerical value
+//                     and returns the name of the field
+//
+
+function calcMetaDataField_lastValueArray(data,params,field,strict)
+{
+    
+    var targets = field.target;          // these are always arrays coming in
+    
+    if (!Array.isArray(targets)) {
+	targets = [targets];
+    }
+
+    var max = -1;
+    var maxName = null;
+    for(var i = 0; i < targets.length; i++){
+	var target = targets[i];
+	if(data.hasOwnProperty(target)) {
+	    var m = getMaxVal(data[target]);
+	    if(m > max){
+		max = m;
+		maxName = target;
+	    }
+	}
+    }
+
+    return(maxName);
+}
+
+//
+// getMaxVal() - given an array of numerical values it will return the largest value
+//               in that array
+//
+function getMaxVal(valArr) {
+    if(!valArr){
+	return null;
+    }
+
+    var max = valArr[0];
+    for(var i = 1; i < valArr.length; i++){
+	if(valArr[i] > max){
+	    max = valArr[i];
+	}
+    }
+
+    return max;
+}
+

@@ -40,6 +40,7 @@ function seasonLoad_generateHTML(seasonXML)
 			      case "box":         output += generateBox($(this)); break;
 			      case "imageMap":    output += generateImageMap($(this),targetElementField); break;
 			      case "imageMapFlip":output += generateImageMapFlip($(this),targetElementField); break;
+			      case "image":       output += generateImage($(this),targetElementField); break;
 			  }
 		      });
     
@@ -240,8 +241,12 @@ function generateTextField(layoutField)
 {
     
     var output = "";
+    var style = fieldPosition(layoutField);
+    style = style.substring(0, style.length-1) + ';color:'+ layoutField.find("color").text() + '"';
+    
 
-    output += '<div class="NASA-field-text" ' + fieldPosition(layoutField) + '>';
+    console.log(fieldPosition(layoutField));
+    output += '<div ' + style +' class="NASA-field-text" ' + style + '>';
     var text = layoutField.find("label").text();
     output += text;
     output += '</div>';
@@ -609,4 +614,39 @@ function generateImageMapFlip(layoutField,targetField)
     output += '<image src="blue-red-flip-100x100.png" ' + idProp + style + '/>';
 
     return(output);
+}
+
+
+//
+// generateImageMap() - generates a pretty image 
+//
+function generateImage(layoutField,targetField)
+{
+    console.log(targetField, layoutField);
+    
+    var output = "";
+
+    var image64 = layoutField.children('imageb64').text();            // the image encoded in base64
+
+    image64 = 'data:image/png;base64,' + image64;
+    image64 = image64.replace(/\s+/g,'');                          // get rid of pesky returns!
+
+    var style = htmlStyleLocationSize(getLocationSize(layoutField)) + ' ';
+
+    var id = layoutField.children('name').text();
+
+    var xyFieldName = null;
+    var xyField = layoutField.children('locationField');
+    if(xyField.length > 0) {
+	xyFieldName = xyField.text();
+    }
+
+    var idProp = 'id="' + id + '" ';
+    var itemClass = 'class="nasa-imagemap" ';
+    var src = 'src="' + image64 + '"';
+
+
+    output += '<img ' + idProp + itemClass + src + style + '/>';
+    
+    return output;
 }
