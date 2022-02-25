@@ -83,7 +83,9 @@ function imageMap_initAll()
     	$('#' + 'overlay-' + imageMapID).off();
 	$('#' + 'overlay-' + imageMapID).on("mousedown",imageMap_mouseDown.bind(null,imageMapID));
 	$('#' + 'overlay-' + imageMapID).on("mouseup",imageMap_mouseUp.bind(null,imageMapID));
-	$('#' + 'overlay-' + imageMapID).on("taphold",imageMap_longPress.bind(null,imageMapID));
+	$('#' + 'overlay-' + imageMapID).on("touchstart",imageMap_mouseDown.bind(null,imageMapID));
+	$('#' + 'overlay-' + imageMapID).on("touchend",imageMap_mouseUp.bind(null,imageMapID));
+//	$('#' + 'overlay-' + imageMapID).on("taphold",imageMap_longPress.bind(null,imageMapID));
 
 	$('#' + imageMapID + '-flip').off();
 	$('#' + imageMapID + '-flip').on('click',imageMap_longPress.bind(null,imageMapID));
