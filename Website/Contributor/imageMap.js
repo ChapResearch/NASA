@@ -81,10 +81,12 @@ function imageMap_initAll()
 //	$('#' + 'overlay-' + imageMapID).on("click",imageMap_click.bind(null,imageMapID));
 
     	$('#' + 'overlay-' + imageMapID).off();
-	$('#' + 'overlay-' + imageMapID).on("mousedown",imageMap_mouseDown.bind(null,imageMapID));
-	$('#' + 'overlay-' + imageMapID).on("mouseup",imageMap_mouseUp.bind(null,imageMapID));
-	$('#' + 'overlay-' + imageMapID).on("touchstart",imageMap_mouseDown.bind(null,imageMapID));
-	$('#' + 'overlay-' + imageMapID).on("touchend",imageMap_mouseUp.bind(null,imageMapID));
+	$('#' + 'overlay-' + imageMapID).on("pointerdown",imageMap_mouseDown.bind(null,imageMapID));
+	$('#' + 'overlay-' + imageMapID).on("pointerup",imageMap_mouseUp.bind(null,imageMapID));
+//	$('#' + 'overlay-' + imageMapID).on("mousedown",imageMap_mouseDown.bind(null,imageMapID));
+//	$('#' + 'overlay-' + imageMapID).on("mouseup",imageMap_mouseUp.bind(null,imageMapID));
+//	$('#' + 'overlay-' + imageMapID).on("touchstart",imageMap_mouseDown.bind(null,imageMapID));
+//	$('#' + 'overlay-' + imageMapID).on("touchend",imageMap_mouseUp.bind(null,imageMapID));
 //	$('#' + 'overlay-' + imageMapID).on("taphold",imageMap_longPress.bind(null,imageMapID));
 
 	$('#' + imageMapID + '-flip').off();
