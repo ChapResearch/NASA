@@ -7,6 +7,7 @@
 var firebase = require('firebase');
 
 var combineDelta = require('./combineDelta');
+const { geoSubsetOP, differenceOP, correlateOP } = require('./ac2.js');
 
 //
 // There are special nodes in the tree that don't participate
@@ -229,6 +230,12 @@ function calcMetaDataField(data,params,field)
     case 'containsHowMany': return(calcMetaDataField_containsHowMany(data,params,field));
     case 'filterArray': return(calcMetaDataField_containsHowMany(data,params,field));
     case 'lastVal':     return(calcMetaDataField_lastValueArray(daata,params,field));
+
+	// operations for heatmap data
+    case 'geoSubset':   return(calcMetaDataField_geoSubset(data,params,field));
+    case 'difference':  return(calcMetaDataField_difference(data,params,field));
+    case 'correlate':   return(calcMetaDataField_correlate(data,params,field));
+	
     default:         console.log("BAD OP: " + operation); return(false);
     }
 
@@ -387,6 +394,27 @@ function normalizeDataItem(data,fieldName)
 	}
     }
     return(returnArray);
+}
+
+//
+// normalizeField() - when retrieving named fields from the XML, they should all be
+//        in arrays, if they are defined. So cause SOMETHING to be returned, even if
+//        it either isn't in the fields or is not an array for some reason.  This
+//        routine is meant to spit out a log message of a field isn't found, so the
+//        user can narrow down bugs.
+//
+function normalizeField(field,name,errorLocation)
+{
+    if(field.hasOwnProperty(name) && field[name] !== null) {
+	if(Array.isArray(field[name])) {
+	    return(field[name]);
+	} else {
+	    return([field[name]]);
+	}
+    } else {
+	console.log('Expected field "' + name + '" not in XML (or null) for ' + errorLocation);
+	return([]);
+    }
 }
 
 //
@@ -1167,6 +1195,88 @@ function calcMetaDataField_lastValueArray(data,params,field,strict)
 
     return(maxName);
 }
+
+//
+// _geoSubset() - given heatmap data (both the event array and the position
+//      array), determine the subset of events that fit within the particular
+//      area.  The area is defined by a specified shape logically positioned
+//      within the heatmap (from 0 to 100 on both x and y). See ac2.js for more
+//      information.
+//
+//      XML arguments for geoSubset are:
+//           target[0] - heatmapEventsField
+//           target[1] - heatmapPositionsField
+//           shape - text string for shape (currently 'circle' or 'rect')
+//           x - origin.x CONSTANT (not field)
+//           y - origin.y CONSTANT (not field)
+//           width - width CONSTANT (not field)
+//           height - height CONSTANT (not field)
+//
+//      For a rect, the (x,y) is the upper left corner
+//      For a circle, the (x,y) is the center
+//
+function calcMetaDataField_geoSubset(data,params,field)
+{
+    var eventsField = normalizeField(field,'target','geoSubset')[0];
+    var positionsField = normalizeField(field,'target','geoSubset')[1];
+    var shape = normalizeField(field,'shape','geoSubset')[0];
+    var x = normalizeField(field,'x','geoSubset')[0];
+    var y = normalizeField(field,'y','geoSubset')[0];
+    var width = normalizeField(field,'width','geoSubset')[0];
+    var height = normalizeField(field,'height','geoSubset')[0];
+
+    // normalizing will ensure we get an array for each, which may be empty
+    var eventsArray = normalizeDataItem(data,eventsField);
+    var positionsArray = normalizeDataItem(data,positionsField);
+
+    return(geoSubsetOP(eventsArray,positionsArray,shape,x,y,width,height));
+}
+
+//
+// _difference() - subtract one event array from another, or if more than 2 arguments are
+//      given, subtract all of the arguments from the first in order. See ac2.js
+//      for more information.
+//
+//        XML arguments for difference are:
+//          target[0] - the starting array to subtract from
+//          target[1...] - arrays to subtract
+//
+function calcMetaDataField_difference(data,params,field)
+{
+    var targets = normalizeField(field,'target','difference');
+
+    var arrays = [];
+    for(var i=0; i < targets.length; i++) {
+	arrays.push(normalizeDataItem(data,targets[i]));
+    }
+
+    return(differenceOP(...arrays));
+}
+
+//
+// _correlate() - compute the correlation of start-events to end-events,
+//      based upon "clusters" of events. This routine is coded to "favor"
+//      the end-events, in other words, a single start-event can have
+//      multiple end-events. See ac2.js for more information.
+//
+//        XML arguments for correlate are:
+//          target[0] - the start event array
+//          target[1] - the end event array
+//          target[2...] - all other start event arrays (or a subset of start events, either one)
+//
+function calcMetaDataField_correlate(data,params,field)
+{
+    var targets = normalizeField(field,'target','correlate');
+
+    var arrays = [];
+    for(var i=0; i < targets.length; i++) {
+	arrays.push(normalizeDataItem(data,targets[i]));
+    }
+
+    return(correlateOP(...arrays));
+}
+			       
+
 
 //
 // getMaxVal() - given an array of numerical values it will return the largest value
