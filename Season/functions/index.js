@@ -243,7 +243,9 @@ function fieldClone(field)
     var clone = Object.assign({},field);                // clone ALL object fields
 
     var listFields = ["perspective","target","start","end","targetVal",
-		      "multiplier","low","high" ];    // then replace arrays with clones
+		      "multiplier","low","high",
+		      "shape","x","y","width","height",             // fields added for geoSubset
+		     ];    // then replace arrays with clones
 
     listFields.forEach((listField) => {
 	if(clone.hasOwnProperty(listField)) {
@@ -295,7 +297,9 @@ function metaFieldData(xmlObj)
 	});
 
 	var listFields = [ "perspective","target","start","end","targetVal",
-			   "multiplier","low","high" ];
+			   "multiplier","low","high",
+			   "shape","x","y","width","height",             // fields added for geoSubset
+			 ];
 	
 	listFields.forEach(function(field) {
 	    if(incomingFieldObj.hasOwnProperty(field)) {
