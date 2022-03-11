@@ -66,6 +66,11 @@ function geoSubset(eventArray,positionArray,shape,x,y,w,h)
     if(w === undefined) { w = 100; }
     if(h === undefined) { h = 100; }
 
+    x = Number(x);
+    y = Number(y);
+    w = Number(w);
+    h = Number(h);
+
     var outArray = [];
 
     var rx, ry;
@@ -90,8 +95,8 @@ function geoSubset(eventArray,positionArray,shape,x,y,w,h)
     }
 
     for(var i=0; i < eventArray.length; i++) {
-	var eventX = positionArray[i].x;
-	var eventY = positionArray[i].y;
+	var eventX = Number(positionArray[i].x);
+	var eventY = Number(positionArray[i].y);
 	
 	switch(shape) {
 
@@ -252,11 +257,11 @@ function correlate(startEvents,endEvents)    // OTHER ARGUMENTS ARE POSSIBLE
 	    continue;
 	}
 
-	var clusterStart = startEvents[i];
+	var clusterStart = Number(startEvents[i]);
 	var clusterEnd = null;                    // null means "to the end"
 
-	for(var j=0; allStartEvents[j] > clusterStart; j++ ) {
-	    clusterEnd = allStartEvents[j];
+	for(var j=0; Number(allStartEvents[j]) > clusterStart; j++ ) {
+	    clusterEnd = Number(allStartEvents[j]);
 	}
 
 	// now we have the start of the cluster, and either the end of the cluster
@@ -264,8 +269,9 @@ function correlate(startEvents,endEvents)    // OTHER ARGUMENTS ARE POSSIBLE
 	//   get the endEvents within that cluster.
 
 	for(var j=0; j < endEvents.length; j++) {
-	    if(endEvents[j] >= clusterStart && (clusterEnd === null || endEvents[j] < clusterEnd)) {
-		outEvents.push(endEvents[j]);
+	    var endEvent = Number(endEvents[j]);
+	    if(endEvent >= clusterStart && (clusterEnd === null || endEvent < clusterEnd)) {
+		outEvents.push(endEvent);
 	    }
 	}
     }
