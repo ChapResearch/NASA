@@ -18,21 +18,21 @@ div.numSpinner_field {
 div.numSpinner_minus {
     color: white;
     background-color: red;
-    width: 40px;
+    width: calc(29% - 4px);
     cursor: pointer;
 }
 
 div.numSpinner_value {
     color: black;
     background-color: white;
-    width: calc(100% - 88px);
+    width: 42%;
     border-right: 0px;
     border-left: 0px;
 }
 div.numSpinner_plus {
     color: white;
     background-color: green;
-    width: 40px;
+    width: calc(29% - 4px);
     cursor: pointer;
 }
 

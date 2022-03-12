@@ -103,6 +103,7 @@ div.NASA-field-textInput form{
 body {
   background: #e8ebee;
   font-family: "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
+  overscroll-behavior-y: contain;
 }
 
 button {
@@ -111,6 +112,7 @@ button {
     height: 50;
     color: white;
     border-radius: 10%;
+    font-size: 18px;
 }
 
 button:active {

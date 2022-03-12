@@ -334,6 +334,10 @@ function generateIntChoiceField(layoutField, elementField)
     var output = "";
     var name = layoutField.find('name').text();
     var label = elementField.find('label').text();
+    var width = 150;
+    if(layoutField.find('width')){
+	width = layoutField.find('width').text();
+    }
 
     // allow the layout label to override the data label
     var layoutLabel = layoutField.find("label");
@@ -353,7 +357,7 @@ function generateIntChoiceField(layoutField, elementField)
     output += '<div>';    
     output += label;
     output += '</div>';
-    output += '<div class="numSpinner">';    
+    output += '<div class="numSpinner" style="width:' + width + 'px">';    
     output += '<input type="number" name="' + name + '" step="1" ';
     if(min.length) {
 	output += 'min="' + min.text() + '" ';
