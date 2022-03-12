@@ -997,44 +997,13 @@ function calcMetaDataField_containsHowMany(data,params,field)
 }
 
 //
-// percent100() - this function essentially divides one value by another then multiplies
+// divPercent() - this function essentially divides one value by another then multiplies
 //                the result by 100 to make it appear as a percent
 //
 function calcMetaDataField_divPercent(data, params, field)
 {
-    if(field.target.length == 0){
-	console.log("no fields were given to multiply by");
-	return(0);
-    }
-    
-    // grab the first element (because i could set this to 1 or 0, but then either
-    // the product would always be 0, or a return of 1 would come back on an unseccessful multiplication)
-    var dividend = normalizeDataItem(data,field.target[0]);
-
-    // now we need to check if the dividend we start with is an array with a length greater than 1, we will also do this in the loop
-    if(dividend.length > 1){
-	console.log("Cannot multiply by an array (this is likely a list of events)");
-	return null;
-    }
-    
-    var nextNum;
-
-    // for each target multiply the current dividend by the next target field
-    for(var i = 1; i < field.target.length; i++){
-	nextNum = normalizeDataItem(data,field.target[i]);
-	// if our next num is an array with length greater than 1 we can't multiply, return null
-	if(nextNum.length > 1){
-	    console.log("Cannot multiply by an array (this is likely a list of events)");
-	    return null;
-	}
-	dividend = dividend * parseFloat(nextNum[0]);    // ensure that we're working with a number
-    }
-    
-    return(dividend*100);    
+    return(calcMetaDataField_divide(data, params, field) * 100); 
 }
-
-
-
 
 
 
@@ -1175,20 +1144,22 @@ function calcMetaDataField_lastValueArray(data,params,field,strict)
 {
     
     var targets = field.target;          // these are always arrays coming in
+    var values = field.value;
     
     if (!Array.isArray(targets)) {
 	targets = [targets];
     }
 
     var max = -1;
-    var maxName = null;
+    var maxVal = null;
     for(var i = 0; i < targets.length; i++){
 	var target = targets[i];
+	var value = values[i];
 	if(data.hasOwnProperty(target)) {
 	    var m = getMaxVal(data[target]);
 	    if(m > max){
 		max = m;
-		maxName = target;
+		maxVal = value;
 	    }
 	}
     }
